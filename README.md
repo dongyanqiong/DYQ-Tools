@@ -1,16 +1,16 @@
 # DYQ-Tools
 自己编写的实用小工具。
-##tdit
+## tdit
 巡检脚本
 
-##tdmanager
+## tdmanager
 python编写的集群管理工具。
 
-##econvert.sh
+## econvert.sh
 错误代码转换
 
-##ipconvert.sh
+## ipconvert.sh
 IP地址转换
 
-##vcalc.sh
+## vcalc.sh
 统计vnode在不同节点的分布.
