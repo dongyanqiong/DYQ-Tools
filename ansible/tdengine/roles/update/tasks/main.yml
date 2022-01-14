@@ -1,0 +1,16 @@
+- name: stop taosd
+  service: name=taosd enabled=no state=stopped
+- name: uinstall taosd
+  shell: rmtaos
+- name: cpfile
+  copy: src={{pkg}} dest=/tmp
+- name: uzip
+  unarchive: src=/tmp/{{pkg}} dest=/tmp copy=no
+#- name: cpsh
+#  copy: src=ucheck.sh dest=/tmp
+- name: install
+  shell: cd /tmp/{{dir}}/; bash install.sh -e no
+- name: start
+  service: name=taosd enabled=yes state=started 
+#- name: check
+#  shell: bash /tmp/ucheck.sh

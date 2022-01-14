@@ -1,0 +1,7 @@
+- name: TDengine
+  hosts: jd
+  vars:
+     pkg: "TDengine-enterprise-server-2.2.2.5-Linux-x64.tar.gz"
+     dir: "TDengine-enterprise-server-2.2.2.5"
+  roles:
+    - install

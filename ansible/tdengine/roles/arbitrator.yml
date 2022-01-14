@@ -1,0 +1,4 @@
+- name: Arbitrator
+  hosts: arb
+  roles:
+    - arbitrator

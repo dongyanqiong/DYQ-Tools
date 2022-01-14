@@ -1,0 +1,8 @@
+- name: uinstall taosd
+  shell: rmtaos
+- name: rmdata
+  shell: rm -rf /var/lib/taos/*
+- name: rmlog
+  shell: rm -rf /var/log/taos/*
+- name: rmcfg
+  shell: rm -rf /etc/taos

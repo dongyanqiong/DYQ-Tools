@@ -1,0 +1,8 @@
+- name: Preset
+  hosts: jd 
+  ignore_errors: yes
+  vars:
+    coredir: "/var"
+    cluster: "atest"
+  roles:
+    - preset

@@ -1,0 +1,46 @@
+- name: disable selinux
+  shell: sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config 
+- name: setenforce
+  shell: setenforce 0
+- name: stop firewall
+  service: name=firewalld enabled=no state=stopped
+- name: set timezone
+  shell: cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+- name: unlimited
+  shell: echo 'ulimit -c unlimited' >>/etc/profile
+- name: setcorepath
+  shell: echo "kernel.core_pattern={{coredir}}/core-%e-%p" >>/etc/sysctl.conf
+- name: enable coreset
+  shell: sysctl -p
+- name: cp hosts
+  copy: src={{cluster}}/hosts dest=/etc/
+- name: curl install
+  yum: name=curl state=present
+- name: gdb install
+  yum: name=gdb state=present
+- name: tmux install
+  yum: name=tmux state=present
+- name: fio install
+  yum: name=fio state=present
+- name: iperf3 install
+  yum: name=iperf3 state=present
+- name: iosta tinstall
+  yum: name=sysstat state=present
+- name: netstat install
+  yum: name=net-tools state=present
+- name: kernel-header install
+  yum: name=kernel-headers state=present
+- name: copy bpftools-repo
+  copy: src=bpftools.repo  dest=/etc/yum.repos.d/
+- name: bpftools install
+  yum: name=bpftrace state=present 
+- name: installntpdate
+  yum: name=ntpdate state=present
+- name: setdate
+  shell: ntpdate cn.ntp.org.cn
+- name: ntpinstall
+  yum: name=ntp state=present
+- name: start ntp
+  service: name=ntpd enabled=yes state=started
+- name: cp Check
+  copy: src=preCheck.sh dest=/tmp/

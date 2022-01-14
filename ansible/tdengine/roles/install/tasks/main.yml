@@ -1,0 +1,10 @@
+- name: cpfile
+  copy: src={{pkg}} dest=/tmp
+- name: uzip
+  unarchive: src=/tmp/{{pkg}} dest=/tmp copy=no
+- name: install
+  shell: cd /tmp/{{dir}}/; bash install.sh -e no
+- name: config td
+  copy: src=taos.cfg dest=/etc/taos
+- name: start
+  service: name=taosd enabled=yes state=started 
