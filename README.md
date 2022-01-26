@@ -10,6 +10,10 @@ Ansible自动部署
 ## tdmanager
 python编写的集群管理工具。
 
+## preCheck.sh
+安装环境预检查 
+使用方法：./preCheck.sh
+
 ## econvert.sh
 错误代码转换
 使用方法：
