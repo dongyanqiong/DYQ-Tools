@@ -92,7 +92,7 @@ fi
 
 
 
-    for i in tmux gdb fio iperf sysstat net-tools
+    for i in tmux gdb fio iperf sysstat net-tools jannsson snappy
     do 
         grep $i $PACKETFILE 1>/dev/null 2>/dev/null 
         if [ $? -eq 0 ]
