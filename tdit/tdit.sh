@@ -764,6 +764,14 @@ cd $ldr
 
 echo ""
 echo ""
+echo "The config is as follow, you can change by edit the shell. "
+echo "cfg=$CFGFILE"
+echo "Username=$user"
+echo "Password=$pass"
+echo ""
+echo "Press Enter for continue, Crtl+C Abort"
+read nothing
+
 echo -n "Please wait......................"
 mcheck >>mlog.txt
 echo -n "....."
