@@ -494,6 +494,89 @@ fi
 
 }
 
+ dblog2()
+{
+    CFGFILE=/etc/taos/taos.cfg
+    dd=$(date +%Y%m%d)
+    taoscfg=$(echo "taoscfg"$dd".txt")
+
+
+    echo ""
+    echo "###### TDengine进程 ##########"
+    ps aux | grep -w taosd | grep -v grep
+
+    echo ""
+    echo "###### Cluster ID ##########"
+    grep -v '^#' $CFGFILE| grep -iw datadir  1>/dev/null 2>/dev/null
+    if [ $? -eq 0 ]
+    then
+        datad=$(grep -v '^#' $CFGFILE| grep -iw datadir|awk  '{print $2}')
+    else
+        datad=/var/lib/taos
+    fi
+    clid=$(grep clusterId $datad/dnode/dnodeCfg.json  | awk '{print $2}'|sed 's/"//g')
+    echo "ClusterId:$clid"
+
+
+
+    echo ""
+    echo "###### TDengine近3次启动时间 ##########"
+
+    grep -v '^#' $CFGFILE| grep -iw logdir  1>/dev/null 2>/dev/null
+    if [ $? -eq 0 ]
+    then
+        logd=$(grep -v '^#' $CFGFILE| grep -iw logdir|awk  '{print $2}')
+    else
+        logd=/var/log/taos
+    fi
+
+
+    grep TDengine $logd/taosinfo.* |grep -v 'shut down' |awk -F ':' '{for(i=1;i<=NF;++i) printf $i ":";printf "\n"}' |sort  |tail -n 6
+
+
+    echo ""
+    echo "###### Data 目录 ##########"
+
+    grep -v '^#' $CFGFILE | grep -i datadir 1>/dev/null 2>/dev/null
+    if [ $? -eq 0 ]
+    then
+        for i in $(grep -v '^#' $CFGFILE | grep -iw datadir | awk '{print $2}')
+        do
+            du -sh $i/*
+            echo ""
+            echo "______________________________________________"
+            echo ""
+            ls -lh $i/vnode*/*/*/*
+        done
+        else
+        du -sh /var/lib/taos/*
+            echo ""
+            echo "______________________________________________"
+            echo ""
+        ls -lh /var/lib/taos/vnode*/*/*/*
+
+    fi
+
+    echo ""
+    echo "###### Log 目录 ##########"
+
+
+    grep -v '^#' $CFGFILE | grep -i logdir  1>/dev/null 2>/dev/null
+    if [ $? -eq 0 ]
+    then
+        for i in $(grep -v '^#' $CFGFILE | grep -iw logdir  | awk '{print $2}')
+        do
+            du -sh $i
+            echo ""
+            du -sh $i/*
+        done
+        else
+            du -sh /var/log/taos
+            echo ""
+            du -sh /var/log/taos/*
+    fi 
+
+}
 
 report()
 {
@@ -762,6 +845,7 @@ fi
 mkdir $ldr
 cd $ldr
 
+nodeinfo=$1
 echo ""
 echo ""
 echo "The config is as follow, you can change by edit the shell. "
@@ -777,7 +861,17 @@ mcheck >>mlog.txt
 echo -n "....."
 oslog >>oslog.txt
 echo -n "....."
-dblog >>dblog.txt
+if [ $nodeinfo ]
+then
+    if [ $nodeinfo = 'dnode' ]
+    then
+        dblog2 >>dblog.txt
+    else
+        dblog >>dblog.txt
+    fi
+else
+    dblog >>dblog.txt
+fi
 echo -n "....."
 echo "done"
 echo ""
