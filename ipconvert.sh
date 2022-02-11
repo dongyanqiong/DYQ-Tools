@@ -2,18 +2,24 @@
 tr=$(echo $1| sed 's/0x//g')
 ll=$(echo $tr|wc -L)
 
-if [ $ll -gt 8 ]
-then
-	echo "invalid input "
-	exit
-fi
 
-if [ $ll -eq 7 ]
-then
-	str=$(echo "0$tr")
-else
-	str=$tr
-fi
+case $ll in 
+	[1-6]) 
+		echo ""invalid input ""
+		exit
+		;;
+	7)
+		str=$(echo "0$tr")
+		;;
+	8)
+		str=$tr
+		;;
+	*)
+		echo ""invalid input ""
+		exit
+		;;
+esac
+
 
 str1=$(echo $str|cut -c 1-2)
 str2=$(echo $str|cut -c 3-4)
