@@ -1,6 +1,13 @@
 #!/bin/sh
 tr=$(echo $1| sed 's/0x//g')
 ll=$(echo $tr|wc -L)
+
+if [ $ll -gt 8 ]
+then
+	echo "invalid input "
+	exit
+fi
+
 if [ $ll -eq 7 ]
 then
 	str=$(echo "0$tr")
