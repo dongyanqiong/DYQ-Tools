@@ -25,7 +25,33 @@ echo "Type any key to Continue, or Ctrl+C exit"
 read xxxx
 
 ###get table struc
-csql=$(taos -h $source_ip -u $source_user -p$source_pass -s "show create table $source_db.$source_table\G;| grep 'Create Table:'| awk -F ':' '{print $NF}'" )
+csql=$(taos -h $source_ip -u $source_user -p$source_pass -s "show create table $source_db.$source_table\G;"| grep 'Create Table:'| awk -F '(' '{print $NF ";"}' )
+csql=$(echo "create table $dest_db.$dest_table ($csql")
 
-echo $csql
+taos -h $dest_ip -u $dest_user -p$dest_pass -s "$csql" | grep 'Query OK' 1>/dev/null 2>/dev/null
+rt=$?
+if [ $rt -ne 0 ]
+then
+	echo ""
+	echo "Cannot Create table $dest_db.$dest_table at $dest_ip"
+	exit;
+fi
+
+datafile=$(echo "$tmpdir/$source_table".csv)
+
+echo ""
+echo "Begine dump out data........"
+taos -h $source_ip -u $source_user -p$source_pass -s "select * from $source_db.$source_table >> $datafile;" 1>/dev/null 
+echo "Dump out done."
+
+sed -i '1d' $datafile
+echo ""
+echo "Begin dump in data......"
+taos -h $dest_ip -u $dest_user -p$dest_pass -s "insert into $dest_db.$dest_table file '$datafile';" 1>/dev/null 
+
+rm -f $datafile
+
+echo "Dump in over."
+echo ""
+
 
