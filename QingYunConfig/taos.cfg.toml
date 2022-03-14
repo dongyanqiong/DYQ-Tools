@@ -1,0 +1,7 @@
+[template]
+src = "taos.cfg.tmpl"
+dest = "/etc/taos/taos.cfg.tmpl"
+keys = [
+  "/",
+]
+reload_cmd = "/etc/taos/pre.sh && /etc/taos/start.sh"

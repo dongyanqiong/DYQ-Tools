@@ -1,0 +1,22 @@
+
+{
+    "Name": "名称",
+    "Description": "描述",
+    "VxNet": "私有网络",
+    "Nodes": "节点",
+    "CPU": "CPU",
+    "Memory": "内存",
+    "Resource Type": "资源类型",
+    "Cluster-3":"3节点集群",
+    "Cluster-5":"5节点集群",
+    "Cluster-7":"7节点集群",
+    "The resource configuration of the service":"选择不同的节点数量的集群配置",
+    "The description of the application":"应用描述",
+    "The Cluster name.":"集群名称",
+    "CPUs of each node":"每个节点CPU数量。",
+    "Number of nodes for the cluster to create":"集群中节点数量。",
+    "Memory of each node (in MiB)":"每个节点内存大小(MB)。",
+    "The instance type for the cluster to run，such as high performance，high performance plus":"选择实例类型.",
+    "The volume type for each instance，such as high performance，high performance plus，high capacity":"选择磁盘类型.",
+    "The volume size for each instance":"每个节点磁盘大小(GB)。"
+}

@@ -1,0 +1,26 @@
+{
+    "name": {{cluster.name}},
+    "description": {{cluster.description}},
+    "vxnet": {{cluster.vxnet}},
+    "nodes": [{
+        "role": "role_name",
+        "container": {
+            "type": "kvm",
+            "zone": "pek3",
+            "image": "img-qgas7b7c"
+        },
+        "user_access":true,
+        "count": 1,
+        "volume": {
+            "size": {{cluster.role_name.volume_size}},
+            "mount_point": "/data",
+            "mount_options": "defaults,noatime,data=ordered",
+            "filesystem": "ext4",
+            "class": {{cluster.role_name.volume_class}}
+        },
+        "cpu": {{cluster.nodes.cpu}},
+        "memory": {{cluster.nodes.memory}},
+        "instance_class": {{cluster.nodes.instance_class}}
+    }],
+    "advanced_actions": ["change_vxnet", "associate_eip"]
+}

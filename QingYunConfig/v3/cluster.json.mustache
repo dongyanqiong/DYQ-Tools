@@ -1,0 +1,27 @@
+{
+    "name": {{cluster.name}},
+    "description": {{cluster.description}},
+    "vxnet": {{cluster.vxnet}},
+    "nodes": [{
+        "role": "role_name",
+        "container": {
+            "type": "kvm",
+            "image": "img-yhy22yic",
+            "zone": "pek3"
+        },       
+        "cpu": {{cluster.role_name.cpu}},
+        "memory": {{cluster.role_name.memory}},
+        "instance_class": {{cluster.role_name.instance_class}},
+        "count": {{cluster.role_name.count}},
+        "volume": {
+            "size": {{cluster.role_name.volume_size}},
+            "mount_point": "/data",
+            "mount_options": "defaults,data=ordered",
+            "filesystem": "ext4",
+            "class": {{cluster.role_name.volume_class}}
+        },
+        "user_access":true,
+        "agent_installed": true
+    }],
+    "advanced_actions": ["change_vxnet", "scale_horizontal"]
+}

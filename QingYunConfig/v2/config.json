@@ -1,0 +1,99 @@
+{
+    "type": "array",
+    "properties": [{
+        "key": "cluster",
+        "description": "cluster properties",
+        "type": "array",
+        "properties": [{
+            "key": "name",
+            "label": "Name",
+            "description": "",
+            "type": "string",
+            "default": "TDengine时序大数据处理引擎",
+            "required": "no"
+        }, {
+                "key": "resource_group",
+                "label": "Resource Configuration",
+                "description": "The resource configuration of the service",
+                "type": "string",
+                "customizable": true,
+                "default": "Standard",
+                "range": ["Standard", "Enterprise", "Enterprise Plus"]
+        }, {
+            "key": "description",
+            "label": "Description",
+            "description": "",
+            "type": "string",
+            "default": "",
+            "required": "no"
+        }, {
+            "key": "vxnet",
+            "label": "VxNet",
+            "description": "",
+            "type": "string",
+            "default": "",
+            "required": "yes"
+        }, {
+            "key": "nodes",
+            "label": "Nodes",
+            "description": "Node properties",
+            "type": "array",
+            "properties": [{
+                "key": "cpu",
+                "label": "CPU",
+                "description": "",
+                "type": "integer",
+                "default": 2,
+                "range": [
+                    2,
+                    4,
+                    8,
+                    16,
+                    32
+                ],
+                "required": "yes",
+                "resource_group": [2, 4, 16]
+            }, {
+                "key": "memory",
+                "label": "Memory",
+                "description": "",
+                "type": "integer",
+                "default": 4096,
+                "range": [
+                    4096,
+                    8192,
+                    16384,
+                    32768,
+                    65536
+                ],
+                "required": "yes"
+            }, {
+                "key": "volume_class",
+                "label": "Volume Class",
+                "description": "The volume type for each instance，such as high performance，high performance plus，high capacity",
+                "type": "integer",
+                "default": 100,
+                "range": [100, 200, 5],
+                "required": "yes"
+            }, {
+                "key": "volume_size",
+                "label": "Volume Size",
+                "description": "The volume size for each instance",
+                "type": "integer",
+                "default": 20,
+                "min": 20,
+                "max": 1000,
+                "step": 10,
+                "required": "yes"
+            }, {
+                "key": "instance_class",
+                "label": "Resource Type",
+                "description": "",
+                "type": "integer",
+                "default": 101,
+                "range": [101, 202],
+                "required": "yes"
+            }]
+        }]
+    }]
+}

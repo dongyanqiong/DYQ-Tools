@@ -1,0 +1,102 @@
+{
+    "type": "array",
+    "properties": [{
+        "key": "cluster",
+        "description": "cluster properties",
+        "type": "array",
+        "properties": [{
+            "key": "name",
+            "label": "Name",
+            "description": "The Cluster name.",
+            "type": "string",
+            "default": "",
+            "required": "yes"
+        }, {
+            "key": "resource_group",
+            "label": "Resource Configuration",
+            "description": "The resource configuration of the service",
+            "type": "string",
+            "customizable": true,
+            "default": "Cluster-3",
+            "range": ["Cluster-3", "Cluster-5", "Cluster-7"]
+        }, {
+            "key": "description",
+            "label": "Description",
+            "description": "The description of the application",
+            "type": "string",
+            "default": "",
+            "required": "no"
+        }, {
+            "key": "vxnet",
+            "label": "VxNet",
+            "description": "The vxnet that the application will join",
+            "type": "string",
+            "default": "",
+            "required": "yes"
+        }, {
+            "key": "role_name",
+            "description": "role-based node properties",
+            "label": "Role Name",
+            "type": "array",
+            "properties": [{
+                "key": "cpu",
+                "label": "CPU",
+                "description": "CPUs of each node",
+                "type": "integer",
+                "default": 2,
+                "range": [2, 4, 8, 16],
+                "required": "yes",
+                "resource_group": [2, 4, 16]
+            }, {
+                "key": "memory",
+                "label": "Memory",
+                "description": "Memory of each node (in MiB)",
+                "type": "integer",
+                "default": 4096,
+                "range": [4096, 8192, 16384, 32768, 49152],
+                "required": "yes",
+                "resource_group": [4096, 8192, 32768]
+            }, {
+                "key": "count",
+                "label": "Count",
+                "description": "Number of nodes for the cluster to create",
+                "type": "integer",
+                "default": 1,
+                "max": 100,
+                "min": 1,
+                "required": "yes",
+                "auto_scale_step": 2,
+                "resource_group": [3, 5, 7]
+            }, {
+                "key": "instance_class",
+                "label": "Instance Class",
+                "description": "The instance type for the cluster to run，such as high performance，high performance plus",
+                "type": "integer",
+                "default": 101,
+                "range": [101, 202],
+                "required": "yes",
+                "resource_group": [101, 202, 202]
+            }, {
+                "key": "volume_class",
+                "label": "Volume Class",
+                "description": "The volume type for each instance，such as high performance，high performance plus，high capacity",
+                "type": "integer",
+                "default": 100,
+                "range": [100, 200, 5],
+                "required": "yes",
+                "resource_group": [5, 200, 200]
+            }, {
+                "key": "volume_size",
+                "label": "Volume Size",
+                "description": "The volume size for each instance",
+                "type": "integer",
+                "default": 50,
+                "min": 50,
+                "step": 50,
+                "auto_scale_step": 50,
+                "required": "yes"
+            }]
+        }]
+    }]
+
+}
