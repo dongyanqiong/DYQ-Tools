@@ -90,7 +90,7 @@
                 "label": "Volume Size",
                 "description": "The volume size for each instance",
                 "type": "integer",
-                "default": 50,
+                "default": 500,
                 "min": 50,
                 "step": 50,
                 "auto_scale_step": 50,
