@@ -62,7 +62,7 @@
                 "description": "Number of nodes for the cluster to create",
                 "type": "integer",
                 "default": 1,
-                "max": 100,
+                "max": 10,
                 "min": 1,
                 "required": "yes",
                 "auto_scale_step": 2,
