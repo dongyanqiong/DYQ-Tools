@@ -82,13 +82,21 @@ fi
 
     PACKETFILE=/tmp/packfile.tmp
 
+    case $os in 
+    "CentOS")
+    rpm -qa >$PACKETFILE 
+    ;;
+    "Red")
+    rpm -qa >$PACKETFILE 
+    ;;
+    "Ubuntu")
+    dpkg -l >$PACKETFILE
+    ;;
+    *)
+    exit
+    ;;
+    esac
 
-    if [ $os = 'CentOS' ]
-    then
-        rpm -qa >$PACKETFILE 
-    else
-        dpkg -l >$PACKETFILE
-    fi
 
 
 
@@ -299,12 +307,20 @@ fi
     echo "###### 操作系统版本 ##########"
     os=$(cat /etc/os-release| grep PRETTY_NAME | awk '{print $1}'|awk -F '=' '{print $2}' | sed 's/"//g')
 
-    if [ $os = 'CentOS' ]
-    then
-        cat /etc/redhat-release 
-    else
-        cat /etc/issue
-    fi
+    case $os in 
+    "CentOS")
+    cat /etc/redhat-release 
+    ;;
+    "Red")
+    cat /etc/redhat-release 
+    ;;
+    "Ubuntu")
+    cat /etc/issue
+    ;;
+    *)
+    exit
+    ;;
+    esac
 
     echo ""
     echo "###### 系统启动时间 ##########"
