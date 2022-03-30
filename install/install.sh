@@ -1,4 +1,5 @@
 #!/bin/sh
+##./install.sh  TDengine-enterprise-server-2.4.0.14-Linux-x64.tar.gz /home/tdengine/test
 
 star=$1
 sdir=$2
@@ -6,8 +7,33 @@ udir=$(echo $star | awk -F '-' '{print $1"-"$2"-"$3"-"$4}')
 
 RED='\033[0;31m'
 GREEN='\033[1;32m'
-
 NC='\033[0m' 
+
+
+if [ $# -ne 2 ]
+then
+    echo "./install.sh  TDengine-enterprise-server-2.4.0.14-Linux-x64.tar.gz /home/tdengine/test"
+    exit
+fi
+
+if [ -ers $star ]
+then
+    echo "tar file: $star"
+else
+    echo "$star is not exists!!"
+    exit
+fi
+
+if [ -d $sdir ]
+then
+    echo "TDengine Dir: $sdir"
+else
+    echo "$sdir is not exists!!"
+    exit
+fi
+
+
+
 
 tar xzf $star
 tar xzf $udir/taos.tar.gz -C $sdir/
