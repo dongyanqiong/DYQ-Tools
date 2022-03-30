@@ -16,18 +16,22 @@ then
     exit
 fi
 
-if [ -ers $star ]
+if [ -e $star ]
 then
+    echo ""
     echo "tar file: $star"
 else
+    echo ""
     echo "$star is not exists!!"
     exit
 fi
 
 if [ -d $sdir ]
 then
+    echo ""
     echo "TDengine Dir: $sdir"
 else
+    echo ""
     echo "$sdir is not exists!!"
     exit
 fi
