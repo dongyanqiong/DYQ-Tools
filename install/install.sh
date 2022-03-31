@@ -39,10 +39,8 @@ fi
 
 
 
-tar xzf $star
-tar xzf $udir/taos.tar.gz -C $sdir/
-cp -r $udir/driver $sdir/
-cp -r $udir/examples $sdir/
+tar xzf $star -C $sdir/
+tar xzf $sdir/taos.tar.gz -C $sdir/ 
 
 ln -s $sdir/driver/libtaos.so.2.4.0.14 $sdir/driver/libtaos.so.1
 
