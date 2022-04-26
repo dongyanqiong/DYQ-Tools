@@ -33,3 +33,8 @@ IP地址转换
 用来查看mnode的wal日志
 使用方法：
 perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
+
+##wal_change
+用来将2.2的wal文件升到到2.4版本
+使用方法：
+./wal_change wal0
