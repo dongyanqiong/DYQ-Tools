@@ -295,6 +295,7 @@ fi
     taoscfg=$(echo "taoscfg"$dd".txt")
     ufile=$(echo "ulimit"$dd".txt")
     sysfile=$(echo "sysctl"$dd".txt")
+    dmesgfile=$(echo "dmesg"$dd".txt")
 
     echo ""
     echo "###### 机器码 ##########"
@@ -366,6 +367,8 @@ fi
     ulimit -a >$ufile
 
     cat /proc/`pidof taosd`/limits >>$ufile
+
+    dmesg -T >>$dmesgfile
 
 }
 
