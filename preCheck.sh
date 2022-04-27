@@ -13,7 +13,7 @@ else
 fi
 
 
-softlist=(curl gdb tmux fio iperf3 iostat netstat bpftrace )
+softlist=(curl gdb tmux fio iperf3 iostat netstat bpftrace)
 diskSize=10000000
 
 wab='\033[47;30m'
