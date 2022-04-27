@@ -5,7 +5,7 @@ os=$(cat /etc/os-release| grep PRETTY_NAME | awk '{print $1}'|awk -F '=' '{print
 if [ $os = 'Ubuntu' ]
 then
     echo "You should run this script by bash!"
-elif [ $os = 'CentOS' ] 
+elif [ $os = 'CentOS' -o $os = 'Red' ] 
 then
     echo ""
 else
@@ -23,7 +23,7 @@ NC='\033[0m'
 if [ $os = 'Ubuntu' ]
 then
     liblist=(libdl.so libm.so librt.so libpthread.so libc.so) 
-elif [ $os = 'CentOS' ] 
+elif [ $os = 'CentOS' -o $os = 'Red' ] 
 then
     liblist=(libdl.so libm.so librt.so libpthread.so libc.so libstdc++.so libgcc_s.so) 
 else
@@ -225,7 +225,7 @@ done
 
 echo
 echo -e "${wab} $(mprint 'OS Config Check')${NC}"
-if [ $os = 'CentOS' ]
+if [ $os = 'CentOS' -o $os = 'Red' ]
 then
     selinuxCheck
 fi
