@@ -156,7 +156,7 @@ limitCheck()
     grep -v '^#' /etc/systemd/system.conf| grep -E "NOFILE|NPROC"
     echo
     echo "##sysctl"
-    sysctl -a 2>/dev/null | grep -E "pid_max|nr_open"
+    sysctl -a 2>/dev/null | grep -E "pid_max|nr_open|wmem_max|rmem_max"
     echo
     echo "##limits.conf" 
     grep -v '^#'  /etc/security/limits.conf | grep -E "nofile|nproc"|sed 's/\t\t/\t/g'
