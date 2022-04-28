@@ -330,7 +330,7 @@ fi
     echo ""
     echo "###### 预安装包 ##########"
 
-    if [ $os = 'CentOS' ]
+    if [ $os = 'CentOS' -o $os = 'Red' ]
     then
         rpm -qa | grep -E "tmux|gdb|fio|iperf|sysstat|net-tools"
     else
