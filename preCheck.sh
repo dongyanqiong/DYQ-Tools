@@ -5,6 +5,8 @@ os=$(cat /etc/os-release| grep PRETTY_NAME | awk '{print $1}'|awk -F '=' '{print
 if [ $os = 'Ubuntu' ]
 then
     echo "You should run this script by bash!"
+    echo "/bin/bash preCheck.sh"
+    echo ""
 elif [ $os = 'CentOS' -o $os = 'Red' ] 
 then
     echo ""
@@ -213,6 +215,67 @@ diskCheck()
     done
 }
 
+sysCheck()
+{
+    echo
+    echo "OS Configs.............."
+    echo 
+    tmpfile=/tmp/sysctl$$
+    sysctl -a > $tmpfile 2>/dev/null
+    nr_hugepages=$(grep -w 'vm.nr_hugepages' $tmpfile |awk '{print $NF}')
+    if [ $nr_hugepages -eq 0 ]
+    then
+        mesg nr_hugepages OK
+    else
+        mesg nr_hugepages ERROR
+    fi
+
+    swappiness=$(grep -w 'vm.swappiness' $tmpfile |awk '{print $NF}')
+    if [ $swappiness -eq 0 ]
+    then
+        mesg swappiness ERROR
+    else
+        mesg swappiness OK
+    fi   
+
+    overcommit_memory=$(grep -w 'vm.overcommit_memory' $tmpfile |awk '{print $NF}')
+    if [ $overcommit_memory -eq 0 ]
+    then
+        mesg overcommit_memory OK
+    else
+        mesg overcommit_memory ERROR
+    fi 
+
+    overcommit_ratio=$(grep -w 'vm.overcommit_ratio' $tmpfile |awk '{print $NF}')
+    if [ $overcommit_ratio -eq 0 ]
+    then
+        mesg overcommit_ratio ERROR
+    else
+        mesg overcommit_ratio OK
+    fi 
+
+    dirty_background_ratio=$(grep -w 'vm.dirty_background_ratio' $tmpfile |awk '{print $NF}')
+    if [ $dirty_background_ratio -eq 0 ]
+    then
+        mesg dirty_background_ratio ERROR
+    else
+        mesg dirty_background_ratio OK
+    fi 
+
+    dirty_ratio=$(grep -w 'vm.dirty_ratio' $tmpfile |awk '{print $NF}')
+    if [ $dirty_ratio -eq 0 ]
+    then
+        mesg dirty_ratio ERROR
+    else
+        mesg dirty_ratio OK
+    fi 
+
+
+    rm -f $tmpfile
+}
+
+
+
 
 ###Main####
 #clear
@@ -247,7 +310,9 @@ diskCheck
 
 echo 
 echo -e "${wab} $(mprint 'Other Config Check')${NC}"
+sysCheck
 zoneCheck
 limitCheck
+
 
 pdesc 'END'
