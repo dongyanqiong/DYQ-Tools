@@ -34,7 +34,12 @@ IP地址转换
 使用方法：
 perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
 
-##wal_change
+## wal_change
 用来将2.2的wal文件升到到2.4版本
 使用方法：
 ./wal_change wal0
+
+## cprint.sh
+用来读取current文件
+使用方法：
+./cprint.sh current
