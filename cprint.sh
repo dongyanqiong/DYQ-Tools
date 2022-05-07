@@ -7,7 +7,7 @@ tfile=tfile$$.txt
 touch $dfile
 touch $tfile
 
-for i in $(grep ^dataDir $cfile |awk '{print $3}'|uniq)
+for i in $(grep ^dataDir $cfile |awk '{print $3}'|sort -n |uniq)
 do
 	l=1
 	grep ^dataDir $cfile|while read line 
@@ -37,16 +37,16 @@ then
 	jb=$(($((16#$jb))/2))
 	gz=$((($((16#$gz))/2)+1))
 	fpth=$(grep "$jb:$gz" $dfile |awk -F ':' '{print $NF}')
-	echo -e "$fpth:$df\n" >> $tfile
+	echo -e "\n$fpth:$df\n" >> $tfile
 fi
 
 done
 
-for d in $(grep '/' $tfile |awk -F ':' '{print $1}'|uniq)
+for d in $(grep '/' $tfile |awk -F ':' '{print $1}'|sort-n|uniq)
 do
 	echo $d
 	grep $d $tfile | awk -F '/' '{print "\t"$NF}'
-
+	echo ""
 done
 
 rm -f $file
