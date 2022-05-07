@@ -42,7 +42,7 @@ fi
 
 done
 
-for d in $(grep '/' $tfile |awk -F ':' '{print $1}'|sort-n|uniq)
+for d in $(grep '/' $tfile |awk -F ':' '{print $1}'|sort -n|uniq)
 do
 	echo $d
 	grep $d $tfile | awk -F '/' '{print "\t"$NF}'
