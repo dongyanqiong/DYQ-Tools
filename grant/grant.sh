@@ -18,4 +18,5 @@ do
 done
 
 #echo "#machineCode $mc"
-echo $mc|md5sum|awk '{print $1}'
+echo "$(date +%s) $et $mc " >> grantlog.log
+echo "$et$mc"|md5sum|awk '{print $1}'
