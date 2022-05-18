@@ -17,5 +17,5 @@ do
     esac
 done
 
-echo "#machineCode $mc"
-echo $mc|md5sum|awk '{print "ActiveCode "$1}'
+#echo "#machineCode $mc"
+echo $mc|md5sum|awk '{print $1}'
