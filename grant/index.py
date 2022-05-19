@@ -1,4 +1,5 @@
 
+from curses.panel import bottom_panel
 from logging import logMultiprocessing
 import subprocess
 import base64
@@ -19,15 +20,24 @@ def log_write(msg):
 
 ##将传递的SQL写入TDengine数据库
 def db_write(msg):
-    conn: taos.TaosConnection = taos.connect(host="localhost",
+    try:
+        conn: taos.TaosConnection = taos.connect(host="localhost",
                                          user="root",
                                          password="taosdata",
                                          database="grant_log",
                                          port=6030,
                                          config="/etc/taos",  
                                          timezone="Asia/Shanghai")  
-    conn.execute(msg)
-    conn.close()
+
+        affected_row: int = conn.execute(msg)
+        conn.close()
+        if affected_row == 1:
+            err = 0
+        else:
+            err = 1
+    except:
+        err = 1
+    return err
 
 ##根据华为云算法生成authToken，传递参数（需加密字符串，key）
 def tokenCheck(data, key):
@@ -81,12 +91,16 @@ def do_grant():
             if len(Code) == 24:
                 license = licenseGrant(expireTime,10000,Code)
                 sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+license+"\');"
-                db_write(str(sql))
-                rCode = '000000'
-                rMsg = 'Success.'
+                if db_write(str(sql)) == 0:
+                    rCode = '000000'
+                    rMsg = 'Success.'
+                else:
+                    rCode = '000005'
+                    rMsg = 'Write DB Failed.'
+                    license = '0000000000'
             else:
                 rCode = '000001'
-                rMsg = 'machineCode Error.'
+                rMsg = 'machineCode is invalid.'
                 license = '0000000000'
         else:
             rCode = '000002'
@@ -99,7 +113,9 @@ def do_grant():
     
     return template('{"resultCode":"{{rCode}}","resultMsg":"{{rMsg}}","license":"{{license}}"}', rCode=rCode, rMsg=rMsg,license=license)
 
-run(host='0.0.0.0', port=80,reloader=True)
+
+if __name__ == '__main__':
+    run(host='0.0.0.0', port=80,reloader=True)
     
 
 
