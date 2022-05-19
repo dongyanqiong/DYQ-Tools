@@ -9,7 +9,7 @@ import taos
 from crypt import methods
 from bottle import route, run, template, request
 
-
+##写入本地日志
 def log_write(msg):
     logfile = "./grant_info.log"
     file = open(logfile, 'a')
@@ -17,6 +17,7 @@ def log_write(msg):
     file.write('\r\n')
     file.close()
 
+##将传递的SQL写入TDengine数据库
 def db_write(msg):
     conn: taos.TaosConnection = taos.connect(host="localhost",
                                          user="root",
@@ -28,7 +29,7 @@ def db_write(msg):
     conn.execute(msg)
     conn.close()
 
-
+##根据华为云算法生成authToken，传递参数（需加密字符串，key）
 def tokenCheck(data, key):
     key = key.encode('utf-8')
     message = data.encode('utf-8')
@@ -36,8 +37,20 @@ def tokenCheck(data, key):
     sign = str(sign, 'utf-8')
     return sign
 
+##调用授权系统，生成授权码，要求传递(到期时间，测点数，机器码)
+def licenseGrant(etime,tser,mcode):
+    plicense = subprocess.Popen(['/bin/sh', './grant.sh', '-k', mcode],shell=False,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    lic = plicense.stdout.readline().strip()
+    return str(lic,'UTF-8')
+
+##监听grant，对传入变量进行处理
 @route('/grant/')
 def do_grant():
+    ##预设默认返回值
+    rCode = '000005'
+    rMsg = 'unknown Error.'
+    license = '0000000000'
+
     activity = request.GET.get('activity')
     businessId = request.GET.get('businessId')
     chargingMode = request.GET.get('chargingMode')
@@ -56,31 +69,35 @@ def do_grant():
     userName = request.GET.get('userName')
     authToken = request.GET.get('authToken')
 
-    longMsg = "activity="+activity+"&businessId="+businessId+"&chargingMode="+chargingMode+"&customerId="+customerId+"&customerName="+customerName+"&expireTime="+expireTime+"&orderId="+orderId+"&periodNumber="+periodNumber+"&periodType="+periodType+"&productId="+productId+"&provisionType="+provisionType+"&saasExtendParams="+saasExtendParams+"&testFlag="+testFlag+"&timeStamp="+timeStamp+"&userId="+userId+"&userName="+userName
-    key = "71d8a0d7-508d-4017-8563-60f9099eea71"+timeStamp
-    Ctoken = tokenCheck(longMsg,key)
-    if Ctoken == authToken:
-        mCode = eval(base64.b64decode(saasExtendParams, altchars=None, validate=False).decode())
-        Code = (mCode[0])['value'] 
-        ltime = int(time.time()*1000//1)
-        if len(Code) == 24:
-            plicense = subprocess.Popen(['/bin/sh', './grant.sh', '-k', Code],shell=False,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-            license = plicense.stdout.readline().strip()
-            sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+str(license,'UTF-8')+"\');"
-            db_write(str(sql))
-            rCode = '000000'
-            rMsg = 'Success.'
+    if activity == 'getLicense':
+        ##根据传入变量生成要加密的字符串
+        longMsg = "activity="+activity+"&businessId="+businessId+"&chargingMode="+chargingMode+"&customerId="+customerId+"&customerName="+customerName+"&expireTime="+expireTime+"&orderId="+orderId+"&periodNumber="+periodNumber+"&periodType="+periodType+"&productId="+productId+"&provisionType="+provisionType+"&saasExtendParams="+saasExtendParams+"&testFlag="+testFlag+"&timeStamp="+timeStamp+"&userId="+userId+"&userName="+userName
+        key = "71d8a0d7-508d-4017-8563-60f9099eea71"+timeStamp
+        Ctoken = tokenCheck(longMsg,key)
+
+        if Ctoken == authToken:
+            mCode = eval(base64.b64decode(saasExtendParams, altchars=None, validate=False).decode())
+            Code = (mCode[0])['value'] 
+            if len(Code) == 24:
+                license = licenseGrant(expireTime,10000,Code)
+                sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+license+"\');"
+                db_write(str(sql))
+                rCode = '000000'
+                rMsg = 'Success.'
+            else:
+                rCode = '000001'
+                rMsg = 'machineCode Error.'
+                license = '0000000000'
         else:
-            rCode = '000001'
-            rMsg = 'machineCode Error.'
+            rCode = '000002'
+            rMsg = 'authToken Error.'
             license = '0000000000'
     else:
         rCode = '000002'
-        rMsg = 'authToken Error.'
+        rMsg = 'Invalid Argument.'
         license = '0000000000'
     
     return template('{"resultCode":"{{rCode}}","resultMsg":"{{rMsg}}","license":"{{license}}"}', rCode=rCode, rMsg=rMsg,license=license)
-
 
 run(host='0.0.0.0', port=80,reloader=True)
     
