@@ -8,7 +8,7 @@ import hmac
 import time
 import taos
 from crypt import methods
-from bottle import route, run, template, request
+from bottle import route, run, template, request, response
 
 ##写入本地日志
 def log_write(msg):
@@ -60,6 +60,7 @@ def do_grant():
     rCode = '000005'
     rMsg = 'unknown Error.'
     license = '0000000000'
+    bkey = '71d8a0d7-508d-4017-8563-60f9099eea71'
 
     activity = request.GET.get('activity')
     businessId = request.GET.get('businessId')
@@ -79,10 +80,10 @@ def do_grant():
     userName = request.GET.get('userName')
     authToken = request.GET.get('authToken')
 
-    if activity == 'getLicense' and businessId in vars() and customerId in vars() and orderId in vars() and productId in vars():
+    if activity == 'getLicense':
         ##根据传入变量生成要加密的字符串
         longMsg = "activity="+activity+"&businessId="+businessId+"&chargingMode="+chargingMode+"&customerId="+customerId+"&customerName="+customerName+"&expireTime="+expireTime+"&orderId="+orderId+"&periodNumber="+periodNumber+"&periodType="+periodType+"&productId="+productId+"&provisionType="+provisionType+"&saasExtendParams="+saasExtendParams+"&testFlag="+testFlag+"&timeStamp="+timeStamp+"&userId="+userId+"&userName="+userName
-        key = "71d8a0d7-508d-4017-8563-60f9099eea71"+timeStamp
+        key = bkey+timeStamp
         Ctoken = tokenCheck(longMsg,key)
 
         if Ctoken == authToken:
@@ -111,7 +112,12 @@ def do_grant():
         rMsg = 'Invalid Argument.'
         license = '0000000000'
     
-    return template('{"resultCode":"{{rCode}}","resultMsg":"{{rMsg}}","license":"{{license}}"}', rCode=rCode, rMsg=rMsg,license=license)
+    returnMsg = '{"resultCode":"'+rCode+'","resultMsg":"'+rMsg+'","license":"'+license+'"}'
+    bsign = tokenCheck(returnMsg,bkey)
+    httpMsg='sign_type="HMAC-SHA256", signature= "'+bsign+'"'
+    response.add_header('Body-Sign', httpMsg)
+    return template(returnMsg)
+    #return template('{"resultCode":"{{rCode}}","resultMsg":"{{rMsg}}","license":"{{license}}"}', rCode=rCode, rMsg=rMsg,license=license)
 
 
 if __name__ == '__main__':
