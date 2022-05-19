@@ -79,7 +79,7 @@ def do_grant():
     userName = request.GET.get('userName')
     authToken = request.GET.get('authToken')
 
-    if activity == 'getLicense':
+    if activity == 'getLicense' and businessId in vars() and customerId in vars() and orderId in vars() and productId in vars():
         ##根据传入变量生成要加密的字符串
         longMsg = "activity="+activity+"&businessId="+businessId+"&chargingMode="+chargingMode+"&customerId="+customerId+"&customerName="+customerName+"&expireTime="+expireTime+"&orderId="+orderId+"&periodNumber="+periodNumber+"&periodType="+periodType+"&productId="+productId+"&provisionType="+provisionType+"&saasExtendParams="+saasExtendParams+"&testFlag="+testFlag+"&timeStamp="+timeStamp+"&userId="+userId+"&userName="+userName
         key = "71d8a0d7-508d-4017-8563-60f9099eea71"+timeStamp
