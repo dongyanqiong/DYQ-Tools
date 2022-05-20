@@ -1,4 +1,4 @@
-## 简介
+## 1.简介
 使用Python bottle 框架做的线上授权系统。
 
 支持通过数据库的产品信息库来判断产品ID的合法性；
@@ -8,24 +8,24 @@
 支持多个机器码的传入。
 
 
-### grant.sh
-模拟授权系统，根据提供的机器码返回一个MD5校验码
+### 1.1.grant.sh
+模拟授权系统，根据提供的机器码返回一个MD5校验码，
 并记录到grantlog.log文件中
 
-### index.py
-web接口，监听80端口，读取http请求中参数
+### 1.2.index.py
+web接口，监听80端口，读取http请求中参数。
 校验完成后调用grant 生成激活码，并返回给客户端。
 
-## 环境准备
-### 安装依赖包
+## 2.环境准备
+### 2.1.安装依赖包
 pip3 install bottle
 
 pip3 install taospy
 
-### 安装TDengine
+### 2.2.安装TDengine
 见官方文档
 
-### 配置数据库
+### 2.3.配置数据库
 创建数据库 grant_log
 
 CREATE DATABASE grant_log REPLICA 1 QUORUM 1 DAYS 10 KEEP 36500,36500,36500 CACHE 16 BLOCKS 6 MINROWS 100 MAXROWS 4096 WAL 2 FSYNC 3000 COMP 2 CACHELAST 1 PRECISION 'ms' UPDATE 0;
@@ -42,5 +42,5 @@ CREATE TABLE `grant_log.product_info` (`ts` TIMESTAMP,`productid` BINARY(200),`s
 
 insert into product_info values(now,'00301-666666-0--0',100000);
 
-## 使用方法
+## 3.使用方法
 python3 index.py
