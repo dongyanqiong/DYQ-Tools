@@ -39,6 +39,29 @@ def db_write(msg):
         err = 1
     return err
 
+##将从TDengine数据库查询测点数
+def db_select(msg):
+    try:
+        conn: taos.TaosConnection = taos.connect(host="localhost",
+                                         user="root",
+                                         password="taosdata",
+                                         database="grant_log",
+                                         port=6030,
+                                         config="/etc/taos",  
+                                         timezone="Asia/Shanghai")  
+
+        result: taos.TaosResult = conn.query(msg)
+        for row in result:
+            rmsg = row[0]
+        conn.close()
+    except:
+        rmsg = 0
+    return rmsg
+
+def timeConvert(otime):
+    rtime = otime[0:4]+"-"+otime[4:6]+"-"+otime[6:8]
+    return rtime
+
 ##根据华为云算法生成authToken，传递参数（需加密字符串，key）
 def tokenCheck(data, key):
     key = key.encode('utf-8')
@@ -87,10 +110,13 @@ def do_grant():
         Ctoken = tokenCheck(longMsg,key)
 
         if Ctoken == authToken:
+            psql = 'select last(snum) from grant_log.product_info where productid="'+productId+'";';
+            serNum = db_select(psql)
+            etime = timeConvert(str(20220531202610))
             mCode = eval(base64.b64decode(saasExtendParams, altchars=None, validate=False).decode())
             Code = (mCode[0])['value'] 
-            if len(Code) == 24:
-                license = licenseGrant(expireTime,10000,Code)
+            if len(Code) == 24 and serNum > 0:
+                license = licenseGrant(etime,serNum,Code)
                 sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+license+"\');"
                 if db_write(str(sql)) == 0:
                     rCode = '000000'
