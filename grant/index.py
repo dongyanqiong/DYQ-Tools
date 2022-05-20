@@ -6,6 +6,7 @@ import base64
 from hashlib import sha256
 import hmac
 import time
+import re
 import taos
 from crypt import methods
 from bottle import route, run, template, request, response
@@ -110,21 +111,27 @@ def do_grant():
         Ctoken = tokenCheck(longMsg,key)
 
         if Ctoken == authToken:
-            psql = 'select last(snum) from grant_log.product_info where productid="'+productId+'";';
+            psql = 'select last(snum) from grant_log.product_info where productid="'+productId+'";'
             serNum = db_select(psql)
             etime = timeConvert(str(20220531202610))
             mCode = eval(base64.b64decode(saasExtendParams, altchars=None, validate=False).decode())
             Code = (mCode[0])['value'] 
-            if len(Code) == 24 and serNum > 0:
-                license = licenseGrant(etime,serNum,Code)
-                sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+license+"\');"
-                if db_write(str(sql)) == 0:
-                    rCode = '000000'
-                    rMsg = 'Success.'
-                else:
-                    rCode = '000005'
-                    rMsg = 'Write DB Failed.'
-                    license = '0000000000'
+            
+            if len(Code)%24 == 0 and serNum > 0:
+                codeList = re.findall(r'.{24}',Code)
+                licList = []
+                for cCode in codeList:
+                    licList.append(licenseGrant(etime,serNum,cCode))
+                    sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+license+"\');"
+                    if db_write(str(sql)) == 0:
+                        rCode = '000000'
+                        rMsg = 'Success.'
+                    else:
+                        rCode = '000005'
+                        rMsg = 'Write DB Failed.'
+                        license = '0000000000'
+                license = ','.join(licList)
+
             else:
                 rCode = '000001'
                 rMsg = 'machineCode is invalid.'
