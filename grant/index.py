@@ -59,6 +59,7 @@ def db_select(msg):
         rmsg = 0
     return rmsg
 
+##对传入的时间格式进行转换
 def timeConvert(otime):
     rtime = otime[0:4]+"-"+otime[4:6]+"-"+otime[6:8]
     return rtime
@@ -109,20 +110,25 @@ def do_grant():
         longMsg = "activity="+activity+"&businessId="+businessId+"&chargingMode="+chargingMode+"&customerId="+customerId+"&customerName="+customerName+"&expireTime="+expireTime+"&orderId="+orderId+"&periodNumber="+periodNumber+"&periodType="+periodType+"&productId="+productId+"&provisionType="+provisionType+"&saasExtendParams="+saasExtendParams+"&testFlag="+testFlag+"&timeStamp="+timeStamp+"&userId="+userId+"&userName="+userName
         key = bkey+timeStamp
         Ctoken = tokenCheck(longMsg,key)
-
+        ##通过authToken校验，判断传递的参数是否合法
         if Ctoken == authToken:
             psql = 'select last(snum) from grant_log.product_info where productid="'+productId+'";'
             serNum = db_select(psql)
             etime = timeConvert(str(20220531202610))
             mCode = eval(base64.b64decode(saasExtendParams, altchars=None, validate=False).decode())
             Code = (mCode[0])['value'] 
-            
+            ##判断机器码长度和测点数是否合法
             if len(Code)%24 == 0 and serNum > 0:
+                ##将机器码安装24位长度分组
                 codeList = re.findall(r'.{24}',Code)
                 licList = []
                 for cCode in codeList:
-                    licList.append(licenseGrant(etime,serNum,cCode))
-                    sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+license+"\');"
+                    ##获取激活码
+                    cLicense = licenseGrant(etime,serNum,cCode)
+                    ##将激活码添加到激活码组
+                    licList.append(cLicense)
+                    ##将授权记录写入数据库
+                    sql = "insert into grant_log.url_log values(now,\'"+activity+"\',\'"+businessId+"\',\'"+chargingMode+"\',\'"+customerId+"\',\'"+customerName+"\',\'"+expireTime+"\',\'"+orderId+"\',\'"+periodNumber+"\',\'"+periodType+"\',\'"+productId+"\',\'"+provisionType+"\',\'"+saasExtendParams+"\',\'"+testFlag+"\',\'"+timeStamp+"\',\'"+userId+"\',\'"+userName+"\',\'"+authToken+"\',\'"+cLicense+"\');"
                     if db_write(str(sql)) == 0:
                         rCode = '000000'
                         rMsg = 'Success.'
@@ -144,11 +150,12 @@ def do_grant():
         rCode = '000002'
         rMsg = 'Invalid Argument.'
         license = '0000000000'
-    
+    ##http body签名
     returnMsg = '{"resultCode":"'+rCode+'","resultMsg":"'+rMsg+'","license":"'+license+'"}'
     bsign = tokenCheck(returnMsg,bkey)
     httpMsg='sign_type="HMAC-SHA256", signature= "'+bsign+'"'
     response.add_header('Body-Sign', httpMsg)
+    ##返回结果
     return template(returnMsg)
     #return template('{"resultCode":"{{rCode}}","resultMsg":"{{rMsg}}","license":"{{license}}"}', rCode=rCode, rMsg=rMsg,license=license)
 
