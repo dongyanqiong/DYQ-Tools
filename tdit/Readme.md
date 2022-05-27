@@ -9,6 +9,9 @@
 4.使用dnode参数，可以不检查数据库相关内容，用于集群非主节点环境检查。例：./tdit.sh dnode
 
 I 更新记录
+--20220527
+优化Markdown输出
+
 --20220127
 添加dnode参数，防止集群环境重复检查。 
 使用dnode参数，不会检查DB，Mnode，Dnode，Vnode等信息。

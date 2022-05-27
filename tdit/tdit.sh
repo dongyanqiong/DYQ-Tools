@@ -810,6 +810,7 @@ report()
         echo "</tr>"
         nu=$(($nu+1))
     done
+    echo "</table>"
     echo ""
 
 
@@ -834,6 +835,7 @@ report()
         echo "</tr>"
         nu=$(($nu+1))
     done
+    echo "</table>"
     echo ""
 
     echo "### 2.3 系统资源概况"
