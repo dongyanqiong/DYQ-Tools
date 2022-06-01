@@ -93,6 +93,8 @@ else
     exit
 fi
 
+echo " "
+echo "Check Cluster HA "
 tid=11
 for dnode in ${tdnodes[@]}
 do
