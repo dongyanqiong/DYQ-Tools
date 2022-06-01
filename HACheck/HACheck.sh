@@ -4,6 +4,10 @@
 tdnodes=(c0-11 c0-12)
 ###Tdengine root用户密码
 password=taosdata
+###初始数据副本数
+repl=2
+###初始数据表数量
+tnum=100
 
 export LANG=en_US.UTF-8
 wab='\033[47;30m'
@@ -84,7 +88,7 @@ pdesc 'BEGIN'
 
 ###Create demo data
 echo "Init Demo Data "
-taosBenchmark -uroot -p$password -d db01 -a ${#tdnodes[@]} -t 100 -n 100 -y 1>/dev/null 2>/dev/null 
+taosBenchmark -uroot -p$password -d db01 -a $repl -t $tnum -n 100 -y 1>/dev/null 2>/dev/null 
 if [ $? -eq 0 ]
 then
     mesg Init_Demo_Data OK

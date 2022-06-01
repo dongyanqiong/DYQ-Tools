@@ -14,6 +14,11 @@
 tdnodes=(c0-11 c0-12)
 #配置Tdengine root用户密码
 password=taosdata
+###初始数据副本数
+repl=2
+###初始数据表数量
+tnum=100
+
 ```
 ### 运行检查脚本
 ```shell
