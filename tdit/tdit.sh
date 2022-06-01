@@ -904,6 +904,6 @@ cd ..
 report $ldr > $ldr/$ldr.md
 
 cd ..
-tar czf $ldr.gz $ldr 
+tar czf $ldr.tar.gz $ldr 
 
 rm -rf $ldr
