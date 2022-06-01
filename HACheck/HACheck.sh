@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#---------------------------------
 ###配置节点FQDN
 tdnodes=(c0-11 c0-12)
 ###Tdengine root用户密码
@@ -8,6 +8,7 @@ password=taosdata
 repl=2
 ###初始数据表数量
 tnum=100
+#---------------------------------
 
 export LANG=en_US.UTF-8
 wab='\033[47;30m'
