@@ -1,13 +1,13 @@
 #!/bin/bash
+
+###配置节点FQDN
+tdnodes=(c0-11 c0-12)
+###Tdengine root用户密码
+password=taosdata
+
 export LANG=en_US.UTF-8
 wab='\033[47;30m'
 NC='\033[0m'
-
-###配置节点FQDN
-tdnodes=(test1 )
-
-###root用户密码
-password=taosdata
 
 pdesc()
 {
@@ -15,6 +15,18 @@ pdesc()
     echo "----------------------$1---------------------"
     echo
 
+}
+
+mprint()
+{
+
+    strN=$1
+    strLen=$((50-$(echo $strN|wc -L)))
+    echo -n  "$strN "
+    for ((ll=1;ll<$strLen;ll++))
+    do
+        echo -n  "."
+    done
 }
 
 mesg()
@@ -37,7 +49,6 @@ mesg()
     esac
 }
 
-
 sshcheck()
 {
     node=$1
@@ -49,7 +60,6 @@ sshcheck()
         exit
     fi
 }
-
 
 
 os=$(cat /etc/os-release| grep PRETTY_NAME | awk '{print $1}'|awk -F '=' '{print $2}' | sed 's/"//g')
@@ -73,7 +83,8 @@ done
 pdesc 'BEGIN'
 
 ###Create demo data
-taosBenchmark -d db01 -t 4000 -n 100 1>/dev/null 2>/dev/null 
+echo "Init Demo Data "
+taosBenchmark -uroot -p$password -d db01 -a ${#tdnodes[@]} -t 100 -n 100 -y 1>/dev/null 2>/dev/null 
 if [ $? -eq 0 ]
 then
     mesg Init_Demo_Data OK
@@ -82,17 +93,54 @@ else
     exit
 fi
 
+tid=11
 for dnode in ${tdnodes[@]}
 do
-    #ssh $dnode  systemctl stop taosd
-    sleep 5
-    taos -uroot -p$password -s "show dnodes;" | grep offline 1>/dev/null 2>/dev/null 
+    tbname=$(echo "db01.test_"$tid)
+    ssh $dnode  "systemctl stop taosd"  1>/dev/null 2>/dev/null
+    sleep 15
+    taos -uroot -p$password -s "show dnodes\G;" | grep status|grep offline 1>/dev/null 2>/dev/null 
     if [ $? -ne 0 ]
     then
+        mesg "$dnode:Stoped" ERROR 
         exit
     fi
-
-
+    qcheck=$(taos -uroot -p$password -s "select count(*) as sum from db01.d11\G;" | grep 'sum:' |awk '{print $2}')
+    if [ $qcheck -eq 100 ]
+    then
+        taos -uroot -p$password -s "create table $tbname (ts timestamp,v1 int);" 1>/dev/null 2>/dev/null
+        taos -uroot -p$password -s "insert into $tbname values(1643811742000,2222);" 1>/dev/null 2>/dev/null 
+        icheck=$(taos -uroot -p$password -s "select v1 from $tbname where ts=1643811742000 \G;"| grep 'v1:'|awk '{print $2}')
+        if [ $icheck -eq 2222 ]
+        then
+            mesg "$dnode:HACheck" OK
+        else
+            mesg "$dnode:Insert" ERROR
+            exit
+        fi
+    else
+        mesg "$dnode:Query" ERROR
+        exit
+    fi
+    ssh $dnode  "systemctl start taosd"  1>/dev/null 2>/dev/null
+    st=0
+    while true
+    do
+        st=$(($st+1))
+        taos -uroot -p$password -s "show dnodes\G;" | grep status|grep offline 1>/dev/null 2>/dev/null
+        if [ $? -ne 0 ]
+        then
+            break
+        fi
+        sleep 5
+        if [ $st -eq 10 ]
+        then
+            mesg "$dnode:Start" ERROR
+            exit
+        fi
+    done
+    tid=$(($tid+100))
 done
+mesg HACheck OK
 
 pdesc 'END'
