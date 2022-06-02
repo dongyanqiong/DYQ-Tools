@@ -101,7 +101,7 @@ else
 fi
 
 echo " "
-echo "Check Cluster HA "
+echo "Cluster HA Test"
 tid=11
 for dnode in ${tdnodes[@]}
 do
@@ -152,5 +152,8 @@ do
 done
 echo ""
 mesg HACheck OK
+echo ""
+echo "Performance Test"
+tail -5 output.txt |grep -v '^$'
 
 pdesc 'END'
