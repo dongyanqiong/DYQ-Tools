@@ -154,6 +154,7 @@ echo ""
 mesg HACheck OK
 echo ""
 echo "Performance Test"
-tail -5 output.txt |grep -v '^$'
+echo ""
+echo -e "\033[1;32m $(tail -5 output.txt |grep -v '^$') \033[0m"
 
 pdesc 'END'
