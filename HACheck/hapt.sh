@@ -100,7 +100,7 @@ else
     exit
 fi
 
-echo -e "\033[1;32m $(tail -5 output.txt |grep -v '^$') \033[0m"
+echo -e "\033[1;32m \n$(tail -5 output.txt |grep -v '^$') \033[0m"
 echo " "
 echo "Cluster HA Test"
 tid=11
