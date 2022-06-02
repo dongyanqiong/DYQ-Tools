@@ -1,13 +1,13 @@
 #!/bin/bash
 #---------------------------------
 ###配置节点FQDN
-tdnodes=(c0-11 c0-12)
+tdnodes=(c0-11 c0-12 c0-13)
 ###Tdengine root用户密码
 password=taosdata
 ###初始数据副本数
-repl=2
+repl=23
 ###初始数据表数量
-tnum=100
+tnum=10000
 #---------------------------------
 
 export LANG=en_US.UTF-8
@@ -148,6 +148,7 @@ do
     done
     tid=$(($tid+100))
 done
+echo ""
 mesg HACheck OK
 
 pdesc 'END'
