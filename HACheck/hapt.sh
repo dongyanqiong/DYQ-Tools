@@ -90,7 +90,7 @@ done
 pdesc 'BEGIN'
 
 ###Create demo data
-echo "Init Demo Data "
+echo "Performance Test "
 taosBenchmark -uroot -p$password -d db01 -a $repl -t $tnum -n $rnum -y 1>/dev/null 2>/dev/null 
 if [ $? -eq 0 ]
 then
@@ -100,6 +100,7 @@ else
     exit
 fi
 
+echo -e "\033[1;32m $(tail -5 output.txt |grep -v '^$') \033[0m"
 echo " "
 echo "Cluster HA Test"
 tid=11
@@ -152,9 +153,6 @@ do
 done
 echo ""
 mesg HACheck OK
-echo ""
-echo "Performance Test"
-echo ""
-echo -e "\033[1;32m $(tail -5 output.txt |grep -v '^$') \033[0m"
+
 
 pdesc 'END'
