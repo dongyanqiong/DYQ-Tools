@@ -8,6 +8,8 @@ password=taosdata
 repl=3
 ###初始数据表数量
 tnum=10000
+###初始数据单表记录数
+rnum=100
 #---------------------------------
 
 export LANG=en_US.UTF-8
@@ -89,7 +91,7 @@ pdesc 'BEGIN'
 
 ###Create demo data
 echo "Init Demo Data "
-taosBenchmark -uroot -p$password -d db01 -a $repl -t $tnum -n 100 -y 1>/dev/null 2>/dev/null 
+taosBenchmark -uroot -p$password -d db01 -a $repl -t $tnum -n $rnum -y 1>/dev/null 2>/dev/null 
 if [ $? -eq 0 ]
 then
     mesg Init_Demo_Data OK
@@ -113,7 +115,7 @@ do
         exit
     fi
     qcheck=$(taos -uroot -p$password -s "select count(*) as sum from db01.d11\G;" | grep 'sum:' |awk '{print $2}')
-    if [ $qcheck -eq 100 ]
+    if [ $qcheck -eq $rnum ]
     then
         taos -uroot -p$password -s "create table $tbname (ts timestamp,v1 int);" 1>/dev/null 2>/dev/null
         taos -uroot -p$password -s "insert into $tbname values(1643811742000,2222);" 1>/dev/null 2>/dev/null 
