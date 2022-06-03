@@ -153,6 +153,7 @@ do
         fi
     done
     tid=$(($tid+100))
+    echo ""
 done
 echo ""
 mesg HACheck OK

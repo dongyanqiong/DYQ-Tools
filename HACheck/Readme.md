@@ -18,6 +18,8 @@ password=taosdata
 repl=2
 ###初始数据表数量
 tnum=100
+###初始数据单表记录数
+rnum=100
 
 ```
 ### 运行检查脚本
