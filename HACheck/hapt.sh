@@ -114,6 +114,8 @@ do
     then
         mesg "$dnode:Stoped" ERROR 
         exit
+    else
+        mesg "$dnode:Stoped" OK
     fi
     qcheck=$(taos -uroot -p$password -s "select count(*) as sum from db01.d11\G;" | grep 'sum:' |awk '{print $2}')
     if [ $qcheck -eq $rnum ]
@@ -140,6 +142,7 @@ do
         taos -uroot -p$password -s "show dnodes\G;" | grep status|grep offline 1>/dev/null 2>/dev/null
         if [ $? -ne 0 ]
         then
+            mesg "$dnode:Start" OK
             break
         fi
         sleep 5
