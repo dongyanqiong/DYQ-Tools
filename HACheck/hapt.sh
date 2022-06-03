@@ -91,6 +91,7 @@ pdesc 'BEGIN'
 
 ###Create demo data
 echo "Performance Test "
+echo "taosBenchmark -uroot -p$password -d db01 -a $repl -t $tnum -n $rnum "
 taosBenchmark -uroot -p$password -d db01 -a $repl -t $tnum -n $rnum -y 1>/dev/null 2>/dev/null 
 if [ $? -eq 0 ]
 then
@@ -106,7 +107,7 @@ echo "Cluster HA Test"
 tid=11
 for dnode in ${tdnodes[@]}
 do
-    echo "$dnoe:"
+    echo "$dnode:"
     tbname=$(echo "db01.test_"$tid)
     ssh $dnode  "systemctl stop taosd"  1>/dev/null 2>/dev/null
     sleep 15
