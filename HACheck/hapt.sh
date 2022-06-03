@@ -94,9 +94,9 @@ echo "Performance Test "
 taosBenchmark -uroot -p$password -d db01 -a $repl -t $tnum -n $rnum -y 1>/dev/null 2>/dev/null 
 if [ $? -eq 0 ]
 then
-    mesg Init_Demo_Data OK
+    mesg Performance_Test OK
 else
-    mesg Init_Demo_Data ERROR
+    mesg Performance_Test ERROR
     exit
 fi
 
