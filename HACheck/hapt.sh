@@ -106,6 +106,7 @@ echo "Cluster HA Test"
 tid=11
 for dnode in ${tdnodes[@]}
 do
+    echo "$dnoe:"
     tbname=$(echo "db01.test_"$tid)
     ssh $dnode  "systemctl stop taosd"  1>/dev/null 2>/dev/null
     sleep 15
