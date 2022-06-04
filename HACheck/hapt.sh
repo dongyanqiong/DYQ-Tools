@@ -142,6 +142,7 @@ do
         icheck=$(taos -uroot -p$password -s "select v1 from $tbname where ts=1643811742000 \G;"| grep 'v1:'|awk '{print $2}')
         if [ $icheck -eq 2222 ]
         then
+            mesg "$dnode:Query" OK
             mesg "$dnode:HACheck" OK
         else
             mesg "$dnode:Query" ERROR
