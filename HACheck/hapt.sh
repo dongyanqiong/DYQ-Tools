@@ -123,13 +123,27 @@ do
     if [ $qcheck -eq $rnum ]
     then
         taos -uroot -p$password -s "create table $tbname (ts timestamp,v1 int);" 1>/dev/null 2>/dev/null
+        if [ $? -eq 0 ]
+        then
+            mesg "$dnode:Create_Table" OK
+        else
+            mesg "$dnode:Create_Table" ERROR
+            exit
+        fi
         taos -uroot -p$password -s "insert into $tbname values(1643811742000,2222);" 1>/dev/null 2>/dev/null 
+        if [ $? -eq 0 ]
+        then
+            mesg "$dnode:Insert" OK
+        else
+            mesg "$dnode:Insert" ERROR
+            exit
+        fi
         icheck=$(taos -uroot -p$password -s "select v1 from $tbname where ts=1643811742000 \G;"| grep 'v1:'|awk '{print $2}')
         if [ $icheck -eq 2222 ]
         then
             mesg "$dnode:HACheck" OK
         else
-            mesg "$dnode:Insert" ERROR
+            mesg "$dnode:Query" ERROR
             exit
         fi
     else
