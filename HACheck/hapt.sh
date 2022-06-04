@@ -122,6 +122,7 @@ do
     qcheck=$(taos -uroot -p$password -s "select count(*) as sum from db01.d11\G;" | grep 'sum:' |awk '{print $2}')
     if [ $qcheck -eq $rnum ]
     then
+        mesg "$dnode:Query" OK
         taos -uroot -p$password -s "create table $tbname (ts timestamp,v1 int);" 1>/dev/null 2>/dev/null
         if [ $? -eq 0 ]
         then
