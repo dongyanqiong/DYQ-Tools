@@ -7,6 +7,7 @@
 ####taos配置文件
 CFGFILE=/etc/taos/taos.cfg
 export LANG=en_US.UTF-8
+export LANGUAGE=en_US:en
 user=root
 pass=taosdata
 

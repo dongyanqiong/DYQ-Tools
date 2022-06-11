@@ -1,5 +1,6 @@
 #!/bin/bash
 export LANG=en_US.UTF-8
+export LANGUAGE=en_US:en
 
 os=$(cat /etc/os-release| grep PRETTY_NAME | awk '{print $1}'|awk -F '=' '{print $2}' | sed 's/"//g')
 if [ $os = 'Ubuntu' ]
