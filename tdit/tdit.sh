@@ -364,6 +364,8 @@ fi
 
 
     sysctl -a 2>/dev/null  >$sysfile
+    echo "" >> $sysfile
+    cat  /etc/security/limits.conf >> $sysfile
 
     ulimit -a >$ufile
 
