@@ -165,6 +165,7 @@ limitCheck()
     if [ $rlimit -lt 65535 ]
     then
         mesg Limit ERROR
+        echo -e "\033[0;31m Open files should big then 65535 ($rlimit)! \033[0m"
         ulimit -a
     else
         ulimit -a
