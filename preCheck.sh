@@ -161,7 +161,7 @@ limitCheck()
     echo
     echo "##limits.conf" 
     grep -v '^#'  /etc/security/limits.conf | grep -E "nofile|nproc"|sed 's/\t\t/\t/g'
-    rlimit = $(ulimit -a | grep 'open files' | awk '{print $NF}')
+    rlimit=$(ulimit -a | grep 'open files' | awk '{print $NF}')
     if [ $rlimit -lt 65535 ]
     then
         mesg Limit ERROR
