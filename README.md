@@ -43,3 +43,10 @@ perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
 用来读取current文件
 使用方法：
 ./cprint.sh current
+
+## hcache
+查看cache占用
+使用方法：
+./hcache --top 10
+
+./hcache --pid `pidof taosd`
