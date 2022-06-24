@@ -417,7 +417,7 @@ MAXROWS 4096
 UPDATE 2;
 ```
 
-## 4.参数优化
+## 4.生产环境最佳实践
 视具体业务场景而定。
 ### 4.1.内存优化
 优化内存回收速度。
@@ -431,12 +431,19 @@ Environment="MALLOC_CONF=background_thread:true"
 对于大数据量高并发场景，由于大量 WAL 数据需要落盘，会造成 taosd 关闭时耗时较长。
 如需要加快关闭服务速度，进行以下操作：
 
-修改 taosd 启动文件 /etc/systemd/system/taosd.service
-修改
 ```shell
-TimeoutStopSec=1000000s
+systemctl stop taosd & kill -9 `pidof taosd`
 ```
-为
-```shell
-TimeoutStopSec=10s
-```
+
+
+### 4.3.单节点重启步骤
+如果要重启集群中的某个节点，或某个节点意外终止需要重新启动，需遵循以下步骤：
+
+a.使用 kill -9 `pidof taosd` 停止taosd服务（前提服务配置文件已优化）。
+
+b.清理所有vnode的wal文件。
+
+c.如果节点停机时间长，数据差异大，可先手动同步vnode下文件。
+
+d.使用 systemctl start taosd 启动服务。
+
