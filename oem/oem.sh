@@ -29,6 +29,7 @@ replace_ibkh(){
             sed -i 's/TAOS Data, Inc/Engineering Research Institute of USTB Co\.,Ltd/g' $fl
             sed -i 's/TAOS Data,/Engineering Research Institute of USTB Co\.,Ltd/g' $fl 
             sed -i 's/taos connect/ibkh connect/g' $fl
+            sed -i 's/taos client/ibkh client/g' $fl
             sed -i 's/defaultPasswd="taosdata"/defaultPasswd="historydata"/g' $fl
             sed -i 's/\/etc\/taos/\/etc\/ibkh/g' $fl
             sed -i 's/\/var\/log\/taos/\/var\/log\/ibkh/g' $fl
@@ -45,10 +46,8 @@ replace_ibkh(){
     echo "begin sh replace ... $(date)"
     for fl in $(find $BDIR -type f -name "*.sh" |xargs grep -n 'Name="'| awk -F ':' '{print $1}'|sort -n |uniq)
     do
-        echo $fl
         for fln in $(grep -n 'Name="' $fl | awk -F ':' '{print $1}')
         do
-            echo $fln
             sed -i "${fln}s/taosdump/ibkhdump/g" $fl
             sed -i "${fln}s/taosdemo/ibkhdemo/g" $fl
             sed -i "${fln}s/taosadapter/ibkhadapter/g" $fl
