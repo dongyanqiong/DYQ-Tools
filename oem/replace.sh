@@ -10,7 +10,7 @@ taosc=ibkh
 taosd=ibkhd
 taosdata=historydata
 taosdemo=ibkhdemo
-taosdump=ibkdump
+taosdump=ibkhdump
 rmtaos=rmibkh
 taostools=ibkhtools
 taosBenchmark=ibkhBenchmark
@@ -119,7 +119,8 @@ replace_mkg_ibkh(){
 
     sed -i "s/taos/${taos}/g" ${topdir}/community/packaging/tools/release_note
 
-    sed -i "152s/\${productName}/${taos}/g" ${topdir}/community/packaging/tools/makepkg.sh
+    num=$(grep -n 'adapterName\.toml' ${topdir}/community/packaging/tools/makepkg.sh | grep productName | awk -F ':' '{print $1}')
+    sed -i "${num}s/\${productName}/${taos}/g" ${topdir}/community/packaging/tools/makepkg.sh
 }
 
 replace_adapter_ibkh(){
