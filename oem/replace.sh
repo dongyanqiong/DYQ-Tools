@@ -22,7 +22,7 @@ taos_history=ibkh_his
 web='iet\.ustb\.edu\.cn'
 copyright='Engineering Research Institute of USTB Co\.,Ltd'
 email='bkdgyy@ustb\.edu\.cn'
-
+wTDengine=iBKHistory
 
 
 
@@ -138,6 +138,14 @@ replace_web_ibkh(){
     done
 }
 
+replace_win_ibkh(){
+   for file in $(grep -rn "C:/TDengine/" $topdir/* | grep '\.c:'|awk -F ':' '{print $1}')
+   do
+	sed -i "s/TDengine/${wTDengine}/g" $file
+   done
+}
+
+
 ###修改taosc的提示符长度
 prompt(){
     cfile=${topdir}/community/src/kit/shell/src/shellEngine.c
@@ -152,6 +160,7 @@ replace_mkg_ibkh
 replace_pkg_ibkh
 replace_adapter_ibkh
 replace_web_ibkh
+replace_win_ibkh
 
 ###修改代码
 replace TDengine ${TDengine}
