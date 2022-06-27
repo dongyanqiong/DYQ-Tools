@@ -156,6 +156,24 @@ prompt(){
     fi
 }
 
+####生成配置文件
+create_cfg(){
+    cfgfile=${topdir}/enterprise/packaging/cfg/${taos}.cfg
+    servicefile=${topdir}/enterprise/packaging/cfg/${taosd}.service
+    cp -f ${topdir}/community/packaging/cfg/taos.cfg  ${cfgfile}
+    cp -f ${topdir}/community/packaging/cfg/taosd.service ${servicefile}
+    sed -i "s/TDengine/${TDengine}/g" ${cfgfile}
+    sed -i "s/\/var\/log\/taos/\/var\/log\/${taos}/g" ${cfgfile}
+    sed -i "s/\/var\/lib\/taos/\/var\/lib\/${taos}/g" ${cfgfile}
+    sed -i "s/support@taosdata\.com/${email}/g" ${cfgfile}
+    sed -i "s/taos/${taos}/g" ${cfgfile}
+
+    sed -i "s/TDengine/${TDengine}/g" ${servicefile} 
+    sed -i "s/taosd/${taosd}/g" ${servicefile} 
+    sed -i "s/taos/${taos}/g" ${servicefile} 
+}
+
+#####Main###########
 replace_mkg_ibkh
 replace_pkg_ibkh
 replace_adapter_ibkh
@@ -188,5 +206,5 @@ replace3 rmtaos ${rmtaos}
 replace taosd ${taosd}
 
 prompt
-
+create_cfg
 
