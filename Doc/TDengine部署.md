@@ -333,11 +333,15 @@ tcpConnTimeout              100
 >
 > keepTimeOffset = 期望迁移时间-8
 
-如果使用taosAdapter模块，需要指定其目录位置
+如果使用taosAdapter模块，需要指定其目录位置，并根据实际情况修改连接池数量（CPU*2）。
 
 /etc/taos/taosadapter.toml
 
 ```shell
+[pool]
+maxConnect = 32
+maxIdle = 32
+
 [log]
 path = "/data/taos/log"
 ```
