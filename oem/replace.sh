@@ -157,10 +157,11 @@ prompt(){
     fi
 
     cfile=${topdir}/community/src/client/src/tscSystem.c
-    clen=$((${taoslog}+4))
-    if [ $plen -gt 12 ]
+    clen=$((${#taoslog}+4))
+    if [ $clen -gt 12 ]
     then
-        sed -i "s/tscLogFileName\[12\]/tscLogFileName\[$clen\]/g" $cfgfile
+        sed -i "s/tscLogFileName\[12\]/tscLogFileName\[$clen\]/g" $cfile
+
     fi
 }
 
@@ -216,25 +217,3 @@ replace taosd ${taosd}
 
 prompt
 create_cfg
-
-
-
-#echo "TDengine= $TDengine"
-#echo "taos= $taos"
-#echo "taosc= $taosc"
-#echo "taosd= $taosd"
-#echo "taosdata= $taosdata"
-#echo "taosdemo= $taosdemo"
-#echo "taosdump= $taosdump"
-#echo "rmtaos= $rmtaos"
-#echo "taostools= $taostools"
-#echo "taosBenchmark= $taosBenchmark"
-#echo "taosadapter= $taosadapter"
-#echo "taoslog= $taoslog"
-#echo "taosdlog= $taosdlog"
-#echo "taosinfo= $taosinfo"
-#echo "taos_history= $taos_history"
-#echo "web= $web"
-#echo "copyright= $copyright"
-#echo "email= $email"
-#echo "wTDengine= $wTDengine"
