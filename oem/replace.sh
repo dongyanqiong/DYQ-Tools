@@ -3,46 +3,27 @@
 ###代码根目录
 topdir=/TDinternal
 varfile=./$1.cfg
-###替代的变量
-#TDengine=iBKHistory
-#taos=ibkh
-#taosc=ibkh
-#taosd=ibkhd
-#taosdata=historydata
-#taosdemo=ibkhdemo
-#taosdump=ibkhdump
-#rmtaos=rmibkh
-#taostools=ibkhtools
-#taosBenchmark=ibkhBenchmark
-#taosadapter=ibkhadapter
-#taoslog=ibkhlog
-#taosdlog=ibkhdlog
-#taosinfo=ibkhinfo
-#taos_history=ibkh_his
-#web='iet\.ustb\.edu\.cn'
-#copyright='Engineering Research Institute of USTB Co\.,Ltd'
-#email='bkdgyy@ustb\.edu\.cn'
-#wTDengine=iBKHistory
 
-TDengine=$(grep 'TDengine=' $varfile|awk -F '=' '{print $NF}')
-taos=$(grep 'taos=' $varfile|awk -F '=' '{print $NF}')
-taosc=$(grep 'taosc=' $varfile|awk -F '=' '{print $NF}')
-taosd=$(grep 'taosd=' $varfile|awk -F '=' '{print $NF}')
-taosdata=$(grep 'taosdata=' $varfile|awk -F '=' '{print $NF}')
-taosdemo=$(grep 'taosdemo=' $varfile|awk -F '=' '{print $NF}')
-taosdump=$(grep 'taosdump=' $varfile|awk -F '=' '{print $NF}')
-rmtaos=$(grep 'rmtaos=' $varfile|awk -F '=' '{print $NF}')
-taostools=$(grep 'taostools=' $varfile|awk -F '=' '{print $NF}')
-taosBenchmark=$(grep 'taosBenchmark=' $varfile|awk -F '=' '{print $NF}')
-taosadapter=$(grep 'taosadapter=' $varfile|awk -F '=' '{print $NF}')
-taoslog=$(grep 'taoslog=' $varfile|awk -F '=' '{print $NF}')
-taosdlog=$(grep 'taosdlog=' $varfile|awk -F '=' '{print $NF}')
-taosinfo=$(grep 'taosinfo=' $varfile|awk -F '=' '{print $NF}')
-taos_history=$(grep 'taos_history=' $varfile|awk -F '=' '{print $NF}')
-web=$(grep 'web=' $varfile|awk -F '=' '{print $NF}')
-copyright=$(grep 'copyright=' $varfile|awk -F '=' '{print $NF}')
-email=$(grep 'email=' $varfile|awk -F '=' '{print $NF}')
-wTDengine=$(grep 'wTDengine=' $varfile|awk -F '=' '{print $NF}')
+
+TDengine=$(grep '^TDengine=' $varfile|awk -F '=' '{print $NF}')
+taos=$(grep '^taos=' $varfile|awk -F '=' '{print $NF}')
+taosc=$(grep '^taosc=' $varfile|awk -F '=' '{print $NF}')
+taosd=$(grep '^taosd=' $varfile|awk -F '=' '{print $NF}')
+taosdata=$(grep '^taosdata=' $varfile|awk -F '=' '{print $NF}')
+taosdemo=$(grep '^taosdemo=' $varfile|awk -F '=' '{print $NF}')
+taosdump=$(grep '^taosdump=' $varfile|awk -F '=' '{print $NF}')
+rmtaos=$(grep '^rmtaos=' $varfile|awk -F '=' '{print $NF}')
+taostools=$(grep '^taostools=' $varfile|awk -F '=' '{print $NF}')
+taosBenchmark=$(grep '^taosBenchmark=' $varfile|awk -F '=' '{print $NF}')
+taosadapter=$(grep '^taosadapter=' $varfile|awk -F '=' '{print $NF}')
+taoslog=$(grep '^taoslog=' $varfile|awk -F '=' '{print $NF}')
+taosdlog=$(grep '^taosdlog=' $varfile|awk -F '=' '{print $NF}')
+taosinfo=$(grep '^taosinfo=' $varfile|awk -F '=' '{print $NF}')
+taos_history=$(grep '^taos_history=' $varfile|awk -F '=' '{print $NF}')
+web=$(grep '^web=' $varfile|awk -F '=' '{print $NF}')
+copyright=$(grep '^copyright=' $varfile|awk -F '=' '{print $NF}')
+email=$(grep '^email=' $varfile|awk -F '=' '{print $NF}')
+wTDengine=$(grep '^wTDengine=' $varfile|awk -F '=' '{print $NF}')
 
 
 
@@ -193,7 +174,7 @@ create_cfg(){
     sed -i "s/taos/${taos}/g" ${servicefile} 
 }
 
-zhushi(){
+
 #####Main###########
 replace_mkg_ibkh
 replace_pkg_ibkh
@@ -228,7 +209,7 @@ replace taosd ${taosd}
 
 prompt
 create_cfg
-}
+
 
 
 #echo "TDengine= $TDengine"
