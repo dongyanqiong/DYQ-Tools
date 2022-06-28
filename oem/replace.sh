@@ -155,6 +155,13 @@ prompt(){
     then
         sed -i "s/prompt_size = 6/prompt_size = $plen/g" $cfile
     fi
+
+    cfile=${topdir}/community/src/client/src/tscSystem.c
+    clen=$((${taoslog}+4))
+    fi [ $plen -gt 12 ]
+    then
+        sed -i "s/tscLogFileName\[12\]/tscLogFileName\[$clen\]/g" $cfgfile
+    fi
 }
 
 ####生成配置文件
