@@ -158,7 +158,7 @@ prompt(){
 
     cfile=${topdir}/community/src/client/src/tscSystem.c
     clen=$((${taoslog}+4))
-    fi [ $plen -gt 12 ]
+    if [ $plen -gt 12 ]
     then
         sed -i "s/tscLogFileName\[12\]/tscLogFileName\[$clen\]/g" $cfgfile
     fi
