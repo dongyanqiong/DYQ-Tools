@@ -1,4 +1,4 @@
-
+#!/usr/bin/python3
 import requests
 import json
 import sys
@@ -6,6 +6,37 @@ import getopt
 import os
 import readline
 readline.write_history_file('.history')
+commonds = [
+'SHOW TABLES','SHOW DNODES','SHOW MNODES','SHOW VGROUPS','SHOW CONNECTIONS','SHOW VARIABLES','SHOW QUERIES',
+'CREATE DATABASE','CREATE STABLE','CREATE TABLE','CREATE USER',
+'ALTER DATABASE','ALTER TABLE','ALTER STABLE','ALTER USER',
+'BOOL','TINYINT','SMALLINT','INT','BIGINT','FLOAT','DOUBLE','STRING',
+'TIMESTAMP','BINARY','NCHAR','JSON','OR','AND','NOT','EQ','NE','ISNULL','NOTNULL','IS','LIKE','MATCH','NMATCH','CONTAINS',
+'GLOB','BETWEEN','IN','GT','GE','LT','LE','BITAND','BITOR','BITXOR','LSHIFT','RSHIFT','SHOW','DATABASES','TOPICS',
+'FUNCTIONS','MNODES','DNODES','ACCOUNTS','USERS','QUERIES','CONNECTIONS','STREAMS',
+'VARIABLES','SCORES','GRANTS','VNODES','DOT','CREATE',
+'TABLE','STABLE','DATABASE','TABLES','STABLES','VGROUPS','DROP',
+'TOPIC','FUNCTION','DNODE','USER','ACCOUNT','USE','DESCRIBE',
+'ALTER','PASS','PRIVILEGE','LOCAL','COMPACT','IF','EXISTS',
+'AS','SELECT','UNION','ALL','DISTINCT','FROM','RANGE','INTERVAL','EVERY',
+'SESSION','STATE_WINDOW','FILL','SLIDING','ORDER',
+'BY','ASC','GROUP','HAVING','LIMIT','OFFSET','SLIMIT',
+'SOFFSET','WHERE','TODAY','RESET','QUERY','SYNCDB','ADD',
+'COLUMN','MODIFY','TAG','CHANGE','SET','KILL','CONNECTION',
+'STREAM','COLON','DELETE','ABORT','AFTER','ATTACH','BEFORE','BEGIN',
+'CASCADE','CLUSTER','CONFLICT','COPY','DEFERRED','DELIMITERS',
+'DETACH','EACH','END','EXPLAIN','FAIL','FOR','IGNORE','IMMEDIATE',
+'INITIALLY','INSTEAD','KEY','OF','RAISE','REPLACE','RESTRICT','NONE','PREV',
+'LINEAR','IMPORT','TBNAME','JOIN','INSERT','INTO','VALUES','FILE'
+]
+
+def complete(text,state):
+    for cmd in commonds:
+        if cmd.startswith(text.upper()):
+            if not state:
+                return cmd
+            else:
+                state -= 1
 
 def pprint(ss:list):
     lstr=",  ".join([str(s) for s in ss])
@@ -77,8 +108,11 @@ else:
             qnum=qquery['rows']
             print('\n\033[0;32;40m TDengine Version:{version} Connections:{cnum} Queries:{qnum} \033[0m\n'.format(version=version,cnum=cnum,qnum=qnum))
             while True:
+                    #SQL=input("\n\033[0;32;40m[{cname}]>\033[0m".format(cname=host)).strip() 
+                    readline.parse_and_bind("tab: complete")
+                    readline.set_completer(complete)
                     SQL=input("\n\033[0;32;40m[{cname}]>\033[0m".format(cname=host)).strip() 
-                    if SQL == 'q':
+                    if SQL.lower() == 'q' :
                         break
                     USERSQL=SQL.replace(';','')
                     qr=status_query(host,port,user,password,USERSQL)
