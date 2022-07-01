@@ -101,7 +101,7 @@ replace_pkg_ibkh(){
             sed -i "s/Name=\"taosadapter/Name=\"${taosadapter}/g" $fl
             sed -i "s/Name=\"taosBenchmakr/Name=\"${taosBenchmark}/g" $fl
             sed -i "s/Name=\"taostools/Name=\"${taostools}/g" $fl
-            sed -i "s/Name=\"taos/Name=\"${taos}/g" $fl
+            sed -i "s/serverName=\"taosd/serverName=\"${taosd}/g" $fl
             sed -i "s/Name=\"taos\.tar\.gz/Name=\"${taos}\.tar\.gz/g" $fl
             sed -i "s/Name=\"taos/Name=\"${taos}/g" $fl
         done            
