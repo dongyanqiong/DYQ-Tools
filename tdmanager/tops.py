@@ -87,7 +87,7 @@ def mnode_print(dvalue:dict):
         print("%-2s %-20s %8s" % (dvalue['head'][0],dvalue['head'][1],dvalue['head'][2]))
         data_l=len(dvalue['data'])
         for i in range(data_l):
-            if dvalue['data'][i][2] == 'master' or dvalue['data'][i][2] == 'slave':
+            if dvalue['data'][i][2] == 'master' or dvalue['data'][i][2] == 'slave' or dvalue['data'][i][2] == 'leader' or dvalue['data'][i][2] == 'follower':
                 print("%-2d %-20s %8s" % (dvalue['data'][i][0],dvalue['data'][i][1],dvalue['data'][i][2]))
             else:
                 print("\033[0;37;41m%-2d %-20s %8s\033[0m" % (dvalue['data'][i][0],dvalue['data'][i][1],dvalue['data'][i][2]))
