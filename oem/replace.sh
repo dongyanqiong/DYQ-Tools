@@ -167,7 +167,7 @@ prompt(){
 
 ####生成配置文件
 create_cfg(){
-    cfgfile=${topdir}/enterprise/packaging/cfg/${taos}.cfg
+    cfgfile=${topdir}/enterprise/packaging/cfg/${taoscfg}
     servicefile=${topdir}/enterprise/packaging/cfg/${taosd}.service
     cp -f ${topdir}/community/packaging/cfg/taos.cfg  ${cfgfile}
     cp -f ${topdir}/community/packaging/cfg/taosd.service ${servicefile}
