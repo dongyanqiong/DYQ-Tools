@@ -173,7 +173,7 @@ prompt(){
 
 ####生成配置文件
 create_cfg(){
-    cfgname=$(echo $taoscfg)
+    cfgname=$(echo $taoscfg|sed 's/\///g')
     cfgfile=${topdir}/enterprise/packaging/cfg/${cfgname}
     servicefile=${topdir}/enterprise/packaging/cfg/${taosd}.service
     cp -f ${topdir}/community/packaging/cfg/taos.cfg  ${cfgfile}
