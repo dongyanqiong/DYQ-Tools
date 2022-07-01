@@ -196,7 +196,7 @@ replace TDengine- ${TDengineq}-
 replace taosdata ${taosdata}
 replace taosc  ${taosc}
 replace 'taos>' "${taos}>"
-replace3 'taos\.cfg' "${taos}\.cfg"
+replace3 'taos\.cfg' "${taoscfg}"
 replace 'support@taosdata\.com'  ${email}
 replace 'TAOS Data, Inc' "${copyright}"
 replace 'www\.taosdata\.com' ${web}
@@ -204,7 +204,7 @@ replace 'TAOS Data,' ${copyright}
 replace 'taos connect' "${taos} connect"
 replace 'taos client' "${taos} client"
 replace 'defaultPasswd=\"taosdata\"' "defaultPasswd=\"${taosdata}\""
-replace '\/etc\/taos' "\/etc\/${taos}"
+replace '\/etc\/taos' "\/etc\/${etctaos}"
 replace '\/var\/log\/taos' "\/var\/log\/${taos}"
 replace '\/var\/lib\/taos' "\/var\/lib\/${taos}"
 replace '\/usr\/local\/taos' "\/usr\/local\/${taos}"
