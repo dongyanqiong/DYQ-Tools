@@ -8,6 +8,12 @@ varfile=./$1.cfg
 TDengine=$(grep '^TDengine=' $varfile|awk -F '=' '{print $NF}')
 taos=$(grep '^taos=' $varfile|awk -F '=' '{print $NF}')
 taosc=$(grep '^taosc=' $varfile|awk -F '=' '{print $NF}')
+taosshell=$(grep '^taosshell=' $varfile|awk -F '=' '{print $NF}')
+etctaos=$(grep '^etctaos=' $varfile|awk -F '=' '{print $NF}')
+logtaos=$(grep '^logtaos=' $varfile|awk -F '=' '{print $NF}')
+libtaos=$(grep '^libtaos=' $varfile|awk -F '=' '{print $NF}')
+localtaos=$(grep '^libtaos=' $varfile|awk -F '=' '{print $NF}')
+taoscfg=$(grep '^taoscfg=' $varfile|awk -F '=' '{print $NF}')
 taosd=$(grep '^taosd=' $varfile|awk -F '=' '{print $NF}')
 taosdata=$(grep '^taosdata=' $varfile|awk -F '=' '{print $NF}')
 taosdemo=$(grep '^taosdemo=' $varfile|awk -F '=' '{print $NF}')
@@ -115,7 +121,7 @@ replace_mkg_ibkh(){
     sed -i "s/OUTPUT_NAME taos/OUTPUT_NAME ${taos}/g"  $cfile
     
     cfile=${topdir}/community/src/dnode/CMakeLists.txt
-    sed -i "s/taos\.cfg/${taos}\.cfg/g" $cfile
+    sed -i "s/taos\.cfg/${taoscfg}/g" $cfile
     echo "SET_TARGET_PROPERTIES(taosd PROPERTIES OUTPUT_NAME ${taosd})" >> $cfile
 
     sed -i "s/taos/${taos}/g" ${topdir}/community/packaging/tools/release_note
@@ -126,7 +132,7 @@ replace_mkg_ibkh(){
 
 replace_adapter_ibkh(){
     replace 'taosadapter_' "${taosadapter}_"
-    replace3 '\/etc\/taos\/taosadapter\.toml' "\/etc\/${taos}\/${taosadapter}\.toml"
+    replace3 '\/etc\/taos\/taosadapter\.toml' "\/etc\/${etctaos}\/${taosadapter}\.toml"
     sed -i "2a replace github.com/taosdata/taosadapter => ../../../../community/src/plugins/taosadapter" ${topdir}/enterprise/src/plugins/taosainternal/go.mod
 } 
 
@@ -150,7 +156,7 @@ replace_win_ibkh(){
 ###修改taosc的提示符长度
 prompt(){
     cfile=${topdir}/community/src/kit/shell/src/shellEngine.c
-    plen=$((${#taos}+2))
+    plen=$((${#taosshell}+2))
     if [ $plen -gt 6 ]
     then
         sed -i "s/prompt_size = 6/prompt_size = $plen/g" $cfile
@@ -172,8 +178,8 @@ create_cfg(){
     cp -f ${topdir}/community/packaging/cfg/taos.cfg  ${cfgfile}
     cp -f ${topdir}/community/packaging/cfg/taosd.service ${servicefile}
     sed -i "s/TDengine/${TDengine}/g" ${cfgfile}
-    sed -i "s/\/var\/log\/taos/\/var\/log\/${taos}/g" ${cfgfile}
-    sed -i "s/\/var\/lib\/taos/\/var\/lib\/${taos}/g" ${cfgfile}
+    sed -i "s/\/var\/log\/taos/\/var\/log\/${logtaos}/g" ${cfgfile}
+    sed -i "s/\/var\/lib\/taos/\/var\/lib\/${libtaos}/g" ${cfgfile}
     sed -i "s/support@taosdata\.com/${email}/g" ${cfgfile}
     sed -i "s/taos/${taos}/g" ${cfgfile}
 
@@ -195,7 +201,7 @@ replace TDengine ${TDengine}
 replace TDengine- ${TDengineq}-
 replace taosdata ${taosdata}
 replace taosc  ${taosc}
-replace 'taos>' "${taos}>"
+replace 'taos>' "${taoshell}>"
 replace3 'taos\.cfg' "${taoscfg}"
 replace 'support@taosdata\.com'  ${email}
 replace 'TAOS Data, Inc' "${copyright}"
@@ -205,9 +211,9 @@ replace 'taos connect' "${taos} connect"
 replace 'taos client' "${taos} client"
 replace 'defaultPasswd=\"taosdata\"' "defaultPasswd=\"${taosdata}\""
 replace '\/etc\/taos' "\/etc\/${etctaos}"
-replace '\/var\/log\/taos' "\/var\/log\/${taos}"
-replace '\/var\/lib\/taos' "\/var\/lib\/${taos}"
-replace '\/usr\/local\/taos' "\/usr\/local\/${taos}"
+replace '\/var\/log\/taos' "\/var\/log\/${logtaos}"
+replace '\/var\/lib\/taos' "\/var\/lib\/${libtaos}"
+replace '\/usr\/local\/taos' "\/usr\/local\/${localtaos}"
 replace3 taoslog ${taoslog}
 replace3 taosdlog ${taosdlog}
 replace3 taosinfo ${taosinfo}
