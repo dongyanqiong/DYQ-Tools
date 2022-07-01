@@ -99,7 +99,7 @@ replace_pkg_ibkh(){
             sed -i "s/Name=\"taosdump/Name=\"${taosdump}/g" $fl
             sed -i "s/Name=\"taosdemo/Name=\"${taosdemo}/g" $fl
             sed -i "s/Name=\"taosadapter/Name=\"${taosadapter}/g" $fl
-            sed -i "s/Name=\"taosBenchmakr/Name=\"${taosBenchmark}/g" $fl
+            sed -i "s/Name=\"taosBenchmark/Name=\"${taosBenchmark}/g" $fl
             sed -i "s/Name=\"taostools/Name=\"${taostools}/g" $fl
             sed -i "s/serverName=\"taosd/serverName=\"${taosd}/g" $fl
             sed -i "s/Name=\"taos\.tar\.gz/Name=\"${taos}\.tar\.gz/g" $fl
@@ -202,7 +202,7 @@ replace TDengine ${TDengine}
 replace TDengine- ${TDengineq}-
 replace taosdata ${taosdata}
 replace taosc  ${taosc}
-replace 'taos>' "${taoshell}>"
+replace 'taos>' "${taosshell}>"
 replace3 'taos\.cfg' "${taoscfg}"
 replace 'support@taosdata\.com'  ${email}
 replace 'TAOS Data, Inc' "${copyright}"
