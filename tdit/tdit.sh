@@ -459,7 +459,7 @@ fi
     echo "###### 流计算 ##########"
     taos -u$user -p$pass -s "show streams\G;" 
 
-    grep -v '^#' $CFGFILE  | grep -v "^$" | awk '{print $1":"$2}' >$taoscfg
+    grep -v '^#' $CFGFILE  | grep -v "^$"  >$taoscfg
     echo "------------------" >> $taoscfg
     taos -u$user -p$pass -s "show variables;" >> $taoscfg
 
