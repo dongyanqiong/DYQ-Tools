@@ -391,7 +391,7 @@ fi
     grep -v '^#' $CFGFILE| grep -iw datadir  1>/dev/null 2>/dev/null
     if [ $? -eq 0 ]
     then
-        datad=$(grep -v '^#' $CFGFILE| grep -iw datadir|awk  '{print $2}')
+        datad=$(grep -v '^#' $CFGFILE| grep -iw datadir|head -1|awk  '{print $2}')
     else
         datad=/var/lib/taos
     fi
@@ -532,7 +532,7 @@ fi
     grep -v '^#' $CFGFILE| grep -iw datadir  1>/dev/null 2>/dev/null
     if [ $? -eq 0 ]
     then
-        datad=$(grep -v '^#' $CFGFILE| grep -iw datadir|awk  '{print $2}')
+        datad=$(grep -v '^#' $CFGFILE| grep -iw datadir|head -1|awk  '{print $2}')
     else
         datad=/var/lib/taos
     fi
