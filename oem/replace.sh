@@ -128,6 +128,12 @@ replace_mkg_ibkh(){
 
     num=$(grep -n 'adapterName\.toml' ${topdir}/community/packaging/tools/makepkg.sh | grep productName | awk -F ':' '{print $1}')
     sed -i "${num}s/\${productName}/${taos}/g" ${topdir}/community/packaging/tools/makepkg.sh
+
+    toml=${taosdir}/community/src/plugins/taosadapter/example/config/taosadapter.toml
+    sed -i "s/taosdata/${taosdata}" $toml
+    sed -i "s/\/var\/log\/taos/\/var\/log\/${logtaos}" $toml
+
+
 }
 
 replace_adapter_ibkh(){
@@ -221,6 +227,7 @@ replace3 taosinfo ${taosinfo}
 replace3 taos_history ${taos_history}
 replace3 rmtaos ${rmtaos}
 replace taosd ${taosd}
+replace taosdump ${taosdump}
 
 prompt
 create_cfg
