@@ -451,3 +451,22 @@ c.如果节点停机时间长，数据差异大，可先手动同步vnode下文�
 
 d.使用 systemctl start taosd 启动服务。
 
+### 4.4.操作系统优化
+/etc/sysctl.conf
+
+```bash
+net.core.somaxconn=10240
+net.core.netdev_max_backlog=2048
+net.ipv4.tcp_retries2=5
+net.ipv4.tcp_syn_retries=2
+net.ipv4.tcp_synack_retries=2
+net.ipv4.tcp_tw_reuse=1
+net.ipv4.tcp_tw_recycle=1
+net.ipv4.tcp_keepalive_time=600
+net.ipv4.tcp_max_tw_buckets=5000
+
+net.core.wmem_default=212992
+net.core.wmem_max=212992
+net.core.rmem_default=212992
+net.core.rmem_max=212992
+````
