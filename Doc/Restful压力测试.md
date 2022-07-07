@@ -127,6 +127,10 @@ sh jmeter.sh
 Ramp-Up时间（秒）：1
 循环测试：1000
 
+```qutoa
+如果要增加并发量，可以将 Ramp-Up 设置为 0（默认是1）。 
+```
+
 ##### HTTP信息头管理器
 名称：Authorization
 值：Basic cm9vdDp0YW9zZGF0YQ==
@@ -138,3 +142,7 @@ HTTP请求：POST
 路径：/rest/sql
 消息体数据：select last_row(*) from db01.meters;
 
+#### 进行测试
+```bash
+./jmeter -n -t test.jmx
+```

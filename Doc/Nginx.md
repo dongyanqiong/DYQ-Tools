@@ -8,6 +8,7 @@ pid /run/nginx.pid;
 include /usr/share/nginx/modules/*.conf;
 
 events {
+    use epoll;
     worker_connections 1024;
 }
 
@@ -21,9 +22,9 @@ http {
  
     upstream taosdata {
         least_conn;
-        server 192.168.0.11:6041;
-        server 192.168.0.12:6041;
-        server 192.168.0.13:6041;
+        server 192.168.0.11:6041 max_fails=2 fail_timeout=3s;
+        server 192.168.0.12:6041 max_fails=2 fail_timeout=3s;
+        server 192.168.0.13:6041 max_fails=2 fail_timeout=3s;
     }
 }
 ```
@@ -52,4 +53,18 @@ listen 6041;
 ```bash
 #最小连接数
 least_conn;
+```
+在实际测试中发现采用轮询方式，每个节点分配的连接数并不均匀。
+
+## 操作系统参数
+```bash
+sysctl -w net.core.somaxconn=10240
+sysctl -w net.core.netdev_max_backlog=2048
+sysctl -w net.ipv4.tcp_retries2=5
+sysctl -w net.ipv4.tcp_syn_retries=2
+sysctl -w net.ipv4.tcp_synack_retries=2
+sysctl -w net.ipv4.tcp_tw_reuse=1
+sysctl -w net.ipv4.tcp_tw_recycle=1
+sysctl -w net.ipv4.tcp_keepalive_time=600
+sysctl -w net.ipv4.tcp_max_tw_buckets=5000
 ```
