@@ -5,6 +5,8 @@ ab 是 apachebench 命令的缩写，ab 是 apache 自带的压力测试工具�
 
 ab 能够创建多个并发线程，占用的资源非常少。
 
+https://httpd.apache.org/docs/2.4/programs/ab.html
+
 ### 1.1.安装
 ```bash
 #CentOS
@@ -92,6 +94,8 @@ Percentage of the requests served within a certain time (ms)
 Apache JMeter 是 Apache 组织基于 Java 开发的压力测试工具，用于对软件做压力测试。
 
 JMeter 最初被设计用于 Web 应用测试，但后来扩展到了其他测试领域，可用于测试静态和动态资源，如静态文件、Java 小服务程序、CGI 脚本、Java 对象、数据库和 FTP 服务器等等。
+
+https://jmeter.apache.org/usermanual/index.html
 
 ### 2.1.安装
 JMete 是基于 Java 开发的，使用前需求先安装 Java。
