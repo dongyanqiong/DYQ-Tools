@@ -78,19 +78,19 @@ enableService(){
 }
 echo "Begin pkgInstall ......"
 pkgInstall
-echo "pkgInstall Finished!"
+echo "...pkgInstall Finished!"
 echo ""
 
 echo "Begin cfgCreate ......"
 cfgCreate
-echo "cfgCreate Finished!"
+echo "...cfgCreate Finished!"
 echo ""
 
 echo "Begin coreSet ......"
 coreSet
-echo "coreSet Finished!"
+echo "...coreSet Finished!"
 echo ""
 
 echo "Begin enableService ......"
 enableService
-echo "enableService Finished!"
+echo "...enableService Finished!"
