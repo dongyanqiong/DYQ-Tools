@@ -7,10 +7,10 @@ tfile=tfile$$.txt
 touch $dfile
 touch $tfile
 
-for i in $(grep ^dataDir $cfile |awk '{print $3}'|sort -n |uniq)
+for i in $(grep -iw ^dataDir $cfile |awk '{print $3}'|sort -n |uniq)
 do
 	l=1
-	grep ^dataDir $cfile|while read line 
+	grep -iw ^dataDir $cfile|while read line 
 	do
 		cjb=$(echo $line|awk '{print $3}')
 		pth=$(echo $line|awk '{print $2}')

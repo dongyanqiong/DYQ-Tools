@@ -66,3 +66,12 @@ perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
 ./hcache --top 10
 ./hcache --pid `pidof taosd`
 ```
+
+## mulbackup.sh
+多级存储备份current 
+使用方法：
+```shell
+./mulbackup.sh
+```
+建议放到计划任务中，定期执行。
+
