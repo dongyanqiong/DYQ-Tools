@@ -75,3 +75,6 @@ perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
 ```
 建议放到计划任务中，定期执行。
 
+## install
+支持非root用户安装 TDengine 到任意目录
+

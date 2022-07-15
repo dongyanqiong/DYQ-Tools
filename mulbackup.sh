@@ -29,6 +29,3 @@ do
     done
 done
 
-
-
-

@@ -280,6 +280,7 @@ mv taos.cfg taos.cfg.bak
 firstEp                     node1:6030
 secondEp                    node2:6030
 fqdn                        node1
+arbitrator                  node2:6042
 logDir                      /data/taos/log
 dataDir                     /data/taos/data
 tempDir                     /data/taos/tmp
