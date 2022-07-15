@@ -5,7 +5,10 @@
 Ansible自动部署
 
 ## tdit
+### tdit.sh
 巡检脚本
+### tdinstall.sh
+自动部署脚本
 
 ## tdmanager
 python编写的集群管理工具。
