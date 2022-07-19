@@ -76,6 +76,9 @@ enableService(){
     systemctl enable taosd
     systemctl enable taosadapter
 }
+
+###Main
+
 echo "Begin pkgInstall ......"
 pkgInstall
 echo "...pkgInstall Finished!"
