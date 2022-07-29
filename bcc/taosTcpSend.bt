@@ -1,0 +1,27 @@
+struct SFdObj {
+  void              *signature;
+  int32_t           fd;          // TCP socket FD
+  void              *thandle;     // handle from upper layer, like TAOS
+  uint32_t           ip;
+  uint16_t           port;
+  int16_t            closedByApp; // 1: already closed by App
+};
+
+u:/lib/libtaos.so.1:taosSendTcpData{
+$ip1=arg0;
+$port1=arg1;
+$sig=((struct SFdObj *) arg4) ->signature;
+$ip2=((struct SFdObj *) arg4) ->ip;
+$port2=((struct SFdObj *) arg4) ->port;
+$sd=((struct SFdObj *) arg4) ->fd;
+
+if (arg4){
+if (arg4 != $sig){
+        time("%H:%M:%S ");
+        printf("IP2=%u:%u,IP2=%u:%u \t SIG=%d \t chandle=%d \t FD=%d \n",$ip1,$port1,$ip2,$port2,$sig,arg4,$sd);
+}
+}else{
+        time("%H:%M:%S ");
+        printf("IP2=%u:%u,IP2=%u:%u \t SIG=%d \t chandle=%d \t FD=%d \n",$ip1,$port1,$ip2,$port2,$sig,arg4,$sd);
+}
+}
