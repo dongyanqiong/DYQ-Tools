@@ -1,5 +1,5 @@
 # TDengine Operation Tools(beta)
-
+# tops.py
 ## 1.工具说明
 该工具提供对多个TDengine集群和节点管理及状态检查，使用工具前，需要将TDengine相关信息配置到host.cfg中
 
@@ -36,3 +36,8 @@
 ### 3.3.TDengine Cluster Heathly Check
 该模块提供对TDengine集群或节点的健康状态检查，目前仅支持Dnode、Mnode和Database。
 如果该集群以上状态正常，则以绿底白字显示集群名称；如果该集群以上状态异常，则以红底白字显示集群名称，并打印异常信息。
+
+# ptaos.py 
+基于RESTFul的客户端，可替代taosc。
+
+ptaos-win.py  适用于Windows 平台。
