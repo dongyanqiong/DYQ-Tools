@@ -93,7 +93,6 @@ else:
                 passowrd=arg
             else:
                 sys.exit
-        os.system("clear")
         qr=status_query(host,port,user,password,'select server_version()')
         if qr != 2 and qr['status'] == 'succ':
             version=qr['data'][0][0]
