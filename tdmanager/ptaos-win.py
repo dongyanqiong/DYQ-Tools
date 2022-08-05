@@ -4,8 +4,6 @@ import json
 import sys
 import getopt
 import os
-import readline
-readline.write_history_file('.history')
 commonds = [
 'SHOW TABLES','SHOW DNODES','SHOW MNODES','SHOW VGROUPS','SHOW CONNECTIONS','SHOW VARIABLES','SHOW QUERIES','SHOW SCORES',
 'CREATE DATABASE','CREATE STABLE','CREATE TABLE','CREATE USER',
@@ -39,7 +37,7 @@ def pprint(ss:list):
     lstr=",  ".join([str(s) for s in ss])
     return lstr
 def perror(estr:str):
-    print(" \n \033[0;37;41mCanot Connecto to {estr}! \033[0m \n ".format(estr=estr))
+    print(" \n Canot Connecto to {estr}!  \n ".format(estr=estr))
 def status_query(host: str, port: int, user: str, password: str, cmd: str):
     url = "http://%s:%d/rest/sql" % (host, port)
     try:
@@ -52,7 +50,7 @@ def status_query(host: str, port: int, user: str, password: str, cmd: str):
 def rest_print(rvalue:dict):
     rcode=(rvalue['status'])
     if rcode == 'succ': 
-        print("\033[0;37;42m{hed}\033[0m".format(hed=pprint(rvalue['head'])))
+        print("{hed}".format(hed=pprint(rvalue['head'])))
         data_ll=len(rvalue['data'])
         if data_ll == 0:
             data_l=1
@@ -103,12 +101,10 @@ else:
             qquery=status_query(host,port,user,password,'show queries')
             cnum=cquery['rows']
             qnum=qquery['rows']
-            print('\n\033[0;32;40m TDengine Version:{version} Connections:{cnum} Queries:{qnum} \033[0m\n'.format(version=version,cnum=cnum,qnum=qnum))
+            print('\n TDengine Version:{version} Connections:{cnum} Queries:{qnum} \n'.format(version=version,cnum=cnum,qnum=qnum))
             while True:
-                    #SQL=input("\n\033[0;32;40m[{cname}]>\033[0m".format(cname=host)).strip() 
-                    readline.parse_and_bind("tab: complete")
-                    readline.set_completer(complete)
-                    SQL=input("\n\033[0;32;40m[{cname}]>\033[0m".format(cname=host)).strip() 
+                    #SQL=input("\n[{cname}]>".format(cname=host)).strip() 
+                    SQL=input("\n[{cname}]>".format(cname=host)).strip() 
                     if SQL.lower() == 'q' :
                         break
                     USERSQL=SQL.replace(';','')
