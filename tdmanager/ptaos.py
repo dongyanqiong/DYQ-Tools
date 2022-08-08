@@ -56,7 +56,7 @@ def rest_print(rvalue:dict):
         rcode=(rvalue['code'])
     else:
         rcode=(rvalue['status'])
-        
+
     if rcode == 'succ' or rcode == 0: 
         head_ll=len(rvalue['column_meta'])
         for hl in range(head_ll):
@@ -123,6 +123,11 @@ else:
                     SQL=input("\n\033[0;32;40m[{cname}]>\033[0m".format(cname=host)).strip() 
                     if SQL.lower() == 'q' :
                         break
+                    sqlcmd=SQL.lower().split()
+                    if sqlcmd[0] == 'host' :
+                        del sqlcmd[0]
+                        os.system(' '.join(sqlcmd))
+                        continue
                     USERSQL=SQL.replace(';','')
                     qr=status_query(host,port,user,password,USERSQL)
                     if qr != 2:
