@@ -50,9 +50,21 @@ def status_query(host: str, port: int, user: str, password: str, cmd: str):
     else:
         return(json.loads(json.dumps(resp.json())))
 def rest_print(rvalue:dict):
-    rcode=(rvalue['status'])
-    if rcode == 'succ': 
-        print("\033[0;37;42m{hed}\033[0m".format(hed=pprint(rvalue['head'])))
+    try:
+        rvalue['status']
+    except:   
+        rcode=(rvalue['code'])
+    else:
+        rcode=(rvalue['status'])
+        
+    if rcode == 'succ' or rcode == 0: 
+        head_ll=len(rvalue['column_meta'])
+        for hl in range(head_ll):
+            colname=rvalue['column_meta'][hl][0]
+            #print("\033[0;37;42m{hed}\033[0m".format(hed=colname),end="")
+            print("%s  |" % colname,end="")
+        print("")
+            
         data_ll=len(rvalue['data'])
         if data_ll == 0:
             data_l=1
@@ -97,7 +109,7 @@ else:
                 sys.exit
         os.system("clear")
         qr=status_query(host,port,user,password,'select server_version()')
-        if qr != 2 and qr['status'] == 'succ':
+        if qr != 2 :
             version=qr['data'][0][0]
             cquery=status_query(host,port,user,password,'show connections')
             qquery=status_query(host,port,user,password,'show queries')
