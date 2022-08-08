@@ -465,7 +465,7 @@ net.ipv4.tcp_synack_retries=2
 net.ipv4.tcp_tw_reuse=1
 net.ipv4.tcp_tw_recycle=1
 net.ipv4.tcp_keepalive_time=600
-tcp_abort_on_overflow = 1
+net.ipv4.tcp_abort_on_overflow=1
 net.ipv4.tcp_max_tw_buckets=5000
 
 net.core.wmem_default=212992
