@@ -425,7 +425,7 @@ fi
     #done
 
     grep TDengine $logd/taosinfo.* |grep -v 'shut down' |awk -F ':' '{for(i=1;i<=NF;++i) printf $i ":";printf "\n"}' |sort  |tail -n 6
-
+    tar -czf taosinfo.tar.gz $logd/taosinfo.*
 
 
     echo ""
@@ -554,7 +554,7 @@ fi
 
 
     grep TDengine $logd/taosinfo.* |grep -v 'shut down' |awk -F ':' '{for(i=1;i<=NF;++i) printf $i ":";printf "\n"}' |sort  |tail -n 6
-
+    tar -czf taosinfo.tar.gz $logd/taosinfo.*
 
     echo ""
     echo "###### Data 目录 ##########"
