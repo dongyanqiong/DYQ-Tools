@@ -63,16 +63,16 @@ vi /etc/fstab
 
 ```shell
 ###CentOS/RedHat
-yum install -y screen
-yum install -y tmux  
-yum install -y gdb  
-yum install -y fio  
-yum install -y iperf3  
-yum install -y sysstat  
-yum install -y net-tools  
-yum install -y ntp 
-yum install -y tree 
-yum install -y wget 
+sudo yum install -y screen
+sudo yum install -y tmux  
+sudo yum install -y gdb  
+sudo yum install -y fio  
+sudo yum install -y iperf3  
+sudo yum install -y sysstat  
+sudo yum install -y net-tools  
+sudo yum install -y ntp 
+sudo yum install -y tree 
+sudo yum install -y wget 
 wget https://repos.baslab.org/rhel/7/bpftools/bpftools.repo -O /etc/yum.repos.d/bpftools.repo --no-check-certificate 
 yum install -y bpftrace
 ```
