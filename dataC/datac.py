@@ -17,8 +17,11 @@ idb='db12'
 
 thnum = 20
 ## Begin time for select data from table.
+## Before one day.
 #stime = str(int(time.time()*1000-86400000))
+## All data.
 stime = str(1500000000000)
+
 ## Number of one SQL.
 offnum = 5000
 
@@ -107,24 +110,23 @@ def get_tblist(eurl,edb,euserName, epassWord):
 
 ## Get table list from database.
 ##
-tblist = get_tblist(eurl,edb,euserName, epassWord)
-for i in range(len(tblist)):
-        tbname = tblist[i]
-        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)
+#tblist = get_tblist(eurl,edb,euserName, epassWord)
+#for i in range(len(tblist)):
+#        tbname = tblist[i]
+#        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)#
 
 
 ## Get table list from file.
 ##
-print(type(sys.argv[1]))
-#fileobj = open("tblist.txt",'r')
-#try:
-#    tblist =  fileobj.readlines()
-#    for i in range(len(tblist)):
-#        tbname = tblist[i].strip('\n')
-#        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)
-#finally:
-#    fileobj.close()
-
+filename = sys.argv[1]
+fileobj = open(filename,'r')
+try:
+    tblist =  fileobj.readlines()
+    for i in range(len(tblist)):
+        tbname = tblist[i].strip('\n')
+        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)
+finally:
+    fileobj.close()
 
 
 
