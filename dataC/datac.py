@@ -1,22 +1,26 @@
-#coding=utf-8
+## Transfer data from Database A to Database B table by table by Restful.
 import requests
 import json
 from requests.auth import HTTPBasicAuth
+import sys
 import time
 
 euserName="root"
 epassWord="taosdata"
 eurl="http://192.168.3.21:6041/rest/sql"
-edb='db21'
+edb='db11'
 
 iuserName="root"
 ipassWord="taosdata"
 iurl="http://192.168.3.21:6041/rest/sql"
-idb='db22'
+idb='db12'
 
 thnum = 20
+## Begin time for select data from table.
 #stime = str(int(time.time()*1000-86400000))
 stime = str(1500000000000)
+## Number of one SQL.
+offnum = 5000
 
 def request_post(url, sql, user, pwd):
     try:
@@ -44,8 +48,7 @@ def export_sql(dbname,tbname, exdata):
     exsql = exsql + ';'
     return exsql
 
-def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword,stime):
-    offnum = 100
+def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword,stime,offnum):
     countsql = 'select count(*) from '+edbname+'.'+etbname+' where _c0 >='+stime+';'
     result = request_post(eurl, countsql, eusername, epassword)
     load_data = json.loads(result)
@@ -57,24 +60,28 @@ def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,i
     if row_num != 0 and count_num != 0:
         if count_num < offnum:
             select_sql = 'select * from '+edbname+'.'+etbname+' where _c0 >='+ stime +';'
-            print(select_sql)
+#            print(select_sql)
             resInfo = request_post(eurl, select_sql, eusername, epassword)
             imsql = export_sql(idbname,itbname,resInfo)
             resInfo = request_post(iurl, imsql, iusername, ipassword)
-            print(resInfo)
+            datai = json.loads(resInfo).get("data")
+            print("Table Name:",itbname,"\t\tInsert Rows:",datai[0][0])
         else:
             if count_num % offnum == 0:
                 rnum = int(count_num/offnum)
             else:
                 rnum = int(count_num/offnum)+1
+            irows = 0
             for i in range(rnum):
                 offset = i * offnum
                 select_sql = 'select * from '+edbname+'.'+etbname+' where _c0 >='+ stime +' limit '+str(offnum)+' offset '+str(offset) +';'
-                print(select_sql)
+#                print(select_sql)
                 resInfo = request_post(eurl, select_sql, eusername, epassword)
                 imsql = export_sql(idbname,itbname,resInfo)
                 resInfo = request_post(iurl, imsql, iusername, ipassword)
-                print(resInfo)
+                datai = json.loads(resInfo).get("data")
+                irows = irows + datai[0][0]
+            print("Table Name:",itbname,"\t\tInsert Rows:",irows)
 
 def thfun(tb_list,thread_num,list_num,edbname,eurl,eusername,epassword,idbname,iurl,iusername,ipassword):
     for ll in range(list_num):
@@ -86,7 +93,10 @@ def thfun(tb_list,thread_num,list_num,edbname,eurl,eusername,epassword,idbname,i
 
 
 def get_tblist(eurl,edb,euserName, epassWord):
-    tbsql = 'show '+ edb + '.tables;'
+## Get table list from whole database.    
+#    tbsql = 'show '+ edb + '.tables;'
+## Get table list from stable.
+    tbsql = 'select tbname from '+edb+'.meters;'
     resInfo = request_post(eurl, tbsql, euserName, epassWord)
     load_data = json.loads(resInfo)
     data = load_data.get("data")
@@ -95,15 +105,25 @@ def get_tblist(eurl,edb,euserName, epassWord):
         tblist.insert(i,str(data[i][0]))
     return tblist
 
+## Get table list from database.
+##
+tblist = get_tblist(eurl,edb,euserName, epassWord)
+for i in range(len(tblist)):
+        tbname = tblist[i]
+        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)
 
-fileobj = open("tblist.txt",'r')
-try:
-    tblist =  fileobj.readlines()
-    for i in range(len(tblist)):
-        tbname = tblist[i].strip('\n')
-        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime)
-finally:
-    fileobj.close()
+
+## Get table list from file.
+##
+print(type(sys.argv[1]))
+#fileobj = open("tblist.txt",'r')
+#try:
+#    tblist =  fileobj.readlines()
+#    for i in range(len(tblist)):
+#        tbname = tblist[i].strip('\n')
+#        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)
+#finally:
+#    fileobj.close()
 
 
 
