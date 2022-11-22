@@ -9,18 +9,18 @@
 > 
 > 支持指定数据起始时间
 > 
-> 提供 python2 和 python3 两个版本
+> 兼容 python2 和 python3 两个版本
 > 
 > 支持多线程
 
 ## 示例
 ### 从文件读取表清单
 ```python
-python3 data_python3.py tblist
+python datac.py tblist
 ```
 ### 同步整个数据库（如果未指定表文件，则同步整个数据库）
-```python
-python3 data_python3.py
+```shell
+python datac.py
 ```
 
 ## 配置文件说明

@@ -233,7 +233,6 @@ if __name__ == '__main__':
                 for tb in fileobj.readlines():
                     tblist.append(tb.strip('\n'))
                 multi_thread(tblist)
-
             finally:
                 fileobj.close()
     else:
