@@ -168,6 +168,8 @@ def get_tblist():
 
 ## Multiple threads/process
 def multi_thread(tblist,wmethod):
+    print()
+    print('--------------------begin------------------')
     threads = []
     if len(tblist) < threadNum:
         for i in range(len(tblist)):
@@ -189,6 +191,12 @@ def multi_thread(tblist,wmethod):
             t.start()
         for t in threads:  
             t.join()
+    print('--------------------end------------------')
+    print()
+    print("##############################")
+    print("##",len(tblist),"tables is proceed.")
+    print("##############################")
+    print()
 
 ## Check config file
 def config_check():
