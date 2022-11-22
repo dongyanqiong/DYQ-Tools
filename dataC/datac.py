@@ -6,15 +6,20 @@ import sys
 import time
 import threading
 import multiprocessing
-##python2
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
-###
+
+pversion = int(sys.version[0:1])
+
+if pversion  < 3 :
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
 
 ###Read Config File
-with open("datac.cfg",encoding="utf-8") as j:
-    clusterInfo=json.load(j)
-
+if pversion<3:
+    with open("datac.cfg") as j:
+        clusterInfo=json.load(j)
+else:
+    with open("datac.cfg",encoding="utf-8") as j:
+        clusterInfo=json.load(j)
 
 euserName=clusterInfo.get("exportUsername")
 epassWord=clusterInfo.get("exportPassword")
@@ -63,14 +68,18 @@ def export_sql(dbname,tbname, exdata):
                 strs = 'NULL'
                 exsql = exsql + strs 
             else:
-##python2                
-#                if isinstance(data[i][l],unicode):
-##python3
-                if isinstance(data[i][l],str):           
-                    strs = str(data[i][l])
-                    exsql = exsql + '\'' + strs + '\''
+                if pversion < 3: 
+                    if isinstance(data[i][l],unicode):
+                            strs = str(data[i][l])
+                            exsql = exsql + '\'' + strs + '\''
+                    else:
+                             exsql = exsql + str(data[i][l]) 
                 else:
-                    exsql = exsql + str(data[i][l]) 
+                    if isinstance(data[i][l],str):           
+                        strs = str(data[i][l])
+                        exsql = exsql + '\'' + strs + '\''
+                    else:
+                        exsql = exsql + str(data[i][l]) 
             if l != len(data[i])-1:
                     exsql = exsql +  ','
         exsql = exsql +')'
