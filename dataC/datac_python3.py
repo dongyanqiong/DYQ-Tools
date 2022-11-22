@@ -153,7 +153,7 @@ def get_tblist(eurl,edb,euserName, epassWord):
             tblist.insert(i,str(data[i][0]))
     return tblist
 
-def many_thread(tblist,threadnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL):
+def multi_thread(tblist,threadnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL):
     threads = []
     if len(tblist) < threadnum:
         for i in range(len(tblist)):
@@ -184,7 +184,7 @@ if __name__ == '__main__':
         if len(tblist) == 0:
             exit
         else:
-            many_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+            multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
     else:
     ## Get table list from file.
     ##
@@ -194,7 +194,7 @@ if __name__ == '__main__':
             tblist = []
             for tb in fileobj.readlines():
                 tblist.append(tb.strip('\n'))
-            many_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+            multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
 
         finally:
             fileobj.close()
