@@ -4,6 +4,7 @@ import json
 from requests.auth import HTTPBasicAuth
 import sys
 import time
+import threading
 ##python2
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -23,17 +24,16 @@ iuserName=clusterInfo.get("importUsername")
 ipassWord=clusterInfo.get("importPassword")
 iurl=clusterInfo.get("importUrl")
 idb=clusterInfo.get("importDBName")
-
-threadNum = 20
+threadNum = clusterInfo.get("threadNum")
 
 ## Begin time for select data from table.
 ## Before one day.
-stime = str(int(time.time()*1000-86400000))
+#stime = str(int(time.time()*1000-86400000))
 ## All data.
-#stime = str(1500000000000)
+stime = str(clusterInfo.get("startTime"))
 
 ## Number of one SQL.
-recordPerSQL = 6
+recordPerSQL = clusterInfo.get("recodeOfPerSQL")
 
 
 def request_post(url, sql, user, pwd):
@@ -44,6 +44,7 @@ def request_post(url, sql, user, pwd):
         return text
     except Exception as e:
         print(e)
+
 def export_sql(dbname,tbname, exdata):
     load_data = json.loads(exdata,encoding='utf-8')
     data = load_data.get("data")
@@ -117,15 +118,13 @@ def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,i
                     irows = irows + datai[0][0]
             print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",irows)
 
-
-def thfun(tb_list,thread_num,list_num,edbname,eurl,eusername,epassword,idbname,iurl,iusername,ipassword):
+def thfun(tb_list,thread_num,list_num,edbname,eurl,eusername,epassword,idbname,iurl,iusername,ipassword,stime,recordPerSQL):
     for ll in range(list_num):
         ii=thread_num*list_num+ll
         if ii < len(tblist):
             etbname = str(tb_list[ii])
             itbname = etbname
-            export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword)
-
+            export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword,stime,recordPerSQL)
 
 def get_tblist(eurl,edb,euserName, epassWord):
 ## Get table list from whole database.    
@@ -140,29 +139,44 @@ def get_tblist(eurl,edb,euserName, epassWord):
         tblist.insert(i,str(data[i][0]))
     return tblist
 
-
-if len(sys.argv) <= 1:
-## Get table list from database.
-##
-    tblist = get_tblist(eurl,edb,euserName, epassWord)
-    for i in range(len(tblist)):
+def many_thread(tblist,threadnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL):
+    if len(tblist) < threadnum:
+        for i in range(len(tblist)):
             tbname = tblist[i]
             proce = str(i+1)+'/'+str(len(tblist))
-    #        print(proce)
-            export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)#
-
-else:
-## Get table list from file.
-##
-    filename = sys.argv[1]
-    fileobj = open(filename,'r')
-    try:
-        tblist =  fileobj.readlines()
-        for i in range(len(tblist)):
-            tbname = tblist[i].strip('\n')
+            print(proce)
             export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
-    finally:
-        fileobj.close()
+    else:
+        threads = []
+        listnum = int(len(tblist)/threadnum)+1
+        for tnum in range(threadnum):  
+            t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+            threads.append(t)
+        for t in threads:  
+            t.start()
+        for t in threads:  
+            t.join()
+
+
+if __name__ == '__main__':
+    if len(sys.argv) <= 1:
+    ## Get table list from database.
+    ##
+        tblist = get_tblist(eurl,edb,euserName, epassWord)
+        many_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+
+    else:
+    ## Get table list from file.
+    ##
+        filename = sys.argv[1]
+        fileobj = open(filename,'r')
+        try:
+            tblist = []
+            for tb in fileobj.readlines():
+                tblist.append(tb.strip('\n'))
+            many_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+        finally:
+            fileobj.close()
 
 
 

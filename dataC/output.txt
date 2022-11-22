@@ -1,0 +1,12 @@
+[11/22 13:54:34.500955] INFO: start creating 10000 table(s) with 8 thread(s)
+[11/22 13:54:39.018839] SUCC: Spent 4.5170 seconds to create 10000 table(s) with 8 thread(s), already exist 0 table(s), actual 10000 table(s) pre created, 0 table(s) will be auto created
+[11/22 13:54:42.028158] SUCC: thread[0] completed total inserted rows: 1250, 540.83 records/second
+[11/22 13:54:42.092345] SUCC: thread[2] completed total inserted rows: 1250, 526.40 records/second
+[11/22 13:54:42.151639] SUCC: thread[1] completed total inserted rows: 1250, 513.51 records/second
+[11/22 13:54:42.165635] SUCC: thread[5] completed total inserted rows: 1250, 511.52 records/second
+[11/22 13:54:42.174004] SUCC: thread[7] completed total inserted rows: 1250, 511.26 records/second
+[11/22 13:54:42.177871] SUCC: thread[4] completed total inserted rows: 1250, 508.21 records/second
+[11/22 13:54:42.180027] SUCC: thread[6] completed total inserted rows: 1250, 509.32 records/second
+[11/22 13:54:42.183576] SUCC: thread[3] completed total inserted rows: 1250, 507.10 records/second
+[11/22 13:54:42.491365] SUCC: Spent 2.462518 seconds to insert rows: 10000 with 8 thread(s) into test3 4060.88 records/second
+[11/22 13:54:42.491405] SUCC: insert delay, min: 0.13ms, avg: 1.94ms, p90: 3.09ms, p95: 3.87ms, p99: 7.88ms, max: 60.96ms
