@@ -16,12 +16,22 @@
 ## 示例
 ### 从文件读取表清单
 ```python
-python datac.py tblist
+python datac.py -f tblist
 ```
 ### 同步整个数据库（如果未指定表文件，则同步整个数据库）
 ```shell
 python datac.py
 ```
+
+### 多进程模式（默认为多线程）
+```shell
+python datac.py -p process
+```
+### 查看帮助
+```shell
+python datac.py -h
+```
+
 
 ## 配置文件说明
 {
@@ -50,15 +60,7 @@ python datac.py
     
 }
 
-## 多线程与多进程切换
-### 多进程
-```python
-t = multiprocessing.Process(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
-```
-### 多线程
-```python
-t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
-```
+
 
 ## 设置定时任务
 如果想设置定时任务，定时同步数据，可以将起始时间修改为动态值。

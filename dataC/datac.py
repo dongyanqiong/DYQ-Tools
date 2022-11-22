@@ -3,6 +3,7 @@ import requests
 import json
 from requests.auth import HTTPBasicAuth
 import sys
+import getopt
 import time
 import threading
 import multiprocessing
@@ -162,7 +163,7 @@ def get_tblist():
             tblist.insert(i,str(data[i][0]))
     return tblist
 
-def multi_thread(tblist):
+def multi_thread(tblist,wmethod):
     threads = []
     if len(tblist) < threadNum:
         for i in range(len(tblist)):
@@ -172,12 +173,14 @@ def multi_thread(tblist):
             print(proce)
     else:
         listnum = int(len(tblist)/threadNum)+1
-        for tnum in range(threadNum):  
-## multiThread            
-#            t = threading.Thread(target=thread_func,args=(tblist,tnum,listnum))
-## multiProcess
-            t = multiprocessing.Process(target=thread_func,args=(tblist,tnum,listnum))
-            threads.append(t)
+        if wmethod == 'process':
+            for tnum in range(threadNum):  
+                t = multiprocessing.Process(target=thread_func,args=(tblist,tnum,listnum))
+                threads.append(t)
+        else:
+            for tnum in range(threadNum):             
+                t = threading.Thread(target=thread_func,args=(tblist,tnum,listnum))
+                threads.append(t)
         for t in threads:  
             t.start()
         for t in threads:  
@@ -214,6 +217,9 @@ def config_check():
 
 if __name__ == '__main__':
     cvalue = config_check()
+    filename = ''
+    wmethod = 'thread'
+    help = 'false'
     if cvalue == 0:
         if len(sys.argv) <= 1:
         ## Get table list from database.
@@ -224,17 +230,36 @@ if __name__ == '__main__':
             else:
                 multi_thread(tblist)
         else:
-        ## Get table list from file.
-        ##
-            filename = sys.argv[1]
-            fileobj = open(filename,'r')
             try:
-                tblist = []
-                for tb in fileobj.readlines():
-                    tblist.append(tb.strip('\n'))
-                multi_thread(tblist)
-            finally:
-                fileobj.close()
+                opts,args=getopt.getopt(sys.argv[1:],"f:p:")
+            except getopt.GetoptError:
+                print('\npython datac.py -f tblist_file -p thread\n')
+                print("-f Table list file.")
+                print("-p thread  \tWork with multiple threads(default).")
+                print("   process \tWork with multiple processes.")
+                print()
+                sys.exit
+            else:
+                for opt,arg in opts:
+                    if opt == '-f':
+                        filename = arg
+                    if opt == '-p':
+                        wmethod = arg
+                if len(filename) <=0:
+                    tblist = get_tblist()
+                    if len(tblist) == 0:
+                        exit
+                    else:
+                        multi_thread(tblist,wmethod)
+                else:
+                    fileobj = open(filename,'r')
+                    try:
+                        tblist = []
+                        for tb in fileobj.readlines():
+                            tblist.append(tb.strip('\n'))
+                        multi_thread(tblist,wmethod)
+                    finally:
+                        fileobj.close()
     else:
         print("Config file error!")
 
