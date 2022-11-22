@@ -174,30 +174,60 @@ def multi_thread(tblist,threadnum,edb,eurl,euserName,epassWord,idb,iurl,iuserNam
         for t in threads:  
             t.join()
 
+def config_check(threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL):
+    rvalue = 0
+    etestsql = 'show '+edb+'.vgroups'
+    itestsql = 'show '+idb+'.vgroups'
+    resInfo = request_post(eurl, etestsql, euserName, epassWord)
+    datart = json.loads(resInfo).get("status")
+    if str(datart) == 'error':
+        rvalue = 1
+        print("Export DB config error!")
+    resInfo = request_post(iurl, itestsql, iuserName, ipassWord)
+    datart = json.loads(resInfo).get("status")
+    if str(datart) == 'error':
+        rvalue = 1 
+        print("Import DB config error!") 
+    if int(stime) <= 0:
+        rvalue = 1
+        print("Start time must be bigger than zer0!") 
+    if int(recordPerSQL) <= 0:
+        rvalue = 1
+        print("recordPerSQL must be bigger than zer0!")
+    if int(threadNum) <= 0:
+        rvalue = 1
+        print("recordPerSQL must be bigger than zer0!")
+    if edb == idb and eurl == iurl:
+        rvalue = 1
+        print("Export DB should not be the Import DB!")
+    return rvalue
 
 
 if __name__ == '__main__':
-    if len(sys.argv) <= 1:
-    ## Get table list from database.
-    ##
-        tblist = get_tblist(eurl,edb,euserName, epassWord)
-        if len(tblist) == 0:
-            exit
+    cvalue = config_check(threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+    if cvalue == 0:
+        if len(sys.argv) <= 1:
+        ## Get table list from database.
+        ##
+            tblist = get_tblist(eurl,edb,euserName, epassWord)
+            if len(tblist) == 0:
+                exit
+            else:
+                multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
         else:
-            multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+        ## Get table list from file.
+        ##
+            filename = sys.argv[1]
+            fileobj = open(filename,'r')
+            try:
+                tblist = []
+                for tb in fileobj.readlines():
+                    tblist.append(tb.strip('\n'))
+                multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+
+            finally:
+                fileobj.close()
     else:
-    ## Get table list from file.
-    ##
-        filename = sys.argv[1]
-        fileobj = open(filename,'r')
-        try:
-            tblist = []
-            for tb in fileobj.readlines():
-                tblist.append(tb.strip('\n'))
-            multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
-
-        finally:
-            fileobj.close()
-
+        print("Config file error!")
 
 
