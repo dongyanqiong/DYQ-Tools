@@ -44,7 +44,7 @@ stime = str(clusterInfo.get("startTime"))
 recordPerSQL = clusterInfo.get("recodeOfPerSQL")
 
 
-
+## Restful request
 def request_post(url, sql, user, pwd):
     try:
         sql = sql.encode("utf-8")
@@ -58,6 +58,7 @@ def request_post(url, sql, user, pwd):
     except Exception as e:
         print(e)
 
+## Join SQL
 def export_sql(dbname,tbname,exdata):
     load_data = json.loads(exdata,encoding='utf-8')
     data = load_data.get("data")
@@ -87,6 +88,7 @@ def export_sql(dbname,tbname,exdata):
     exsql = exsql + ';'
     return exsql
 
+## Select data from etbname, and insert into itbname
 def export_table(etbname,itbname):
     countsql = 'select count(*) from '+edb+'.'+etbname+' where _c0 >='+stime+';'
     result = request_post(eurl, countsql, euserName, epassWord)
@@ -139,6 +141,7 @@ def export_table(etbname,itbname):
                             irows = irows + datai[0][0]
                 print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",irows)
 
+## Function for Multiple threads/process
 def thread_func(tb_list,tnum,list_num):
     for ll in range(list_num):
         ii=tnum*list_num+ll
@@ -147,7 +150,7 @@ def thread_func(tb_list,tnum,list_num):
             itbname = etbname
             export_table(etbname,itbname)
            
-
+## Get table list from database
 def get_tblist():
     tblist = []  
     tbsql = 'show '+ edb + '.tables;'
@@ -163,6 +166,7 @@ def get_tblist():
             tblist.insert(i,str(data[i][0]))
     return tblist
 
+## Multiple threads/process
 def multi_thread(tblist,wmethod):
     threads = []
     if len(tblist) < threadNum:
@@ -186,6 +190,7 @@ def multi_thread(tblist,wmethod):
         for t in threads:  
             t.join()
 
+## Check config file
 def config_check():
     rvalue = 0
     etestsql = 'show '+edb+'.vgroups'
@@ -222,13 +227,11 @@ if __name__ == '__main__':
     help = 'false'
     if cvalue == 0:
         if len(sys.argv) <= 1:
-        ## Get table list from database.
-        ##
             tblist = get_tblist()
             if len(tblist) == 0:
                 exit
             else:
-                multi_thread(tblist)
+                multi_thread(tblist,wmethod)
         else:
             try:
                 opts,args=getopt.getopt(sys.argv[1:],"f:p")
