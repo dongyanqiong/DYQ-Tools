@@ -19,7 +19,7 @@ ipassWord="Tbase125#@!"
 iurl="http://192.168.3.23:6041/rest/sql"
 idb='db32'
 
-thnum = 20
+threadNum = 20
 
 ## Begin time for select data from table.
 ## Before one day.
@@ -28,7 +28,7 @@ stime = str(int(time.time()*1000-86400000))
 #stime = str(1500000000000)
 
 ## Number of one SQL.
-offnum = 6
+recordPerSQL = 6
 
 
 def request_post(url, sql, user, pwd):
@@ -64,7 +64,7 @@ def export_sql(dbname,tbname, exdata):
     exsql = exsql + ';'
     return exsql
 
-def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword,stime,offnum):
+def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword,stime,recordPerSQL):
     countsql = 'select count(*) from '+edbname+'.'+etbname+' where _c0 >='+stime+';'
     result = request_post(eurl, countsql, eusername, epassword)
     load_data = json.loads(result)
@@ -75,7 +75,7 @@ def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,i
         count_num = data[0][0]
         print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",etbname,"Select Rows:",count_num)
     if row_num != 0 and count_num != 0:
-        if count_num < offnum:
+        if count_num < recordPerSQL:
             select_sql = 'select * from '+edbname+'.'+etbname+' where _c0 >='+ stime +';'
 #            print(select_sql)
             resInfo = request_post(eurl, select_sql, eusername, epassword)
@@ -90,14 +90,14 @@ def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,i
                 datai = json.loads(resInfo).get("data")
                 print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",datai[0][0])
         else:
-            if count_num % offnum == 0:
-                rnum = int(count_num/offnum)
+            if count_num % recordPerSQL == 0:
+                rnum = int(count_num/recordPerSQL)
             else:
-                rnum = int(count_num/offnum)+1
+                rnum = int(count_num/recordPerSQL)+1
             irows = 0
             for i in range(rnum):
-                offset = i * offnum
-                select_sql = 'select * from '+edbname+'.'+etbname+' where _c0 >='+ stime +' limit '+str(offnum)+' offset '+str(offset) +';'
+                offset = i * recordPerSQL
+                select_sql = 'select * from '+edbname+'.'+etbname+' where _c0 >='+ stime +' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
 #                print(select_sql)
                 resInfo = request_post(eurl, select_sql, eusername, epassword)
                 imsql = export_sql(idbname,itbname,resInfo)
@@ -143,7 +143,7 @@ for i in range(len(tblist)):
         tbname = tblist[i]
         proce = str(i+1)+'/'+str(len(tblist))
 #        print(proce)
-        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)#
+        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)#
 
 
 ## Get table list from file.
@@ -154,7 +154,7 @@ for i in range(len(tblist)):
 #    tblist =  fileobj.readlines()
 #    for i in range(len(tblist)):
 #        tbname = tblist[i].strip('\n')
-#        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,offnum)
+#        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
 #finally:
 #    fileobj.close()
 #
