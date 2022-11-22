@@ -11,7 +11,7 @@
 > 
 > 兼容 python2 和 python3 两个版本
 > 
-> 支持多线程
+> 支持多线程和多进程
 
 ## 示例
 ### 从文件读取表清单
@@ -25,7 +25,7 @@ python datac.py
 
 ### 多进程模式（默认为多线程）
 ```shell
-python datac.py -p process
+python datac.py -p 
 ```
 ### 查看帮助
 ```shell

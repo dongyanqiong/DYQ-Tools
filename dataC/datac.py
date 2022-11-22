@@ -231,12 +231,11 @@ if __name__ == '__main__':
                 multi_thread(tblist)
         else:
             try:
-                opts,args=getopt.getopt(sys.argv[1:],"f:p:")
+                opts,args=getopt.getopt(sys.argv[1:],"f:p")
             except getopt.GetoptError:
                 print('\npython datac.py -f tblist_file -p thread\n')
-                print("-f Table list file.")
-                print("-p thread  \tWork with multiple threads(default).")
-                print("   process \tWork with multiple processes.")
+                print("-f filename \tTable list file.")
+                print("-p \t\tWork with multiple processes( thread is default).")
                 print()
                 sys.exit
             else:
@@ -244,7 +243,7 @@ if __name__ == '__main__':
                     if opt == '-f':
                         filename = arg
                     if opt == '-p':
-                        wmethod = arg
+                        wmethod = 'process'
                 if len(filename) <=0:
                     tblist = get_tblist()
                     if len(tblist) == 0:
