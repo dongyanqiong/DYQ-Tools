@@ -5,6 +5,7 @@ from requests.auth import HTTPBasicAuth
 import sys
 import time
 import threading
+import multiprocessing
 ##python2
 #reload(sys)
 #sys.setdefaultencoding('utf-8')
@@ -41,7 +42,10 @@ recordPerSQL = clusterInfo.get("recodeOfPerSQL")
 def request_post(url, sql, user, pwd):
     try:
         sql = sql.encode("utf-8")
-        result = requests.post(url, data=sql, auth=HTTPBasicAuth(user,pwd))
+        headers = {
+            'Connection': 'keep-alive'
+        }
+        result = requests.post(url, data=sql, auth=HTTPBasicAuth(user,pwd),headers=headers)
         text=result.content.decode()
         return text
     except Exception as e:
@@ -153,7 +157,10 @@ def many_thread(tblist,threadnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName
     else:
         listnum = int(len(tblist)/threadnum)+1
         for tnum in range(threadnum):  
-            t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+## multiThread            
+#            t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+## multiProcess
+            t = multiprocessing.Process(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
             threads.append(t)
         for t in threads:  
             t.start()

@@ -25,6 +25,7 @@ python3 data_python3.py
 
 ## 配置文件说明
 {
+    
     "exporUrl":"http://127.0.0.1:6041/rest/sql",  #导出数据库 Restful接口
 
     "exportDBName":"test",  #导出数据库名称
