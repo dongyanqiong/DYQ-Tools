@@ -81,3 +81,6 @@ perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
 ## install
 支持非root用户安装 TDengine 到任意目录
 
+## dataC
+数据传输工具，通过Restful方式，实现表到表的数据传输。
+
