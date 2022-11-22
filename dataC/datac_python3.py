@@ -141,27 +141,28 @@ def get_tblist(eurl,edb,euserName, epassWord):
     return tblist
 
 
+if len(sys.argv) <= 1:
 ## Get table list from database.
 ##
-tblist = get_tblist(eurl,edb,euserName, epassWord)
-for i in range(len(tblist)):
-        tbname = tblist[i]
-        proce = str(i+1)+'/'+str(len(tblist))
-#        print(proce)
-        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)#
+    tblist = get_tblist(eurl,edb,euserName, epassWord)
+    for i in range(len(tblist)):
+            tbname = tblist[i]
+            proce = str(i+1)+'/'+str(len(tblist))
+    #        print(proce)
+            export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)#
 
-
+else:
 ## Get table list from file.
 ##
-#filename = sys.argv[1]
-#fileobj = open(filename,'r')
-#try:
-#    tblist =  fileobj.readlines()
-#    for i in range(len(tblist)):
-#        tbname = tblist[i].strip('\n')
-#        export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
-#finally:
-#    fileobj.close()
-#
+    filename = sys.argv[1]
+    fileobj = open(filename,'r')
+    try:
+        tblist =  fileobj.readlines()
+        for i in range(len(tblist)):
+            tbname = tblist[i].strip('\n')
+            export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+    finally:
+        fileobj.close()
+
 
 
