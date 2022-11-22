@@ -5,6 +5,7 @@ from requests.auth import HTTPBasicAuth
 import sys
 import time
 import threading
+import multiprocessing
 ##python2
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -150,7 +151,10 @@ def many_thread(tblist,threadnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName
         threads = []
         listnum = int(len(tblist)/threadnum)+1
         for tnum in range(threadnum):  
-            t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+## multiThread            
+#            t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+## multiProcess
+            t = multiprocessing.Process(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
             threads.append(t)
         for t in threads:  
             t.start()

@@ -25,7 +25,7 @@ python3 data_python3.py
 
 ## 配置文件说明
 {
-    
+
     "exporUrl":"http://127.0.0.1:6041/rest/sql",  #导出数据库 Restful接口
 
     "exportDBName":"test",  #导出数据库名称
@@ -50,15 +50,14 @@ python3 data_python3.py
     
 }
 
-
-## 多进程
-可采用多进程调用达到并发效果，如：
-```shell
-for i in $(ls list_0*)
-do 
-    python3 datac.py $i & 
-done
-
+## 多线程与多进程切换
+### 多进程
+```python
+t = multiprocessing.Process(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+```
+### 多线程
+```python
+t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
 ```
 
 ## 设置定时任务
