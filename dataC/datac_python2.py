@@ -9,15 +9,20 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 ###
 
-euserName="root"
-epassWord="taosdata"
-eurl="http://192.168.3.21:6041/rest/sql"
-edb='db31'
+###Read Config File
+with open("datac.cfg") as j:
+    clusterInfo=json.load(j)
 
-iuserName="test"
-ipassWord="Tbase125#@!"
-iurl="http://192.168.3.23:6041/rest/sql"
-idb='db32'
+
+euserName=clusterInfo.get("exportUsername")
+epassWord=clusterInfo.get("exportPassword")
+eurl=clusterInfo.get("exporUrl")
+edb=clusterInfo.get("exportDBName")
+
+iuserName=clusterInfo.get("importUsername")
+ipassWord=clusterInfo.get("importPassword")
+iurl=clusterInfo.get("importUrl")
+idb=clusterInfo.get("importDBName")
 
 threadNum = 20
 

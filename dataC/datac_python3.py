@@ -9,23 +9,28 @@ import time
 #sys.setdefaultencoding('utf-8')
 ###
 
-euserName="root"
-epassWord="taosdata"
-eurl="http://192.168.3.21:6041/rest/sql"
-edb='db31'
+###Read Config File
+with open("datac.cfg",encoding="utf-8") as j:
+    clusterInfo=json.load(j)
 
-iuserName="test"
-ipassWord="Tbase125#@!"
-iurl="http://192.168.3.23:6041/rest/sql"
-idb='db32'
+
+euserName=clusterInfo.get("exportUsername")
+epassWord=clusterInfo.get("exportPassword")
+eurl=clusterInfo.get("exporUrl")
+edb=clusterInfo.get("exportDBName")
+
+iuserName=clusterInfo.get("importUsername")
+ipassWord=clusterInfo.get("importPassword")
+iurl=clusterInfo.get("importUrl")
+idb=clusterInfo.get("importDBName")
 
 threadNum = 20
 
 ## Begin time for select data from table.
 ## Before one day.
-stime = str(int(time.time()*1000-86400000))
+#stime = str(int(time.time()*1000-86400000))
 ## All data.
-#stime = str(1500000000000)
+stime = str(1500000000000)
 
 ## Number of one SQL.
 recordPerSQL = 6
