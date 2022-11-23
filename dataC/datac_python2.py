@@ -3,24 +3,18 @@ import requests
 import json
 from requests.auth import HTTPBasicAuth
 import sys
-import getopt
 import time
 import threading
 import multiprocessing
-
-pversion = int(sys.version[0:1])
-
-if pversion  < 3 :
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
+##python2
+reload(sys)
+sys.setdefaultencoding('utf-8')
+###
 
 ###Read Config File
-if pversion<3:
-    with open("datac.cfg") as j:
-        clusterInfo=json.load(j)
-else:
-    with open("datac.cfg",encoding="utf-8") as j:
-        clusterInfo=json.load(j)
+with open("datac.cfg") as j:
+    clusterInfo=json.load(j)
+
 
 euserName=clusterInfo.get("exportUsername")
 epassWord=clusterInfo.get("exportPassword")
@@ -44,7 +38,7 @@ stime = str(clusterInfo.get("startTime"))
 recordPerSQL = clusterInfo.get("recodeOfPerSQL")
 
 
-## Restful request
+
 def request_post(url, sql, user, pwd):
     try:
         sql = sql.encode("utf-8")
@@ -58,8 +52,7 @@ def request_post(url, sql, user, pwd):
     except Exception as e:
         print(e)
 
-## Join SQL
-def export_sql(dbname,tbname,exdata):
+def export_sql(dbname,tbname, exdata):
     load_data = json.loads(exdata,encoding='utf-8')
     data = load_data.get("data")
     exsql = 'insert into ' + dbname+'.'+tbname +' values '
@@ -70,28 +63,23 @@ def export_sql(dbname,tbname,exdata):
                 strs = 'NULL'
                 exsql = exsql + strs 
             else:
-                if pversion < 3: 
-                    if isinstance(data[i][l],unicode):
-                            strs = str(data[i][l])
-                            exsql = exsql + '\'' + strs + '\''
-                    else:
-                             exsql = exsql + str(data[i][l]) 
+##python2                
+                if isinstance(data[i][l],unicode):
+##python3
+#                if isinstance(data[i][l],str):           
+                    strs = str(data[i][l])
+                    exsql = exsql + '\'' + strs + '\''
                 else:
-                    if isinstance(data[i][l],str):           
-                        strs = str(data[i][l])
-                        exsql = exsql + '\'' + strs + '\''
-                    else:
-                        exsql = exsql + str(data[i][l]) 
+                    exsql = exsql + str(data[i][l]) 
             if l != len(data[i])-1:
                     exsql = exsql +  ','
         exsql = exsql +')'
     exsql = exsql + ';'
     return exsql
 
-## Select data from etbname, and insert into itbname
-def export_table(etbname,itbname):
-    countsql = 'select count(*) from '+edb+'.'+etbname+' where _c0 >='+stime+';'
-    result = request_post(eurl, countsql, euserName, epassWord)
+def export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword,stime,recordPerSQL):
+    countsql = 'select count(*) from '+edbname+'.'+etbname+' where _c0 >='+stime+';'
+    result = request_post(eurl, countsql, eusername, epassword)
     datart = json.loads(result).get("status")
     if str(datart) == 'error':
         print(result)
@@ -106,10 +94,10 @@ def export_table(etbname,itbname):
             print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",etbname,"Select Rows:",count_num)
         if row_num != 0 and count_num != 0:
             if count_num < recordPerSQL:
-                select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime +';'
-                resInfo = request_post(eurl, select_sql, euserName, epassWord)
-                imsql = export_sql(idb,itbname,resInfo)
-                resInfo = request_post(iurl, imsql, iuserName, ipassWord)
+                select_sql = 'select * from '+edbname+'.'+etbname+' where _c0 >='+ stime +';'
+                resInfo = request_post(eurl, select_sql, eusername, epassword)
+                imsql = export_sql(idbname,itbname,resInfo)
+                resInfo = request_post(iurl, imsql, iusername, ipassword)
                 datart = json.loads(resInfo).get("status")
                 if str(datart) == 'error':
                     print(resInfo)
@@ -124,15 +112,15 @@ def export_table(etbname,itbname):
                 irows = 0
                 for i in range(rnum):
                     offset = i * recordPerSQL
-                    select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime +' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
+                    select_sql = 'select * from '+edbname+'.'+etbname+' where _c0 >='+ stime +' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
     #                print(select_sql)
-                    resInfo = request_post(eurl, select_sql, euserName, epassWord)
+                    resInfo = request_post(eurl, select_sql, eusername, epassword)
                     datart = json.loads(resInfo).get("status")
                     if str(datart) == 'error':
                         print(resInfo)
                     else:
-                        imsql = export_sql(idb,itbname,resInfo)
-                        resInfo = request_post(iurl, imsql, iuserName, ipassWord)
+                        imsql = export_sql(idbname,itbname,resInfo)
+                        resInfo = request_post(iurl, imsql, iusername, ipassword)
                         datart = json.loads(resInfo).get("status")
                         if str(datart) == 'error':
                             print(resInfo)
@@ -141,17 +129,16 @@ def export_table(etbname,itbname):
                             irows = irows + datai[0][0]
                 print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",irows)
 
-## Function for Multiple threads/process
-def thread_func(tb_list,tnum,list_num):
+def thfun(tb_list,thread_num,list_num,edbname,eurl,eusername,epassword,idbname,iurl,iusername,ipassword,stime,recordPerSQL):
     for ll in range(list_num):
-        ii=tnum*list_num+ll
+        ii=thread_num*list_num+ll
         if ii < len(tblist):
             etbname = str(tb_list[ii])
             itbname = etbname
-            export_table(etbname,itbname)
+            export_table(etbname,edbname,eurl,eusername,epassword,itbname,idbname,iurl,iusername,ipassword,stime,recordPerSQL)
            
-## Get table list from database
-def get_tblist():
+
+def get_tblist(eurl,edb,euserName, epassWord):
     tblist = []  
     tbsql = 'show '+ edb + '.tables;'
     resInfo = request_post(eurl, tbsql, euserName, epassWord)
@@ -166,40 +153,28 @@ def get_tblist():
             tblist.insert(i,str(data[i][0]))
     return tblist
 
-## Multiple threads/process
-def multi_thread(tblist,wmethod):
-    print('')
-    print('--------------------begin------------------')
+def multi_thread(tblist,threadnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL):
     threads = []
-    if len(tblist) < threadNum:
+    if len(tblist) < threadnum:
         for i in range(len(tblist)):
             tbname = tblist[i]
-            export_table(tbname)
+            export_table(tbname,edb,eurl,euserName,epassWord,tbname,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
             proce = str(i+1)+'/'+str(len(tblist))
             print(proce)
     else:
-        listnum = int(len(tblist)/threadNum)+1
-        if wmethod == 'process':
-            for tnum in range(threadNum):  
-                t = multiprocessing.Process(target=thread_func,args=(tblist,tnum,listnum))
-                threads.append(t)
-        else:
-            for tnum in range(threadNum):             
-                t = threading.Thread(target=thread_func,args=(tblist,tnum,listnum))
-                threads.append(t)
+        listnum = int(len(tblist)/threadnum)+1
+        for tnum in range(threadnum):  
+## multiThread            
+#            t = threading.Thread(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+## multiProcess
+            t = multiprocessing.Process(target=thfun,args=(tblist,tnum,listnum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL))
+            threads.append(t)
         for t in threads:  
             t.start()
         for t in threads:  
             t.join()
-    print('--------------------end------------------')
-    print('')
-    print("##############################")
-    print("##",len(tblist),"tables is proceed.")
-    print("##############################")
-    print('')
 
-## Check config file
-def config_check():
+def config_check(threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL):
     rvalue = 0
     etestsql = 'show '+edb+'.vgroups'
     itestsql = 'show '+idb+'.vgroups'
@@ -229,47 +204,29 @@ def config_check():
 
 
 if __name__ == '__main__':
-    cvalue = config_check()
-    filename = ''
-    wmethod = 'thread'
-    help = 'false'
+    cvalue = config_check(threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
     if cvalue == 0:
         if len(sys.argv) <= 1:
-            tblist = get_tblist()
+        ## Get table list from database.
+        ##
+            tblist = get_tblist(eurl,edb,euserName, epassWord)
             if len(tblist) == 0:
                 exit
             else:
-                multi_thread(tblist,wmethod)
+                multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
         else:
+        ## Get table list from file.
+        ##
+            filename = sys.argv[1]
+            fileobj = open(filename,'r')
             try:
-                opts,args=getopt.getopt(sys.argv[1:],"f:p")
-            except getopt.GetoptError:
-                print('\npython datac.py -f tblist_file -p thread\n')
-                print("-f filename \tTable list file.")
-                print("-p \t\tWork with multiple processes( thread is default).")
-                print()
-                sys.exit
-            else:
-                for opt,arg in opts:
-                    if opt == '-f':
-                        filename = arg
-                    if opt == '-p':
-                        wmethod = 'process'
-                if len(filename) <=0:
-                    tblist = get_tblist()
-                    if len(tblist) == 0:
-                        sys.exit
-                    else:
-                        multi_thread(tblist,wmethod)
-                else:
-                    fileobj = open(filename,'r')
-                    try:
-                        tblist = []
-                        for tb in fileobj.readlines():
-                            tblist.append(tb.strip('\n'))
-                        multi_thread(tblist,wmethod)
-                    finally:
-                        fileobj.close()
+                tblist = []
+                for tb in fileobj.readlines():
+                    tblist.append(tb.strip('\n'))
+                multi_thread(tblist,threadNum,edb,eurl,euserName,epassWord,idb,iurl,iuserName,ipassWord,stime,recordPerSQL)
+
+            finally:
+                fileobj.close()
     else:
         print("Config file error!")
 
