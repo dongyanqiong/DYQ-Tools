@@ -112,21 +112,19 @@ def createTable(cSQL):
 def init_table():
     stblist = get_stblist()
     Stable = getTableStruc(stblist)
-    print("Create Stable:\t",end='')
     snums = 0
     for i in range(len(Stable)):
         createTable(str(Stable[i]))
         snums += 1
-    print(snums)
+    print("Create Stable:",snums)
 
     tblist = get_tblist()
     Table = getTableStruc(tblist)
-    print("Create Table:\t",end='')
     tnums = 0
     for i in range(len(Table)):
         createTable(str(Table[i]))
         tnums += 1
-    print(tnums)
+    print("Create Table:",tnums)
 
 
 ## Check config file

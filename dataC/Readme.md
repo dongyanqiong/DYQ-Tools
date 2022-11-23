@@ -31,6 +31,12 @@ python datac.py -p
 ```shell
 python datac.py -h
 ```
+### 初始化数据库
+创建所有超级表和子表
+```shell
+python datac_init.py
+```
+
 
 
 ## 配置文件说明
