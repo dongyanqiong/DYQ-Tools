@@ -112,7 +112,23 @@ def export_table(etbname,itbname):
                 resInfo = request_post(iurl, imsql, iuserName, ipassWord)
                 datart = json.loads(resInfo).get("status")
                 if str(datart) == 'error':
-                    print(resInfo)
+                    datard = json.loads(resInfo).get("desc")
+                    if datard == 'Table does not exist':
+                        cSQL = getTableStruc(itbname)
+                        nurl = iurl+'/'+idb
+                        resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
+                        datart = json.loads(resInfo).get("status")
+                        if str(datart) == 'error':
+                             print(resInfo)
+                        else:
+                            resInfo = request_post(iurl, imsql, iuserName, ipassWord)
+                            datart = json.loads(resInfo).get("status")
+                            if str(datart) == 'error':
+                                print(resInfo)
+                            datai = json.loads(resInfo).get("data")
+                            print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",datai[0][0])
+                    else:    
+                        print(resInfo)
                 else:
                     datai = json.loads(resInfo).get("data")
                     print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",datai[0][0])
@@ -135,11 +151,40 @@ def export_table(etbname,itbname):
                         resInfo = request_post(iurl, imsql, iuserName, ipassWord)
                         datart = json.loads(resInfo).get("status")
                         if str(datart) == 'error':
-                            print(resInfo)
+                            datard = json.loads(resInfo).get("desc")
+                            if datard == 'Table does not exist':
+                                cSQL = getTableStruc(itbname)
+                                nurl = iurl+'/'+idb
+                                resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
+                                datart = json.loads(resInfo).get("status")
+                                if str(datart) == 'error':
+                                    print(resInfo)
+                                else:
+                                    resInfo = request_post(iurl, imsql, iuserName, ipassWord)
+                                    datart = json.loads(resInfo).get("status")
+                                    if str(datart) == 'error':
+                                        print(resInfo)
+                            else:    
+                                print(resInfo)
                         else:
                             datai = json.loads(resInfo).get("data")
                             irows = irows + datai[0][0]
                 print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",irows)
+
+## Get table create sql
+def getTableStruc(tbname):
+        etbname = tbname
+        getStrcSQL = "show create table "+edb+"."+etbname
+        resInfo = request_post(eurl, getStrcSQL, euserName, epassWord)    
+        datart = json.loads(resInfo).get("status")
+        if str(datart) == 'error':
+            print(resInfo)
+        else:
+            load_data = json.loads(resInfo)
+            data = load_data.get("data")
+            createSQL = (str(data[0][1]).replace("CREATE TABLE","CREATE TABLE IF NOT EXISTS"))
+        return createSQL
+
 
 ## Function for Multiple threads/process
 def thread_func(tb_list,tnum,list_num):
