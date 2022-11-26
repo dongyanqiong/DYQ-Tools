@@ -14,35 +14,6 @@ if pversion  < 3 :
     reload(sys)
     sys.setdefaultencoding('utf-8')
 
-###Read Config File
-if pversion<3:
-    with open("datac.cfg") as j:
-        clusterInfo=json.load(j)
-else:
-    with open("datac.cfg",encoding="utf-8") as j:
-        clusterInfo=json.load(j)
-
-euserName=clusterInfo.get("exportUsername")
-epassWord=clusterInfo.get("exportPassword")
-eurl=clusterInfo.get("exporUrl")
-edb=clusterInfo.get("exportDBName")
-
-iuserName=clusterInfo.get("importUsername")
-ipassWord=clusterInfo.get("importPassword")
-iurl=clusterInfo.get("importUrl")
-idb=clusterInfo.get("importDBName")
-
-threadNum = clusterInfo.get("threadNum")
-
-## Begin time for select data from table.
-## Before one day.
-#stime = str(int(time.time()*1000-86400000))
-## All data.
-stime = str(clusterInfo.get("startTime"))
-
-## Number of one SQL.
-recordPerSQL = clusterInfo.get("recodeOfPerSQL")
-
 
 ## Restful request
 def request_post(url, sql, user, pwd):
@@ -274,32 +245,81 @@ def config_check():
 
 
 if __name__ == '__main__':
-    cvalue = config_check()
+    cfgfile = 'datac.cfg'
     filename = ''
     wmethod = 'thread'
     help = 'false'
-    if cvalue == 0:
-        if len(sys.argv) <= 1:
-            tblist = get_tblist()
-            if len(tblist) == 0:
-                exit
+
+    if len(sys.argv) <= 1:
+            if pversion<3:
+                with open(cfgfile) as j:
+                    clusterInfo=json.load(j)
             else:
-                multi_thread(tblist,wmethod)
+                with open(cfgfile,encoding="utf-8") as j:
+                    clusterInfo=json.load(j)
+
+            euserName=clusterInfo.get("exportUsername")
+            epassWord=clusterInfo.get("exportPassword")
+            eurl=clusterInfo.get("exporUrl")
+            edb=clusterInfo.get("exportDBName")
+            iuserName=clusterInfo.get("importUsername")
+            ipassWord=clusterInfo.get("importPassword")
+            iurl=clusterInfo.get("importUrl")
+            idb=clusterInfo.get("importDBName")
+            threadNum = clusterInfo.get("threadNum")
+#           stime = str(int(time.time()*1000-86400000))
+            stime = str(clusterInfo.get("startTime"))
+            recordPerSQL = clusterInfo.get("recodeOfPerSQL")
+            cvalue = config_check()
+            if  cvalue == 0:
+                tblist = get_tblist()
+                if len(tblist) == 0:
+                    exit
+                else:
+                    multi_thread(tblist,wmethod)
+            else:
+                print("Config file ERROR!")
+    else:
+        try:
+            opts,args=getopt.getopt(sys.argv[1:],"c:f:p")
+        except getopt.GetoptError:
+            print('\npython datac.py -f tblist_file -p thread\n')
+            print("-c filename \tConfig filename (datac.cfg is default).")
+            print("-f filename \tTable list file.")
+            print("-p \t\tWork with multiple processes( thread is default).")
+            print()
+            sys.exit
         else:
-            try:
-                opts,args=getopt.getopt(sys.argv[1:],"f:p")
-            except getopt.GetoptError:
-                print('\npython datac.py -f tblist_file -p thread\n')
-                print("-f filename \tTable list file.")
-                print("-p \t\tWork with multiple processes( thread is default).")
-                print()
-                sys.exit
+            for opt,arg in opts:
+                if opt == '-c':
+                    cfgfile = arg
+                if opt == '-f':
+                    filename = arg
+                if opt == '-p':
+                    wmethod = 'process'
+
+            if pversion<3:
+                with open(cfgfile) as j:
+                    clusterInfo=json.load(j)
             else:
-                for opt,arg in opts:
-                    if opt == '-f':
-                        filename = arg
-                    if opt == '-p':
-                        wmethod = 'process'
+                with open(cfgfile,encoding="utf-8") as j:
+                    clusterInfo=json.load(j)
+
+            euserName=clusterInfo.get("exportUsername")
+            epassWord=clusterInfo.get("exportPassword")
+            eurl=clusterInfo.get("exporUrl")
+            edb=clusterInfo.get("exportDBName")
+            iuserName=clusterInfo.get("importUsername")
+            ipassWord=clusterInfo.get("importPassword")
+            iurl=clusterInfo.get("importUrl")
+            idb=clusterInfo.get("importDBName")
+            threadNum = clusterInfo.get("threadNum")
+#           stime = str(int(time.time()*1000-86400000))
+            stime = str(clusterInfo.get("startTime"))
+            recordPerSQL = clusterInfo.get("recodeOfPerSQL")
+            cvalue = config_check()
+
+            if  cvalue == 0:
                 if len(filename) <=0:
                     tblist = get_tblist()
                     if len(tblist) == 0:
@@ -315,7 +335,8 @@ if __name__ == '__main__':
                         multi_thread(tblist,wmethod)
                     finally:
                         fileobj.close()
-    else:
-        print("Config file error!")
+            else:
+                print("Config file ERROR!")
+
 
 
