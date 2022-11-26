@@ -15,7 +15,7 @@ if pversion  < 3 :
     sys.setdefaultencoding('utf-8')
 
 ## Read config file
-def getParam(cfgfile):
+def get_param(cfgfile):
     global euserName
     global epassWord
     global eurl
@@ -121,7 +121,7 @@ def export_table(etbname,itbname):
                 if str(datart) == 'error':
                     datard = json.loads(resInfo).get("desc")
                     if datard == 'Table does not exist':
-                        cSQL = getTableStruc(itbname)
+                        cSQL = get_table_struc(itbname)
                         nurl = iurl+'/'+idb
                         resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
                         datart = json.loads(resInfo).get("status")
@@ -160,7 +160,7 @@ def export_table(etbname,itbname):
                         if str(datart) == 'error':
                             datard = json.loads(resInfo).get("desc")
                             if datard == 'Table does not exist':
-                                cSQL = getTableStruc(itbname)
+                                cSQL = get_table_struc(itbname)
                                 nurl = iurl+'/'+idb
                                 resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
                                 datart = json.loads(resInfo).get("status")
@@ -179,7 +179,7 @@ def export_table(etbname,itbname):
                 print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",irows)
 
 ## Get table create sql
-def getTableStruc(tbname):
+def get_table_struc(tbname):
         etbname = tbname
         getStrcSQL = "show create table "+edb+"."+etbname
         resInfo = request_post(eurl, getStrcSQL, euserName, epassWord)    
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     help = 'false'
 
     if len(sys.argv) <= 1:
-            getParam(cfgfile)
+            get_param(cfgfile)
             cvalue = config_check()
             if  cvalue == 0:
                 tblist = get_tblist()
@@ -316,7 +316,7 @@ if __name__ == '__main__':
                 if opt == '-p':
                     wmethod = 'process'
 
-            getParam(cfgfile)
+            get_param(cfgfile)
             cvalue = config_check()
 
             if  cvalue == 0:
