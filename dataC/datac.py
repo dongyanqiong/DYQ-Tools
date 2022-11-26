@@ -14,6 +14,40 @@ if pversion  < 3 :
     reload(sys)
     sys.setdefaultencoding('utf-8')
 
+## Read config file
+def getParam(cfgfile):
+    global euserName
+    global epassWord
+    global eurl
+    global edb
+    global iuserName
+    global ipassWord
+    global iurl
+    global idb
+    global threadNum
+    global stime
+    global recordPerSQL
+
+    if pversion<3:
+        with open(cfgfile) as j:
+            clusterInfo=json.load(j)
+    else:
+        with open(cfgfile,encoding="utf-8") as j:
+            clusterInfo=json.load(j)
+    
+    euserName = clusterInfo.get("exportUsername")
+    epassWord = clusterInfo.get("exportPassword")
+    eurl = clusterInfo.get("exporUrl")
+    edb = clusterInfo.get("exportDBName")
+    iuserName = clusterInfo.get("importUsername")
+    ipassWord = clusterInfo.get("importPassword")
+    iurl = clusterInfo.get("importUrl")
+    idb = clusterInfo.get("importDBName")
+    threadNum = clusterInfo.get("threadNum")
+#         stime = str(int(time.time()*1000-86400000))
+    stime = str(clusterInfo.get("startTime"))
+    recordPerSQL = clusterInfo.get("recodeOfPerSQL")
+
 
 ## Restful request
 def request_post(url, sql, user, pwd):
@@ -251,25 +285,7 @@ if __name__ == '__main__':
     help = 'false'
 
     if len(sys.argv) <= 1:
-            if pversion<3:
-                with open(cfgfile) as j:
-                    clusterInfo=json.load(j)
-            else:
-                with open(cfgfile,encoding="utf-8") as j:
-                    clusterInfo=json.load(j)
-
-            euserName=clusterInfo.get("exportUsername")
-            epassWord=clusterInfo.get("exportPassword")
-            eurl=clusterInfo.get("exporUrl")
-            edb=clusterInfo.get("exportDBName")
-            iuserName=clusterInfo.get("importUsername")
-            ipassWord=clusterInfo.get("importPassword")
-            iurl=clusterInfo.get("importUrl")
-            idb=clusterInfo.get("importDBName")
-            threadNum = clusterInfo.get("threadNum")
-#           stime = str(int(time.time()*1000-86400000))
-            stime = str(clusterInfo.get("startTime"))
-            recordPerSQL = clusterInfo.get("recodeOfPerSQL")
+            getParam(cfgfile)
             cvalue = config_check()
             if  cvalue == 0:
                 tblist = get_tblist()
@@ -298,25 +314,7 @@ if __name__ == '__main__':
                 if opt == '-p':
                     wmethod = 'process'
 
-            if pversion<3:
-                with open(cfgfile) as j:
-                    clusterInfo=json.load(j)
-            else:
-                with open(cfgfile,encoding="utf-8") as j:
-                    clusterInfo=json.load(j)
-
-            euserName=clusterInfo.get("exportUsername")
-            epassWord=clusterInfo.get("exportPassword")
-            eurl=clusterInfo.get("exporUrl")
-            edb=clusterInfo.get("exportDBName")
-            iuserName=clusterInfo.get("importUsername")
-            ipassWord=clusterInfo.get("importPassword")
-            iurl=clusterInfo.get("importUrl")
-            idb=clusterInfo.get("importDBName")
-            threadNum = clusterInfo.get("threadNum")
-#           stime = str(int(time.time()*1000-86400000))
-            stime = str(clusterInfo.get("startTime"))
-            recordPerSQL = clusterInfo.get("recodeOfPerSQL")
+            getParam(cfgfile)
             cvalue = config_check()
 
             if  cvalue == 0:
