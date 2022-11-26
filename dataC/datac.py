@@ -31,9 +31,11 @@ def getParam(cfgfile):
     if pversion<3:
         with open(cfgfile) as j:
             clusterInfo=json.load(j)
+            j.close()
     else:
         with open(cfgfile,encoding="utf-8") as j:
             clusterInfo=json.load(j)
+            j.close()
     
     euserName = clusterInfo.get("exportUsername")
     epassWord = clusterInfo.get("exportPassword")
