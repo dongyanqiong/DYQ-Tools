@@ -17,6 +17,7 @@ http {
         listen 6041;
         location /{
         proxy_pass http://taosdata;
+        proxy_next_upstream http_500 | http_502 | http_503 | http_504 |http_404;
         }
     }
  
