@@ -319,6 +319,7 @@ tcpConnTimeout              100
 #compressMsgSize            -1
 #compressColData            -1
 #keepTimeOffset	            0
+#queryRssThreshold          4096
 ```
 
 参数解读：
@@ -336,6 +337,10 @@ tcpConnTimeout              100
 > compressMsgSize，compressColData 仅适用于网络带宽不足的环境
 >
 > keepTimeOffset = 期望迁移时间-8
+>
+> queryRssThreshold 限制taosd 内存使用，单位MB，如果超过阈值，无法建立新连接。
+> 需要和 MALLOC_CONF=background_thread:true 配合使用
+
 
 如果使用taosAdapter模块，需要指定其目录位置，并根据实际情况修改连接池数量（CPU*2）。
 
