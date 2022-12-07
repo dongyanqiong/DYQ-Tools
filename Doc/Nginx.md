@@ -23,9 +23,9 @@ http {
  
     upstream taosdata {
         least_conn;
-        server 192.168.0.11:6041 max_fails=2 fail_timeout=3s;
-        server 192.168.0.12:6041 max_fails=2 fail_timeout=3s;
-        server 192.168.0.13:6041 max_fails=2 fail_timeout=3s;
+        server 192.168.0.11:6041 max_fails=2 fail_timeout=1s;
+        server 192.168.0.12:6041 max_fails=2 fail_timeout=1s;
+        server 192.168.0.13:6041 max_fails=2 fail_timeout=1s;
     }
 }
 ```

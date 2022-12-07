@@ -129,6 +129,13 @@ echo "* hard nproc  65536" >>/etc/security/limits.conf
 echo "* hard nofile 65536" >>/etc/security/limits.conf
 echo "* hard stack  65536" >>/etc/security/limits.conf
 
+echo "root soft nproc  65536" >>/etc/security/limits.conf
+echo "root soft nofile 65536" >>/etc/security/limits.conf
+echo "root soft stack  65536" >>/etc/security/limits.conf
+echo "root hard nproc  65536" >>/etc/security/limits.conf
+echo "root hard nofile 65536" >>/etc/security/limits.conf
+echo "root hard stack  65536" >>/etc/security/limits.conf
+
 ```
 
 ### 1.7.配置时区
