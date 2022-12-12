@@ -36,6 +36,14 @@ SWAP设置可参考 [What is the recommended swap size for Red Hat platforms?](h
 
 3.文件系统建议选用ext4，格式化是建议配置 【lazy_itable_init=0,lazy_journal_init=0】，挂载时加上【data=ordered】参数。
 
+4.如果数据量大，磁盘空间大，建议选择 xfs。
+
+> 实验测试结果：
+>
+> 在写入方面xfs优于ext4[未优化]，速度提升约25%；关闭barrier后，ext4写入速度较xfs提升近50%。
+>
+>在查询方面，数据离散度越大，ext4表现越好，速度提升约25%；而对于较为连续的查询，ext4速度反而不如xfs。
+
 ### 1.1.准备安装目录
 
 按照前期规划，创建相关目录。生产环境中数据目录和日志目录建议部署在不同磁盘上。

@@ -1,0 +1,45 @@
+struct STscObj {
+ int8_t              signature[8];
+  int8_t              pTimer[8];
+  char               user[24];
+  char               pass[16];
+  char               acctId[11];
+  char               tags[256];
+  char               db[44];
+  char               sversion[12];
+  char               clusterId[40];
+  int8_t               writeAuth;
+
+}
+
+struct SSqlObj {
+  int8_t           signature[8];
+  int64_t          owner;       
+  struct STscObj           *pTscObj;
+  int64_t          rpcRid;
+} 
+
+struct SUserObj {
+  char              user[24];
+  char              pass[16];
+  char              acct[24];
+  int64_t           createdTime;
+  int8_t            superAuth;
+  int8_t            writeAuth;
+} 
+
+u:/usr/local/taos/bin/taosd:mnodeGetUser{
+    time("%H:%M:%S ");
+        printf("mnodeGetuser=%s| ",str(arg0));
+}
+ur:/usr/local/taos/bin/taosd:mnodeGetUser{
+        printf("\tuser=%s| ",((struct SUserObj *) retval)->user);
+        printf("\twriteAuth=%d \n",((struct SUserObj *) retval)->writeAuth);
+}
+
+u:/lib/libtaos.so:tsInsertInitialCheck{
+    $tsobj=((struct SSqlObj *) arg0)->pTscObj;
+    $user=((struct STscObj *) $tsobj)->user;
+    $wau=((struct STscObj *) $tsobj)->writeAuth;
+    printf("\tInsertuser=%s| \twriteAuth=%d \n",$user,$wau);
+}
