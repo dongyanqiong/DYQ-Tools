@@ -339,19 +339,16 @@ tcpConnTimeout              100
 
 ```shell
 shellActivityTimer        120
-firstEp                   hostname:6030
-secondEp
-fqdn                      hostname
-serverPort                6030
+firstEp                   node1:6030
+secondEp                  node2:6030
+fqdn                      node
 maxShellConns             100000
 maxConnections            100000
 maxNumOfDistinctRes         10000000
 logDir                    /var/log/taos
 dataDir                   /var/lib/taos
 tempDir                   /tmp/
-telemetryReporting        1
 supportVnodes             0
-statusInterval            1
 minSlidingTime            10
 minIntervalTime           10
 queryBufferSize           -1
@@ -360,13 +357,8 @@ compressColData           -1
 timezone                  UTC-8
 locale                    en_US.UTF-8
 charset                   UTF-8
-minimalLogDirGB           1.0
-minimalTmpDirGB           1.0
-minimalDataDirGB          2.0
 monitor                   1
-numOfLogLines             10000000
-asyncLog                  1
-logKeepDays               0
+logKeepDays               -1
 countAlwaysReturnValue    1
 numOfCommitThreads        8
 
