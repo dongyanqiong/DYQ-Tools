@@ -337,6 +337,43 @@ tcpConnTimeout              100
 #queryRssThreshold          4096
 ```
 
+```shell
+shellActivityTimer        120
+firstEp                   hostname:6030
+secondEp
+fqdn                      hostname
+serverPort                6030
+maxShellConns             100000
+maxConnections            100000
+maxNumOfDistinctRes         10000000
+logDir                    /var/log/taos
+dataDir                   /var/lib/taos
+tempDir                   /tmp/
+telemetryReporting        1
+supportVnodes             0
+statusInterval            1
+minSlidingTime            10
+minIntervalTime           10
+queryBufferSize           -1
+compressMsgSize           -1
+compressColData           -1
+timezone                  UTC-8
+locale                    en_US.UTF-8
+charset                   UTF-8
+minimalLogDirGB           1.0
+minimalTmpDirGB           1.0
+minimalDataDirGB          2.0
+monitor                   1
+numOfLogLines             10000000
+asyncLog                  1
+logKeepDays               0
+countAlwaysReturnValue    1
+numOfCommitThreads        8
+
+```
+
+
+
 参数解读：
 
 [见官方文档](https://www.taosdata.com/docs/cn/v2.0/administrator#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%85%8D%E7%BD%AE)
