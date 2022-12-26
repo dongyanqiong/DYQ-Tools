@@ -56,7 +56,7 @@ fi
     fi
 
 
-    acode=$(grep 'activeCode' $CFGFILE| grep -v '#'| awk '{print $2}' )
+    acode=$(grep -i 'activeCode' $CFGFILE| grep -v '#'| awk '{print $2}' )
     echo "ACODE:$acode:"
 
 
