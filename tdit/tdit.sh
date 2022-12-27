@@ -6,6 +6,7 @@
 
 ####taos配置文件
 CFGFILE=/etc/taos/taos.cfg
+ADPFILE=/etc/taos/taosadapter.toml
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US:en
 user=root
@@ -291,7 +292,7 @@ fi
 
  oslog()
 {
-    CFGFILE=/etc/taos/taos.cfg
+#    CFGFILE=/etc/taos/taos.cfg
     dd=$(date +%Y%m%d)
     taoscfg=$(echo "taoscfg"$dd".txt")
     ufile=$(echo "ulimit"$dd".txt")
@@ -377,7 +378,7 @@ fi
 
  dblog()
 {
-    CFGFILE=/etc/taos/taos.cfg
+#    CFGFILE=/etc/taos/taos.cfg
     dd=$(date +%Y%m%d)
     taoscfg=$(echo "taoscfg"$dd".txt")
 
@@ -513,12 +514,18 @@ fi
         echo $sv | awk '{print $1"\t"$2}'
     done
 
+    if [ -e $ADPFILE ]
+    then 
+        echo ""
+        echo "###### taosAdapter.toml ##########"
+        grep -v '^#' $ADPFILE
+    fi
 
 }
 
  dblog2()
 {
-    CFGFILE=/etc/taos/taos.cfg
+#    CFGFILE=/etc/taos/taos.cfg
     dd=$(date +%Y%m%d)
     taoscfg=$(echo "taoscfg"$dd".txt")
 
@@ -598,12 +605,19 @@ fi
             du -sh /var/log/taos/*
     fi 
 
+    if [ -e $ADPFILE ]
+    then 
+        echo ""
+        echo "###### taosAdapter.toml ##########"
+        grep -v '^#' $ADPFILE
+    fi
+
 }
 
 report()
 {
     cd $1
-    CFGFILE=/etc/taos/taos.cfg
+#    CFGFILE=/etc/taos/taos.cfg
     mlog=mlog.txt
     dblog=dblog.txt
     oslog=oslog.txt
@@ -762,6 +776,11 @@ report()
     echo "#### 1.3.2 近期启动时间"
     grep ' DND ' $dblog
 
+    if [ -e $ADPFILE ]
+    then
+        echo "#### 1.3.3 taosAdapter配置信息"
+        grep -E "maxConnect|maxIdle" $ADPFILE
+    fi
 
     echo "### 1.4 巡检概述"
     echo "本次通过对系统各项指标进行检查，发现问题如下："
