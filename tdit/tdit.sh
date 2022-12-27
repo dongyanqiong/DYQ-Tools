@@ -781,7 +781,7 @@ report()
     if [ -e $ADPFILE ]
     then
         echo "#### 1.3.3 taosAdapter配置信息"
-        grep -E "maxConnect|maxIdle" $ADPFILE
+        grep -E "maxConnect|maxIdle" $ADPFILE| grep -v '^#'
     fi
 
     echo "### 1.4 巡检概述"
