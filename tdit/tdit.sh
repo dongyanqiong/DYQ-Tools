@@ -860,11 +860,11 @@ report()
     echo "</table>"
     echo ""
 
-    echo "### 2.3 系统资源概况"
+#    echo "### 2.3 系统资源概况"
 
-    echo "#### 2.3.1 磁盘性能(fio)"
+#    echo "#### 2.3.1 磁盘性能(fio)"
 
-    echo "#### 2.3.2 网络性能(iperf3)"
+#    echo "#### 2.3.2 网络性能(iperf3)"
 
 
     echo "## 3. 附件"
