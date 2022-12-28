@@ -239,7 +239,7 @@ fi
 
     DMPFILE=/tmp/dnode.tmp
     ##dnode
-    taos -u$user -p$pass -s "show dnodes;" >$DMPFILE
+    taos -u$user -p$pass -s "SET MAX_BINARY_DISPLAY_WIDTH 40; show dnodes;" >$DMPFILE
 
     DNODE=1
 
@@ -266,7 +266,7 @@ fi
     VGS=1
     for i in $(taos -u$user -p$pass -s "show databases\G;"| grep name |awk '{print $2}'| grep -v log)
     do
-        sql=$(echo "use \`$i\`;show vgroups\G;")
+        sql=$(echo "use $i;show vgroups\G;")
         for l in $(taos -u$user -p$pass -s "$sql" | grep status | awk '{print $2}')
         do
             if [ $l = 'offline' ] || [ $l = 'unsynced' ]
