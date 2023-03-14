@@ -54,13 +54,15 @@ python datac_init.py
 ## 配置文件说明
 {
 
-    "exporUrl":"http://127.0.0.1:6041/rest/sql",  #导出数据库 Restful接口
+    "exporUrl":"http://127.0.0.1:6041/rest/sqlt",  #导出数据库 Restful接口
 
     "exportDBName":"test",  #导出数据库名称
 
     "exportUsername":"root",    #导出数据库用户名
 
     "exportPassword":"prodb",   #导出数据库密码
+
+    "exportVersion":2,          #数据库版本
 
     "importUrl":"http://127.0.0.1:6041/rest/sql",   #导入数据Restful接口
 
@@ -70,6 +72,8 @@ python datac_init.py
 
     "importPassword":"test",    #导入数据库密码
 
+    "importVersion":3,          #数据库版本
+
     "recodeOfPerSQL":100,       #单条SQL包含记录数
 
     "startTime":1321946822000,  #查询起始时间
@@ -78,6 +82,7 @@ python datac_init.py
     
 }
 
+对于 2.x 版本建议采用  sqlt 接口。
 
 
 ## 设置定时任务

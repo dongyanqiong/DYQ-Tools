@@ -330,6 +330,7 @@ slaveQuery                  0
 numOfMnodes                 3 
 offlineInterval             15
 tcpConnTimeout              100
+telemetryReporting          0
 #shellActivityTimer         120
 #compressMsgSize            -1
 #compressColData            -1
