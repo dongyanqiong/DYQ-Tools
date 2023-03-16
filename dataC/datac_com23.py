@@ -28,6 +28,7 @@ def get_param(cfgfile):
     global iversion
     global threadNum
     global stime
+    global etime
     global recordPerSQL
 
     if pversion<3:
@@ -52,6 +53,7 @@ def get_param(cfgfile):
     threadNum = clusterInfo.get("threadNum")
 #         stime = str(int(time.time()*1000-86400000))
     stime = str(clusterInfo.get("startTime"))
+    etime = str(clusterInfo.get("endTime"))
     recordPerSQL = clusterInfo.get("recodeOfPerSQL")
 
 
@@ -113,7 +115,7 @@ def export_sql(dbname,tbname,exdata):
 
 ## Select data from etbname, and insert into itbname
 def export_table(etbname,itbname):
-    countsql = 'select count(*) from '+edb+'.'+etbname+' where _c0 >='+stime+';'
+    countsql = 'select count(*) from '+edb+'.'+etbname+' where _c0 >='+stime+ ' and _c0<='+ etime + ';'
     result = request_post(eurl, countsql, euserName, epassWord)
     chkrt = check_return(result,eversion)
     if chkrt == 'error':
@@ -129,7 +131,7 @@ def export_table(etbname,itbname):
             print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",etbname,"Select Rows:",count_num)
         if row_num != 0 and count_num != 0:
             if count_num < recordPerSQL:
-                select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime +';'
+                select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<=' + etime +';'
                 resInfo = request_post(eurl, select_sql, euserName, epassWord)
                 imsql = export_sql(idb,itbname,resInfo)
                 resInfo = request_post(iurl, imsql, iuserName, ipassWord)
@@ -163,7 +165,7 @@ def export_table(etbname,itbname):
                 irows = 0
                 for i in range(rnum):
                     offset = i * recordPerSQL
-                    select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime +' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
+                    select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<='+ etime + ' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
     #                print(select_sql)
                     resInfo = request_post(eurl, select_sql, euserName, epassWord)
                     chkrt = check_return(resInfo,eversion)
