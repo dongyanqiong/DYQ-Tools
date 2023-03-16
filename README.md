@@ -84,3 +84,8 @@ perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
 ## dataC
 数据传输工具，通过Restful方式，实现表到表的数据传输。
 
+## compact_pr.sh
+查看3.0 compact 进度。
+```shell
+./compact_pr.sh
+```
