@@ -480,6 +480,12 @@ SHOW DNODES;
 SHOW MNODES;
 ```
 
+#### 3.0 创建mnode
+```sql
+CREATE MNODES ON DNODE 2; 
+CREATE MNODES ON DNODE 3;
+```
+
 ## 3.创建数据库
 
 执行 taos 命令，进入TDengine 客户端，执行建库命令：
