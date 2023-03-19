@@ -292,7 +292,7 @@ mv taos.cfg taos.cfg.bak
 ```
 
 创建新配置文件 taos.cfg，内容如下：
-
+##### 2.6
 ```shell
 #activeCode 
 firstEp                     node1:6030
@@ -383,8 +383,6 @@ monitorFqdn                 node1
 logKeepDays                 -1
 debugflag                   131
 ```
-
-
 
 
 参数解读：
@@ -490,6 +488,7 @@ CREATE MNODES ON DNODE 3;
 
 执行 taos 命令，进入TDengine 客户端，执行建库命令：
 
+#### 2.x
 ```sql
 CREATE DATABASE db12 
 DAYS 1 
