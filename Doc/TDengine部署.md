@@ -364,6 +364,26 @@ countAlwaysReturnValue    1
 numOfCommitThreads        8
 
 ```
+3.0
+```shell
+#activeCode 
+firstEp                     node1:6030
+secondEp                    node2:6030
+fqdn                        node1
+arbitrator                  node2:6042
+logDir                      /data/taos/log
+dataDir                     /data/taos/data
+tempDir                     /data/taos/tmp
+numOfCommitThreads          8.0
+timezone                    UTC-8
+locale                      en_US.UTF-8
+charset                     UTF-8
+monitor                     1 
+monitor                     node1
+logKeepDays                 -1
+debugflag                   131
+```
+
 
 
 
