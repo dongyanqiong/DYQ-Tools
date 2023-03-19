@@ -364,7 +364,7 @@ countAlwaysReturnValue    1
 numOfCommitThreads        8
 
 ```
-3.0
+###### 3.0
 ```shell
 #activeCode 
 firstEp                     node1:6030
@@ -379,7 +379,7 @@ timezone                    UTC-8
 locale                      en_US.UTF-8
 charset                     UTF-8
 monitor                     1 
-monitor                     node1
+monitorFqdn                 node1
 logKeepDays                 -1
 debugflag                   131
 ```
