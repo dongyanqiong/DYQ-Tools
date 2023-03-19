@@ -106,7 +106,7 @@ def createTable(cSQL):
     nurl = iurl+'/'+idb
     resInfo = request_post(nurl, cSQL, iuserName, ipassWord) 
     datart = json.loads(resInfo).get("status")
-    if str(datart) == 'error':
+    if str(datart) != 'succ' or str(datart) != '0':
             print(resInfo)
 
 def init_table():
@@ -134,12 +134,12 @@ def config_check():
     itestsql = 'show '+idb+'.vgroups'
     resInfo = request_post(eurl, etestsql, euserName, epassWord)
     datart = json.loads(resInfo).get("status")
-    if str(datart) == 'error':
+    if str(datart) != 'succ' or str(datart) != '0':
         rvalue = 1
         print("Export DB config error!")
     resInfo = request_post(iurl, itestsql, iuserName, ipassWord)
     datart = json.loads(resInfo).get("status")
-    if str(datart) == 'error':
+    if str(datart) != 'succ' or str(datart) != '0':
         rvalue = 1 
         print("Import DB config error!") 
     if int(stime) <= 0:
