@@ -13,11 +13,19 @@ events {
 }
 
 http {
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ''      close;
+    }
+
     server {
         listen 6041;
         location /{
         proxy_pass http://taosdata;
-        proxy_read_timeout  300;
+        proxy_read_timeout  300;  //web-socker时设置为600s
+        proxy_http_version 1.1; //web-socker
+        proxy_set_header Upgrade $http_upgrade; //web-socker
+        proxy_set_header Connection "upgrade"; //web-socker
         proxy_next_upstream error timeout http_502 http_500  non_idempotent;
         }
     }
@@ -28,6 +36,7 @@ http {
         server 192.168.0.12:6041 max_fails=2 fail_timeout=1s;
         server 192.168.0.13:6041 max_fails=2 fail_timeout=1s;
     }
+    access_log off;
 }
 ```
 ## 参数解读：
@@ -76,3 +85,6 @@ sysctl -w net.core.wmem_max = 212992
 sysctl -w net.core.rmem_default = 212992
 sysctl -w net.core.rmem_max = 212992
 ```
+
+## WebSocket
+http://nginx.org/en/docs/http/websocket.html
