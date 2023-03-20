@@ -17,6 +17,7 @@ http {
         listen 6041;
         location /{
         proxy_pass http://taosdata;
+        proxy_read_timeout  300;
         proxy_next_upstream error timeout http_502 http_500  non_idempotent;
         }
     }

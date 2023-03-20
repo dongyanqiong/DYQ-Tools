@@ -362,6 +362,7 @@ monitor                   1
 logKeepDays               -1
 countAlwaysReturnValue    1
 numOfCommitThreads        8
+numOfVnodeQueryThreads    8
 
 ```
 ###### 3.0
@@ -403,6 +404,9 @@ debugflag                   131
 >
 > queryRssThreshold 限制taosd 内存使用，单位MB，如果超过阈值，无法建立新连接。
 > 需要和 MALLOC_CONF=background_thread:true 配合使用
+>
+> numOfVnodeQueryThreads = vCPU - numOfCommitThreads
+
 
 
 如果使用taosAdapter模块，需要指定其目录位置，并根据实际情况修改连接池数量（CPU*2）。
@@ -502,8 +506,10 @@ UPDATE 2;
 ##### 3.0
 ```sql
 CREATE DATABASE db12 
+CACHESIZE   1024  --MB/per Vnode
+CACHEMODEL "both"
 DURATTION 10  --day
-BUFFER 128  --MB
+BUFFER 128  --MB/per Vnode
 VGROUPS 12 
 REPLICA 3 
 KEEP 7,30,3650 
