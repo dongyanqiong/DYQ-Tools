@@ -376,6 +376,7 @@ logDir                      /data/taos/log
 dataDir                     /data/taos/data
 tempDir                     /data/taos/tmp
 numOfCommitThreads          8.0
+numOfVnodeQueryThreads      8
 timezone                    UTC-8
 locale                      en_US.UTF-8
 charset                     UTF-8
