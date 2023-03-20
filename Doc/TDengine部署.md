@@ -362,7 +362,6 @@ monitor                   1
 logKeepDays               -1
 countAlwaysReturnValue    1
 numOfCommitThreads        8
-numOfVnodeQueryThreads    8
 
 ```
 ###### 3.0
