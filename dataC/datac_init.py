@@ -22,12 +22,12 @@ euserName=clusterInfo.get("exportUsername")
 epassWord=clusterInfo.get("exportPassword")
 eurl=clusterInfo.get("exporUrl")
 edb=clusterInfo.get("exportDBName")
-
+eversion = clusterInfo.get("exportVersion")
 iuserName=clusterInfo.get("importUsername")
 ipassWord=clusterInfo.get("importPassword")
 iurl=clusterInfo.get("importUrl")
 idb=clusterInfo.get("importDBName")
-
+iversion = clusterInfo.get("importVersion")
 threadNum = clusterInfo.get("threadNum")
 
 ## Begin time for select data from table.
@@ -39,6 +39,16 @@ stime = str(clusterInfo.get("startTime"))
 ## Number of one SQL.
 recordPerSQL = clusterInfo.get("recodeOfPerSQL")
 
+def check_return(result, tdversion):
+    if tdversion == 2:
+        datart = json.loads(result).get("status")
+    else:
+        datart = json.loads(result).get("code")
+    if str(datart) == 'succ' or str(datart) == '0':
+        chkrt = 'succ'
+    else:
+        chkrt = 'error' 
+    return chkrt
 
 ## Restful request
 def request_post(url, sql, user, pwd):
@@ -60,8 +70,8 @@ def get_tblist():
     tblist = []  
     tbsql = 'show '+ edb + '.tables;'
     resInfo = request_post(eurl, tbsql, euserName, epassWord)
-    datart = json.loads(resInfo).get("status")
-    if str(datart) == 'error':
+    chkrt = check_return(resInfo,eversion)
+    if chkrt == 'error':
         print(resInfo)
     else:
         load_data = json.loads(resInfo)
@@ -75,9 +85,9 @@ def get_stblist():
     tblist = []  
     tbsql = 'show '+ edb + '.stables;'
     resInfo = request_post(eurl, tbsql, euserName, epassWord)
-    datart = json.loads(resInfo).get("status")
-    if str(datart) == 'error':
-        print(resInfo)
+    chkrt = check_return(resInfo,eversion)
+    if chkrt == 'error':
+        print("Get_Stb error "+resInfo+" \n")
     else:
         load_data = json.loads(resInfo)
         data = load_data.get("data")
@@ -93,8 +103,8 @@ def getTableStruc(tblist):
             etbname = tblist[i]
             getStrcSQL = "show create table "+edb+"."+etbname
             resInfo = request_post(eurl, getStrcSQL, euserName, epassWord)    
-            datart = json.loads(resInfo).get("status")
-            if str(datart) == 'error':
+            chkrt = check_return(resInfo,eversion)
+            if chkrt == 'error':
                 print(resInfo)
             else:
                 load_data = json.loads(resInfo)
@@ -105,8 +115,9 @@ def getTableStruc(tblist):
 def createTable(cSQL):
     nurl = iurl+'/'+idb
     resInfo = request_post(nurl, cSQL, iuserName, ipassWord) 
-    datart = json.loads(resInfo).get("status")
-    if str(datart) != 'succ' or str(datart) != '0':
+    chkrt = check_return(resInfo,iversion)
+    if chkrt == 'error':
+            print(cSQL)
             print(resInfo)
 
 def init_table():
@@ -133,13 +144,13 @@ def config_check():
     etestsql = 'show '+edb+'.vgroups'
     itestsql = 'show '+idb+'.vgroups'
     resInfo = request_post(eurl, etestsql, euserName, epassWord)
-    datart = json.loads(resInfo).get("status")
-    if str(datart) != 'succ' or str(datart) != '0':
+    chkrt = check_return(resInfo,eversion)
+    if chkrt == 'error':
         rvalue = 1
         print("Export DB config error!")
     resInfo = request_post(iurl, itestsql, iuserName, ipassWord)
-    datart = json.loads(resInfo).get("status")
-    if str(datart) != 'succ' or str(datart) != '0':
+    chkrt = check_return(resInfo,iversion)
+    if chkrt == 'error':
         rvalue = 1 
         print("Import DB config error!") 
     if int(stime) <= 0:

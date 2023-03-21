@@ -30,6 +30,7 @@ def get_param(cfgfile):
     global stime
     global etime
     global recordPerSQL
+    global tableonly
 
     if pversion<3:
         with open(cfgfile) as j:
@@ -51,10 +52,10 @@ def get_param(cfgfile):
     iurl = clusterInfo.get("importUrl")
     idb = clusterInfo.get("importDBName")
     threadNum = clusterInfo.get("threadNum")
-#         stime = str(int(time.time()*1000-86400000))
     stime = str(clusterInfo.get("startTime"))
     etime = str(clusterInfo.get("endTime"))
     recordPerSQL = clusterInfo.get("recodeOfPerSQL")
+    tableonly = clusterInfo.get("tableonly")
 
 
 ## Restful request
@@ -112,6 +113,16 @@ def export_sql(dbname,tbname,exdata):
         exsql = exsql +')'
     exsql = exsql + ';'
     return exsql
+
+def export_table_only(etbname,itbname):
+    cSQL = get_table_struc(etbname)
+    nurl = iurl+'/'+idb
+    resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
+    chkrt = check_return(resInfo,iversion)
+    if chkrt == 'error':
+        print(resInfo)
+    else:
+        print("Create table [" + itbname +"] done.")
 
 ## Select data from etbname, and insert into itbname
 def export_table(etbname,itbname):
@@ -218,7 +229,13 @@ def thread_func(tb_list,tnum,list_num):
         if ii < len(tblist):
             etbname = str(tb_list[ii])
             itbname = etbname
-            export_table(etbname,itbname)
+            if tableonly == 'false':
+                export_table(etbname,itbname)
+            else:
+                if tableonly == 'true':
+                    export_table_only(etbname,itbname)
+                else:
+                    print("tableonly set error!")
            
 ## Get table list from database
 def get_tblist():
