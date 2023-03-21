@@ -22,7 +22,7 @@ http {
         listen 6041;
         location /{
         proxy_pass http://taosdata;
-        proxy_read_timeout  300;  //web-socker时设置为600s
+        proxy_read_timeout  300s;  //web-socker时设置为600s
         proxy_http_version 1.1; //web-socker
         proxy_set_header Upgrade $http_upgrade; //web-socker
         proxy_set_header Connection "upgrade"; //web-socker
