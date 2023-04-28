@@ -37,12 +37,21 @@ else
 fi
 
 
-
-
 tar xzf $star -C $sdir/
-tar xzf $sdir/taos.tar.gz -C $sdir/ 
+sdir=$(echo "${sdir}$(echo $star|awk -F '-Linux' '{print $1}')")
+if [ -e $sdir/taos.tar.gz ]
+then
+    tar xzf $sdir/taos.tar.gz -C $sdir/ 
+elif [ -e $sdir/package.tar.gz ]
+then
+    tar xzf $sdir/package.tar.gz -C $sdir/ 
+else
+    echo "No package found at $sdir!"
+    exit
+fi
 
-ln -s $sdir/driver/libtaos.so.2.4.0.14 $sdir/driver/libtaos.so.1
+libname=$(ls $sdir/driver/)
+ln -s $sdir/driver/${libname} $sdir/driver/libtaos.so.1
 
 echo ""
 echo -e "${GREEN}TDengine have been installed on $sdir ${NC}"
