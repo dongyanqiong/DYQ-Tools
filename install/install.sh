@@ -50,8 +50,8 @@ else
     exit
 fi
 
-libname=$(ls $sdir/driver/)
-ln -s $sdir/driver/${libname} $sdir/driver/libtaos.so.1
+libname=$(ls $sdir/driver/libtaos.*)
+cp ${libname} $sdir/driver/libtaos.so.1
 
 echo ""
 echo -e "${GREEN}TDengine have been installed on $sdir ${NC}"
