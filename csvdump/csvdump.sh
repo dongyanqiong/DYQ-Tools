@@ -5,7 +5,7 @@ taos=taos
 outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
-batch=20000000
+batch=20000
 sqlh='select * from '
 sqle=' where _c0>0  '
 
@@ -120,17 +120,19 @@ dumpIn(){
                 cp ${outdir}/${tb}.csv ${outdir}/${tb}/
                 cd  ${outdir}/${tb}
                 split -${batch} -d ${tb}.csv part_
+                total_rows=0
                 for csv in $(ls part_*)
                 do
                     insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}/${csv}'" |grep 'OK' |awk '{print $3}')
                     if [ $insert_total ]
                     then 
-                        num=$(($num+1))
-                        echo "$num \t${tb} \t $insert_total rows dump in done!"
+                        total_rows=$(($total_rows+$insert_total))
                     else
                         echo "   \t${tb} \t  dump in ERROR!"
                     fi                
                 done
+                    num=$(($num+1))
+                    echo "$num \t${tb} \t $total_rows rows dump in done!"
                 cd ${outdir}
                 rm -rf ${outdir}/${tb}
             fi
