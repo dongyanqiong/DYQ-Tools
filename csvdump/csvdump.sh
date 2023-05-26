@@ -5,8 +5,9 @@ taos=taos
 outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
+batch=20000000
 sqlh='select * from '
-sqle=' where _c0>0 '
+sqle=' where _c0>0  '
 
 help(){
     echo "Dump Schema out:"
@@ -21,6 +22,7 @@ help(){
     echo "-f tblist file"
     echo "-o outdir."
     echo "-d DBname "
+    echo "-b Batch size "
     echo "-S Dump schema out."
     echo "-D Dump data out."
     echo "-I Dump data in."
@@ -69,7 +71,7 @@ dumpSchema(){
 
 dumpData(){
     num=0
-    echo "Dump SQL : $sqlh ... $sqle >> ...csv;"
+    echo "Dump SQL : $sqlh DBNAME.TABLENAME $sqle >> OUTDIR/TABLENAME.csv;"
     echo ""
     #导出所有表数据
     #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
@@ -101,13 +103,36 @@ dumpIn(){
     do
         if [ -e ${outdir}/${tb}.csv ]
         then
-            insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}.csv'" |grep 'OK' |awk '{print $3}')
-            if [ $insert_total ]
-            then 
-                num=$(($num+1))
-                echo "$num \t${tb} \t $insert_total rows dump in done!"
+            file_count=$(wc -l ${outdir}/${tb}.csv |awk '{print $1}')
+            if [ $file_count -lt $batch ]
+            then
+                insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}.csv'" |grep 'OK' |awk '{print $3}')
+                if [ $insert_total ]
+                then 
+                    num=$(($num+1))
+                    echo "$num \t${tb} \t $insert_total rows dump in done!"
+                else
+                    echo "   \t${tb} \t  dump in ERROR!"
+                fi
             else
-                echo "   \t${tb} \t  dump in ERROR!"
+                #对大文件按照batch进行切割导入
+                mkdir ${outdir}/${tb}
+                cp ${outdir}/${tb}.csv ${outdir}/${tb}/
+                cd  ${outdir}/${tb}
+                split -${batch} -d ${tb}.csv part_
+                for csv in $(ls part_*)
+                do
+                    insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}/${csv}'" |grep 'OK' |awk '{print $3}')
+                    if [ $insert_total ]
+                    then 
+                        num=$(($num+1))
+                        echo "$num \t${tb} \t $insert_total rows dump in done!"
+                    else
+                        echo "   \t${tb} \t  dump in ERROR!"
+                    fi                
+                done
+                cd ${outdir}
+                rm -rf ${outdir}/${tb}
             fi
         else
             echo "${outdir}/${tb}.csv not found!!"
@@ -123,7 +148,7 @@ then
     exit
 fi
 
-while getopts 'u:p:f:o:d:SDI' opt
+while getopts 'u:p:f:o:d:b:SDI' opt
 do
     case $opt in
         u)
@@ -140,6 +165,9 @@ do
         ;;
         d)
         db=$OPTARG
+        ;;
+        b)
+        batch=$OPTARG
         ;;
         S)
         echo "Begin dumpSchema ......"
@@ -161,4 +189,3 @@ do
         exit
     esac
 done
-
