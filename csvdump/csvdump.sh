@@ -69,6 +69,8 @@ dumpSchema(){
 
 dumpData(){
     num=0
+    echo "Dump SQL : $sqlh ... $sqle >> ...csv;"
+    echo ""
     #导出所有表数据
     #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
     #导出指定表数据
@@ -100,8 +102,13 @@ dumpIn(){
         if [ -e ${outdir}/${tb}.csv ]
         then
             insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}.csv'" |grep 'OK' |awk '{print $3}')
-            num=$(($num+1))
-            echo "$num \t${tb} \t $insert_total rows dump in done!"
+            if [ $insert_total ]
+            then 
+                num=$(($num+1))
+                echo "$num \t${tb} \t $insert_total rows dump in done!"
+            else
+                echo "   \t${tb} \t  dump in ERROR!"
+            fi
         else
             echo "${outdir}/${tb}.csv not found!!"
         fi
