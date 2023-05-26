@@ -35,9 +35,13 @@ dumpSchema(){
     if [ ${#dsql} -gt 1 ]
     then
         echo "${dsql}"  >${outdir}/db.sql
+        echo "DB_Name   Info"
+        echo "-------   -----------------------"
         echo "${db} dump out done."
         echo ""
         #导出超级表建表语句
+        echo "No    Stable     Info"
+        echo "---   --------  -------------------"
         dn=1
         for stb in $(${taos} -u${user} -p${pass} -s "show ${db}.stables"|grep '|'|grep -v 'stable_name'|awk '{print $1}' )
         do
@@ -47,6 +51,8 @@ dumpSchema(){
         done
         echo ""
         #导出子表/普通表建表语句
+        echo "No    Table      Info"
+        echo "---   --------  -------------------"
         tn=0
         #导出所有表
         #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
@@ -74,6 +80,8 @@ dumpData(){
     num=0
     echo "Dump SQL : $sqlh ${db}.TABLENAME $sqle >> ${outdir}/TABLENAME.csv;"
     echo ""
+    echo "No    Table      Info"
+    echo "---   --------  -------------------"
     #导出所有表数据
     #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
     #导出指定表数据
@@ -100,6 +108,8 @@ dumpData(){
 
 dumpIn(){
     num=0
+    echo "No    Table      Info"
+    echo "---   --------  -------------------"
     for tb in $(cat $tblist)
     do
         bt=$(date +%s)
