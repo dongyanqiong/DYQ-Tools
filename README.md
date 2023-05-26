@@ -89,3 +89,13 @@ perl wal.pl < {dataDir}/dnode/mnode/wal/wal0
 ```shell
 ./compact_pr.sh
 ```
+
+## csvdump
+CSV导入导出工具
+
+使用方法：
+```shell
+./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -S
+./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -D
+./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db03 -I
+```
