@@ -7,7 +7,7 @@
 ## 导出数据库下所有超级表和子表结构
 
 ```shell
-./csvdump.sh -u root -p taosdata -o /tmp/ -d db01 -S
+./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -S
 ```
 
 ## 导出/tmp/tblist中指定表数据，输出为CSV

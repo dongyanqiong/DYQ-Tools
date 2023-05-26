@@ -10,7 +10,7 @@ sqle=' where _c0>0 '
 
 help(){
     echo "Dump Schema out:"
-    echo "./csvdump.sh -u root -p taosdata -o /tmp/ -d db01 -S"
+    echo "./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -S"
     echo "Dump Data out:"
     echo "./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -D"
     echo "Dump Data in:"
@@ -27,11 +27,14 @@ help(){
 }
 
 dumpSchema(){
-    ${taos} -u${user} -p${pass} -s "show create database ${db}\G"|grep '^Create'|awk -F ':' '{print $NF}' >${outdir}/db.sql
-    if [ -s ${outdir}/db.sql ]
+    #导出建库语句
+    dsql=$(${taos} -u${user} -p${pass} -s "show create database ${db}\G"|grep '^Create'|awk -F ':' '{print $NF}')
+    if [ ${#dsql} -gt 1 ]
     then
+        echo "${dsql}"  >${outdir}/db.sql
         echo "${db} dump out done."
         echo ""
+        #导出超级表建表语句
         dn=1
         for stb in $(${taos} -u${user} -p${pass} -s "show ${db}.stables"|grep '|'|grep -v 'stable_name'|awk '{print $1}' )
         do
@@ -40,6 +43,7 @@ dumpSchema(){
                 dn=$(($dn+1))
         done
         echo ""
+        #导出子表/普通表建表语句
         tn=0
         #导出所有表
         #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
@@ -65,7 +69,9 @@ dumpSchema(){
 
 dumpData(){
     num=0
+    #导出所有表数据
     #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
+    #导出指定表数据
     for tb in $(cat $tblist)
     do
         if [ -e ${outdir}/${tb}.csv ]
