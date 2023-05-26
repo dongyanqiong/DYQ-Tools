@@ -5,14 +5,17 @@ taos=taos
 outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
+sqlh='select * from '
+sqle=' where _c0>0 '
 
 help(){
     echo "Dump Schema out:"
     echo "./csvdump.sh -u root -p taosdata -o /tmp/ -d db01 -S"
     echo "Dump Data out:"
-    echo "./csvdump.sh -u root -p taosdata -o /tmp/ -d db01 -D"
+    echo "./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -D"
     echo "Dump Data in:"
     echo "./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -I"
+    echo ""
     echo "-u username"
     echo "-p password"
     echo "-f tblist file"
@@ -37,45 +40,68 @@ dumpSchema(){
                 dn=$(($dn+1))
         done
         echo ""
-        tn=1
+        tn=0
         for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
         do
                 ${taos} -u${user} -p${pass} -s "show create table ${db}.${tb} \G"|grep '^Create'|awk -F ':' '{print $NF}' >>${outdir}/tb.sql
-                echo "$tn \t${tb} \tdump out done."
                 tn=$(($tn+1))
+                echo "$tn \t${tb} \tdump out done."
         done
+        echo "## $tn tables dump out."
+        echo ""
     else
         echo "Get DB $db Schema failed!"
     fi
 }
 
 dumpData(){
-    sql1='select * from '
-    sql2=' where _c0>0 '
-    num=1
-    for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
+    num=0
+    #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
+    for tb in $(cat $tblist)
     do
-    sql=$(echo "$sql1 ${db}.${tb} $sql2 >>${outdir}/${tb}.csv;")
-    ${taos} -u${user} -p${pass} -s "$sql" 1>/dev/null 2>/dev/null
-    echo "$tb" >> $tblist
-    echo "$num \t${tb} \tdump out done!"
-    num=$(($num+1))
+        if [ -e ${outdir}/${tb}.csv ]
+        then
+            echo "${outdir}/${tb}.csv already exits!!"
+            exit
+        else
+            sql=$(echo "$sqlh ${db}.${tb} $sqle >>${outdir}/${tb}.csv;")
+            file_total=$(${taos} -u${user} -p${pass} -s "$sql"|grep 'OK' |awk '{print $3}' )
+        #    echo "$tb" >> $tblist
+            if [ $file_total ]
+            then 
+                num=$(($num+1))
+                echo "$num \t${tb} \t $file_total rows dump out done."
+            fi
+        fi
     done
+    echo "## $num tables dump out!!"
+    echo ""
 }
 
 dumpIn(){
-    num=1
+    num=0
     for tb in $(cat $tblist)
     do
-    ${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}.csv'" 1>/dev/null 2>/dev/null
-
-    echo "$num \t${tb} \t dump in done!"
-    num=$(($num+1))
+        if [ -e ${outdir}/${tb}.csv ]
+        then
+            insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}.csv'" |grep 'OK' |awk '{print $3}')
+            num=$(($num+1))
+            echo "$num \t${tb} \t $insert_total rows dump in done!"
+        else
+            echo "${outdir}/${tb}.csv not found!!"
+        fi
     done
+    echo "## $num tables dump in!!"
+    echo ""
 }
 
+if [ $# -eq 0 ]
+then
+    help
+    exit
+fi
 
-while getopts ':u:p:f:o:d:SDI' opt
+while getopts 'u:p:f:o:d:SDI' opt
 do
     case $opt in
         u)
@@ -94,15 +120,18 @@ do
         db=$OPTARG
         ;;
         S)
-        echo "dumpSchema"
+        echo "Begin dumpSchema ......"
+        echo ""
         dumpSchema
         ;;
         D)
-        echo "dumpData"
+        echo "Begin dumpData ......"
+        echo ""
         dumpData
         ;;
         I)
-        echo "dumpIn"
+        echo "Begin dumpIn ......"
+        echo ""
         dumpIn
         ;;
         *)
