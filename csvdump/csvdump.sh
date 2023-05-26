@@ -41,11 +41,20 @@ dumpSchema(){
         done
         echo ""
         tn=0
-        for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
+        #导出所有表
+        #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
+        #导出指定表
+        for tb in $(cat $tblist)
         do
-                ${taos} -u${user} -p${pass} -s "show create table ${db}.${tb} \G"|grep '^Create'|awk -F ':' '{print $NF}' >>${outdir}/tb.sql
-                tn=$(($tn+1))
-                echo "$tn \t${tb} \tdump out done."
+                csql=$(${taos} -u${user} -p${pass} -s "show create table ${db}.${tb} \G"|grep '^Create'|awk -F ':' '{print $NF}') 
+                if [ ${#csql} -gt 1 ]
+                then
+                    echo "${csql}" >>${outdir}/tb.sql
+                    tn=$(($tn+1))
+                    echo "$tn \t${tb} \tdump out done."
+                else
+                    echo "  \t${tb} \tdump out ERROR!"
+                fi
         done
         echo "## $tn tables dump out."
         echo ""
