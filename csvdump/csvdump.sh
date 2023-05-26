@@ -101,6 +101,7 @@ dumpIn(){
     num=0
     for tb in $(cat $tblist)
     do
+        bt=$(date +%s)
         if [ -e ${outdir}/${tb}.csv ]
         then
             file_count=$(wc -l ${outdir}/${tb}.csv |awk '{print $1}')
@@ -110,7 +111,8 @@ dumpIn(){
                 if [ $insert_total ]
                 then 
                     num=$(($num+1))
-                    echo "$num \t${tb} \t $insert_total rows dump in done!"
+                    et=$(date +%s)
+                    echo "$num \t${tb} \t $insert_total rows dump in done! Cost $((${et}-${bt})) s."
                 else
                     echo "   \t${tb} \t  dump in ERROR!"
                 fi
@@ -132,7 +134,8 @@ dumpIn(){
                     fi                
                 done
                     num=$(($num+1))
-                    echo "$num \t${tb} \t $total_rows rows dump in done!"
+                    et=$(date +%s)
+                    echo "$num \t${tb} \t $total_rows rows dump in done! Cost $(($et-$bt)) s."
                 cd ${outdir}
                 rm -rf ${outdir}/${tb}
             fi
