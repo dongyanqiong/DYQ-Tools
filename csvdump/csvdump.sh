@@ -10,6 +10,7 @@ sqlh='select * from '
 sqle=' where _c0>0  '
 
 help(){
+    echo ""
     echo "Dump Schema out:"
     echo "./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -S"
     echo "Dump Data out:"
@@ -71,7 +72,7 @@ dumpSchema(){
 
 dumpData(){
     num=0
-    echo "Dump SQL : $sqlh DBNAME.TABLENAME $sqle >> OUTDIR/TABLENAME.csv;"
+    echo "Dump SQL : $sqlh ${db}.TABLENAME $sqle >> ${outdir}/TABLENAME.csv;"
     echo ""
     #导出所有表数据
     #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
@@ -153,6 +154,7 @@ then
     exit
 fi
 
+runlevel=U
 while getopts 'u:p:f:o:d:b:SDI' opt
 do
     case $opt in
@@ -175,22 +177,37 @@ do
         batch=$OPTARG
         ;;
         S)
-        echo "Begin dumpSchema ......"
-        echo ""
-        dumpSchema
+        runlevel=S
         ;;
         D)
-        echo "Begin dumpData ......"
-        echo ""
-        dumpData
+        runlevel=D
         ;;
         I)
-        echo "Begin dumpIn ......"
-        echo ""
-        dumpIn
+        runlevel=I
         ;;
         *)
         help
         exit
     esac
 done
+
+case $runlevel in 
+    S)
+    echo "Begin dumpSchema ......"
+    echo ""
+    dumpSchema
+    ;;
+    D)
+    echo "Begin dumpData ......"
+    echo ""
+    dumpData
+    ;;
+    I)
+    echo "Begin dumpIn ......"
+    echo ""
+    dumpIn
+    ;;
+    *)
+    help
+    exit
+esac
