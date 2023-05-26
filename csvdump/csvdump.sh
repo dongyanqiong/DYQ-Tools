@@ -6,7 +6,7 @@ outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
 batch=20000
-sqlh='select * from '
+sqlh='select ts,current,voltage from '
 sqle=' where _c0>0  '
 
 help(){
@@ -35,41 +35,48 @@ dumpSchema(){
     if [ ${#dsql} -gt 1 ]
     then
         echo "${dsql}"  >${outdir}/db.sql
-        echo "DB_Name   Info"
-        echo "-------   -----------------------"
-        echo "${db} dump out done."
+        echo "DB_Name   Info" 
+        echo "----------   -----------------------" 
+        echo "DB:${db}         Schema dump out done."
         echo ""
         #导出超级表建表语句
-        echo "No    Stable     Info"
-        echo "---   --------  -------------------"
+        echo "No    Stable     Info" 
+        echo "---   --------  -------------------" 
         dn=1
         for stb in $(${taos} -u${user} -p${pass} -s "show ${db}.stables"|grep '|'|grep -v 'stable_name'|awk '{print $1}' )
         do
                 ${taos} -u${user} -p${pass} -s "show create stable ${db}.${stb} \G"|grep '^Create'|awk -F ':' '{print $NF}' >>${outdir}/stb.sql
-                echo "$dn \t${stb} \tdump out done."
+                echo "$dn \t${stb} \tdump out done." 
                 dn=$(($dn+1))
         done
         echo ""
         #导出子表/普通表建表语句
-        echo "No    Table      Info"
-        echo "---   --------  -------------------"
+        echo "No    Table      Info" >> ${outdir}/csvdump.log
+        echo "---   --------  -------------------" >> ${outdir}/csvdump.log
         tn=0
         #导出所有表
         #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
         #导出指定表
         for tb in $(cat $tblist)
         do
-                csql=$(${taos} -u${user} -p${pass} -s "show create table ${db}.${tb} \G"|grep '^Create'|awk -F ':' '{print $NF}') 
-                if [ ${#csql} -gt 1 ]
-                then
-                    echo "${csql}" >>${outdir}/tb.sql
-                    tn=$(($tn+1))
-                    echo "$tn \t${tb} \tdump out done."
-                else
-                    echo "  \t${tb} \tdump out ERROR!"
-                fi
+            #    csql=$(${taos} -u${user} -p${pass} -s "show create table ${db}.${tb} \G"|grep '^Create'|awk -F ':' '{print $NF}') 
+            #    if [ ${#csql} -gt 1 ]
+            #    then
+            #        echo "${csql}" >>${outdir}/tb.sql
+            #        tn=$(($tn+1))
+            #        echo "$tn \t${tb} \tdump out done." >> ${outdir}/csvdump.log
+            #        echo -n '.'
+            #    else
+            #        echo "  \t${tb} \tdump out ERROR!"
+            #    fi
+            echo "show create table ${db}.${tb} \G;" >>${outdir}/${db}.get_table.sql
+            tn=$(($tn+1))
         done
-        echo "## $tn tables dump out."
+        echo "Create Get SQL Done!"
+        ${taos} -u${user} -p${pass} -f ${outdir}/${db}.get_table.sql |grep '^Create Table'|awk -F ':' '{print $NF}' >>${outdir}/tb.sql
+        echo ""
+        sql_count=$(wc -l ${outdir}/tb.sql |awk '{print $1}')
+        echo "## ${sql_count}/${tn} tables dump out."
         echo ""
     else
         echo "Get DB $db Schema failed!"
@@ -80,8 +87,8 @@ dumpData(){
     num=0
     echo "Dump SQL : $sqlh ${db}.TABLENAME $sqle >> ${outdir}/TABLENAME.csv;"
     echo ""
-    echo "No    Table      Info"
-    echo "---   --------  -------------------"
+    echo "No    Table      Info" >> ${outdir}/csvdump.log
+    echo "---   --------  -------------------" >> ${outdir}/csvdump.log
     #导出所有表数据
     #for tb in $(${taos} -u${user} -p${pass} -s "show ${db}.tables"|grep '|'|grep -v 'table_name'|awk '{print $1}' )
     #导出指定表数据
@@ -98,18 +105,20 @@ dumpData(){
             if [ $file_total ]
             then 
                 num=$(($num+1))
-                echo "$num \t${tb} \t $file_total rows dump out done."
+                echo "$num \t${tb} \t $file_total rows dump out done." >> ${outdir}/csvdump.log
+                echo -n '.'
             fi
         fi
     done
+    echo ""
     echo "## $num tables dump out!!"
     echo ""
 }
 
 dumpIn(){
     num=0
-    echo "No    Table      Info"
-    echo "---   --------  -------------------"
+    echo "No    Table      Info" >> ${outdir}/csvdump.log
+    echo "---   --------  -------------------" >> ${outdir}/csvdump.log
     for tb in $(cat $tblist)
     do
         bt=$(date +%s)
@@ -123,7 +132,8 @@ dumpIn(){
                 then 
                     num=$(($num+1))
                     et=$(date +%s)
-                    echo "$num \t${tb} \t $insert_total rows dump in done! Cost $((${et}-${bt})) s."
+                    echo "$num \t${tb} \t $insert_total rows dump in done! Cost $((${et}-${bt})) s." >> ${outdir}/csvdump.log
+                    echo -n "."
                 else
                     echo "   \t${tb} \t  dump in ERROR!"
                 fi
@@ -146,7 +156,8 @@ dumpIn(){
                 done
                     num=$(($num+1))
                     et=$(date +%s)
-                    echo "$num \t${tb} \t $total_rows rows dump in done! Cost $(($et-$bt)) s."
+                    echo "$num \t${tb} \t $total_rows rows dump in done! Cost $(($et-$bt)) s." >> ${outdir}/csvdump.log
+                    echo -n "."
                 cd ${outdir}
                 rm -rf ${outdir}/${tb}
             fi
@@ -154,6 +165,7 @@ dumpIn(){
             echo "${outdir}/${tb}.csv not found!!"
         fi
     done
+    echo ""
     echo "## $num tables dump in!!"
     echo ""
 }
