@@ -84,7 +84,7 @@ dumpSchema(){
 }
 
 dumpData(){
-    bt=$(date +%s)
+    tbt=$(date +%s)
     num=0
     echo "Dump SQL : $sqlh ${db}.TABLENAME $sqle >> ${outdir}/TABLENAME.csv;"
     echo ""
@@ -111,14 +111,14 @@ dumpData(){
             fi
         fi
     done
-    et=$(date +%s)
+    tet=$(date +%s)
     echo ""
-    echo "## $num tables dump out!! Cost $(($et-$bt)) s."
+    echo "## $num tables dump out!! Cost $(($tet-$tbt)) s."
     echo ""
 }
 
 dumpIn(){
-    bt=$(date +%s)
+    tbt=$(date +%s)
     num=0
     echo "No    Table      Info" >> ${outdir}/csvdump.log
     echo "---   --------  -------------------" >> ${outdir}/csvdump.log
@@ -168,9 +168,9 @@ dumpIn(){
             echo "${outdir}/${tb}.csv not found!!"
         fi
     done
-    et=$(date +%s)
+    tet=$(date +%s)
     echo ""
-    echo "## $num tables dump in!! Cost $(($et-$bt)) s."
+    echo "## $num tables dump in!! Cost $(($tet-$tbt)) s."
     echo ""
 }
 
