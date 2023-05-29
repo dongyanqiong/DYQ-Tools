@@ -5,7 +5,7 @@ taos=taos
 outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
-batch=20000
+batch=20000000
 sqlh='select ts,current,voltage from '
 sqle=' where _c0>0  '
 
