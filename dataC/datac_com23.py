@@ -31,6 +31,7 @@ def get_param(cfgfile):
     global etime
     global recordPerSQL
     global tableonly
+    global sqlh
 
     if pversion<3:
         with open(cfgfile) as j:
@@ -56,6 +57,7 @@ def get_param(cfgfile):
     etime = str(clusterInfo.get("endTime"))
     recordPerSQL = clusterInfo.get("recodeOfPerSQL")
     tableonly = clusterInfo.get("tableonly")
+    sqlh = clusterInfo.get("sqlheader")
 
 
 ## Restful request
@@ -142,7 +144,7 @@ def export_table(etbname,itbname):
             print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",etbname,"Select Rows:",count_num)
         if row_num != 0 and count_num != 0:
             if count_num < recordPerSQL:
-                select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<=' + etime +';'
+                select_sql = sqlh+' '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<=' + etime +';'
                 resInfo = request_post(eurl, select_sql, euserName, epassWord)
                 imsql = export_sql(idb,itbname,resInfo)
                 resInfo = request_post(iurl, imsql, iuserName, ipassWord)
@@ -176,7 +178,7 @@ def export_table(etbname,itbname):
                 irows = 0
                 for i in range(rnum):
                     offset = i * recordPerSQL
-                    select_sql = 'select * from '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<='+ etime + ' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
+                    select_sql = sqlh+' '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<='+ etime + ' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
     #                print(select_sql)
                     resInfo = request_post(eurl, select_sql, euserName, epassWord)
                     chkrt = check_return(resInfo,eversion)

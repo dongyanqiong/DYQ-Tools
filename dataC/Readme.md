@@ -74,6 +74,10 @@ python datac_init.py
 
     "importVersion":3,          #数据库版本
 
+    "tableonly":"false",        #是否只导表结构
+
+    "sqlheader":"select * from ",   #查询SQL头，可根据实际需求定制
+
     "recodeOfPerSQL":100,       #单条SQL包含记录数
 
     "startTime":1321946822000,  #查询起始时间

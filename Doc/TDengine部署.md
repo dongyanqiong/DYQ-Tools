@@ -383,6 +383,9 @@ monitor                     1
 monitorFqdn                 node1
 logKeepDays                 -1
 debugflag                   131
+keepColumnName              1
+countAlwaysReturnValue      1
+supportVnodes               0
 ```
 
 
