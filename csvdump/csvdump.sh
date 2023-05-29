@@ -95,6 +95,7 @@ dumpData(){
     #导出指定表数据
     for tb in $(cat $tblist)
     do
+        bt=$(date +%s)
         if [ -e ${outdir}/${tb}.csv ]
         then
             echo -e  "${outdir}/${tb}.csv already exits!!"
@@ -105,8 +106,9 @@ dumpData(){
         #    echo -e  "$tb" >> $tblist
             if [ $file_total ]
             then 
+                et=$(date +%s)
                 num=$(($num+1))
-                echo -e  "$num \t${tb} \t $file_total rows dump out done." >> ${outdir}/csvdump.log
+                echo -e  "$num \t${tb} \t $file_total rows dump out done. Cost $(($et-$bt)) s." >> ${outdir}/csvdump.log
                 echo -e  -n '.'
             fi
         fi
