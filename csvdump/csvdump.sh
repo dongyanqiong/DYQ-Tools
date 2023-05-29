@@ -1,7 +1,7 @@
 #!/bin/sh
 user=root
 pass=taosdata
-taos='taos -r '
+taos=taos
 outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
