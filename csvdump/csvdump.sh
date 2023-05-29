@@ -6,7 +6,7 @@ outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
 batch=20000000
-sqlh='select ts,current,voltage from '
+sqlh='select * from '
 sqle=' where _c0>0  '
 
 help(){
