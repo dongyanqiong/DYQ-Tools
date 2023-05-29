@@ -51,6 +51,7 @@ dumpSchema(){
         done
         echo -e  ""
         #导出子表/普通表建表语句
+        echo -e  "## $(date +'%Y-%m-%d %H:%M:%S')" >> ${outdir}/csvdump.log
         echo -e  "No    Table      Info" >> ${outdir}/csvdump.log
         echo -e  "---   --------  -------------------" >> ${outdir}/csvdump.log
         tn=0
@@ -88,6 +89,7 @@ dumpData(){
     num=0
     echo -e  "Dump SQL : $sqlh ${db}.TABLENAME $sqle >> ${outdir}/TABLENAME.csv;"
     echo -e  ""
+    echo -e  "## $(date +'%Y-%m-%d %H:%M:%S')" >> ${outdir}/csvdump.log
     echo -e  "No    Table      Info" >> ${outdir}/csvdump.log
     echo -e  "---   --------  -------------------" >> ${outdir}/csvdump.log
     #导出所有表数据
@@ -122,6 +124,7 @@ dumpData(){
 dumpIn(){
     tbt=$(date +%s)
     num=0
+    echo -e  "## $(date +'%Y-%m-%d %H:%M:%S')" >> ${outdir}/csvdump.log
     echo -e  "No    Table      Info" >> ${outdir}/csvdump.log
     echo -e  "---   --------  -------------------" >> ${outdir}/csvdump.log
     for tb in $(cat $tblist)
