@@ -21,6 +21,7 @@ help(){
     echo -e  ""
     echo -e  "-u username"
     echo -e  "-p password"
+    echo -e  "-h host"
     echo -e  "-f tblist file"
     echo -e  "-o outdir."
     echo -e  "-d DBname "
