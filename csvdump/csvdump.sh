@@ -2,6 +2,7 @@
 user=root
 pass=taosdata
 taos=taos
+host=localhost
 outdir='/tmp'
 tblist=${outdir}/tblist
 db=''
@@ -31,7 +32,7 @@ help(){
 
 dumpSchema(){
     #导出建库语句
-    dsql=$(${taos} -u${user} -p${pass} -s "show create database ${db}\G"|grep '^Create'|awk -F ':' '{print $NF}')
+    dsql=$(${taos} -u${user} -p${pass} -h ${host} -s "show create database ${db}\G"|grep '^Create'|awk -F ':' '{print $NF}')
     if [ ${#dsql} -gt 1 ]
     then
         echo -e  "${dsql}"  >${outdir}/db.sql
@@ -43,9 +44,9 @@ dumpSchema(){
         echo -e  "No    Stable     Info" 
         echo -e  "---   --------  -------------------" 
         dn=1
-        for stb in $(${taos} -u${user} -p${pass} -s "show ${db}.stables"|grep '|'|grep -v 'stable_name'|awk '{print $1}' )
+        for stb in $(${taos} -u${user} -p${pass} -h ${host} -s "show ${db}.stables"|grep '|'|grep -v 'stable_name'|awk '{print $1}' )
         do
-                ${taos} -u${user} -p${pass} -s "show create stable ${db}.${stb} \G"|grep '^Create'|awk -F ':' '{print $NF}' >>${outdir}/stb.sql
+                ${taos} -u${user} -p${pass} -h ${host} -s "show create stable ${db}.${stb} \G"|grep '^Create'|awk -F ':' '{print $NF}' >>${outdir}/stb.sql
                 echo -e  "$dn \t${stb} \tdump out done." 
                 dn=$(($dn+1))
         done
@@ -74,7 +75,7 @@ dumpSchema(){
             tn=$(($tn+1))
         done
         echo -e  "Create Get SQL Done!"
-        ${taos} -u${user} -p${pass} -f ${outdir}/${db}.get_table.sql |grep '^Create Table'|awk -F ':' '{print $NF}' >>${outdir}/tb.sql
+        ${taos} -u${user} -p${pass} -h ${host} -f ${outdir}/${db}.get_table.sql |grep '^Create Table'|awk -F ':' '{print $NF}' >>${outdir}/tb.sql
         echo -e  ""
         sql_count=$(wc -l ${outdir}/tb.sql |awk '{print $1}')
         echo -e  "## ${sql_count}/${tn} tables dump out."
@@ -104,7 +105,7 @@ dumpData(){
             exit
         else
             sql=$(echo -e  "$sqlh ${db}.${tb} $sqle >>${outdir}/${tb}.csv;")
-            file_total=$(${taos} -u${user} -p${pass} -s "$sql"|grep 'OK' |awk '{print $3}' )
+            file_total=$(${taos} -u${user} -p${pass} -h ${host} -s "$sql"|grep 'OK' |awk '{print $3}' )
         #    echo -e  "$tb" >> $tblist
             if [ $file_total ]
             then 
@@ -135,7 +136,7 @@ dumpIn(){
             file_count=$(wc -l ${outdir}/${tb}.csv |awk '{print $1}')
             if [ $file_count -lt $batch ]
             then
-                insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}.csv'" |grep 'OK' |awk '{print $3}')
+                insert_total=$(${taos} -u${user} -p${pass} -h ${host} -s "insert into ${db}.${tb} file '${outdir}/${tb}.csv'" |grep 'OK' |awk '{print $3}')
                 if [ $insert_total ]
                 then 
                     num=$(($num+1))
@@ -154,7 +155,7 @@ dumpIn(){
                 total_rows=0
                 for csv in $(ls part_*)
                 do
-                    insert_total=$(${taos} -u${user} -p${pass} -s "insert into ${db}.${tb} file '${outdir}/${tb}/${csv}'" |grep 'OK' |awk '{print $3}')
+                    insert_total=$(${taos} -u${user} -p${pass} -h ${host} -s "insert into ${db}.${tb} file '${outdir}/${tb}/${csv}'" |grep 'OK' |awk '{print $3}')
                     if [ $insert_total ]
                     then 
                         total_rows=$(($total_rows+$insert_total))
@@ -187,7 +188,7 @@ then
 fi
 
 runlevel=U
-while getopts 'u:p:f:o:d:b:SDI' opt
+while getopts 'u:p:f:o:d:h:b:SDI' opt
 do
     case $opt in
         u)
@@ -204,6 +205,9 @@ do
         ;;
         d)
         db=$OPTARG
+        ;;
+        h)
+        host=$OPTARG
         ;;
         b)
         batch=$OPTARG
