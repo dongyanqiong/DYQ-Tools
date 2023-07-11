@@ -1,2 +1,4 @@
 * * * * * /root/check_c.sh 
 * * * * * /root/check_r.sh
+
+* * * * * /root/adapter_check.sh
