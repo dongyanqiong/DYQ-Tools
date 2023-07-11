@@ -99,3 +99,16 @@ CSV导入导出工具
 ./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db01 -D
 ./csvdump.sh -u root -p taosdata -o /tmp/ -f /tmp/tblist -d db03 -I
 ```
+
+## AdapterMonitor
+
+taosAdapter 检查脚本，用于检查TD2.6版本taosAdapter卡住问题。
+
+需要提前创建test用户。
+
+使用方法：
+```shell
+chmod 755 adapter_check.sh
+crontab -e
+* * * * * /root/adapter_check.sh
+```
