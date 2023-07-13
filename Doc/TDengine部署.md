@@ -523,6 +523,27 @@ PAGES 512
 PAGESIZE 8;  --KB
 ```
 
+### 3.1.修改root密码
+```shell
+alter user root pass 'Tbase2024_0707###';
+```
+### 3.2.创建监控用户
+```shell
+create user monitor pass 'Tbase_Mon_2024###'
+```
+
+### 3.3.修改taosKeeper配置
+/etc/taos/taoskeeper.toml
+```shell
+username = "monitor"
+password = "Tbase_Mon_2024###"
+```
+```shell
+systemctl start  taoskeeper
+systemctl enable taoskeeper
+```
+
+
 
 ## 4.生产环境最佳实践
 视具体业务场景而定。
