@@ -58,6 +58,7 @@ mkdir -p /data/taos/{log,core,soft,tmp}
 为方便 TDengine 运维及 debug，建议安装以下辅助工具包。
 
 ```shell
+#CentOS
 yum install -y screen
 yum install -y tmux  
 yum install -y gdb  
@@ -70,6 +71,18 @@ yum install -y tree
 yum install -y wget 
 wget https://repos.baslab.org/rhel/7/bpftools/bpftools.repo -O /etc/yum.repos.d/bpftools.repo --no-check-certificate 
 yum install -y bpftrace
+
+#Ubuntu
+apt install -y screen
+apt install -y tmux  
+apt install -y gdb  
+apt install -y fio  
+apt install -y iperf3  
+apt install -y sysstat  
+apt install -y net-tools  
+apt install -y ntp 
+apt install -y tree 
+apt install -y wget 
 ```
 
 工具包说明：
@@ -118,8 +131,13 @@ TDengine 节点间通信采用 TCP 和 UDP 协议，并使用 6030~6040 端口�
 建议关闭防火墙，如需开启防火墙请开放相关端口。关闭防火墙命令如下：
 
 ```shell
+#CentOS
 systemctl stop firewalld 
 systemctl disable firewalld
+
+#Ubuntu
+ufw stop
+ufw disable
 ```
 
 ### 1.6.配置资源限制
@@ -163,8 +181,13 @@ TDengine 节点间时间必须保证同步，否则会造成节点间状态异�
 如无法连接互联网，建议在局域网内部部署 NTP 服务器。
 
 ```shell
+#CentOS 6/7
 systemctl start ntpd 
 systemctl enable ntpd
+
+#Ubuntu/CentOS 8+
+systemctl start  chrony
+systemctl enable chrony
 ```
 
 ### 1.9.设置 SWAP
@@ -189,6 +212,10 @@ echo "ulimit -c unlimited" >>/etc/profile
 echo "kernel.core_pattern=/data/taos/core/core-%e-%p" >>/etc/sysctl.conf 
 sysctl -p
 ```
+```shell
+set_core /data/taos/core
+```
+
 
 ### 1.11.关闭 NUMA
 
@@ -370,7 +397,6 @@ numOfCommitThreads        8
 firstEp                     node1:6030
 secondEp                    node2:6030
 fqdn                        node1
-arbitrator                  node2:6042
 logDir                      /data/taos/log
 dataDir                     /data/taos/data
 tempDir                     /data/taos/tmp
