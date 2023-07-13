@@ -524,12 +524,21 @@ PAGESIZE 8;  --KB
 ```
 
 ### 3.1.修改root密码
-```shell
+```sql
 alter user root pass 'Tbase2024_0707###';
 ```
-### 3.2.创建监控用户
-```shell
+### 3.2.创建用户
+创建监控用户
+```sql
 create user monitor pass 'Tbase_Mon_2024###'
+```
+创建只读用户
+```sql
+create user test pass 'test' sysinfo 0;
+//2.6
+alter user test privilege read;
+//3.0
+grant read on db.* to test;
 ```
 
 ### 3.3.修改taosKeeper配置
