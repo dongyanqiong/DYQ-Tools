@@ -406,12 +406,13 @@ timezone                    UTC-8
 locale                      en_US.UTF-8
 charset                     UTF-8
 monitor                     1 
-monitorFqdn                 node1
+monitorFqdn                 localhost
 logKeepDays                 -1
 debugflag                   131
 keepColumnName              1
 countAlwaysReturnValue      1
 supportVnodes               0
+slowLogThreshold            10
 ```
 
 
