@@ -112,3 +112,12 @@ chmod 755 adapter_check.sh
 crontab -e
 * * * * * /root/adapter_check.sh
 ```
+
+## swapCount.sh
+
+统计进程使用SWAP的总量。
+
+使用方法：
+```shell
+sh swapCount.sh
+```
