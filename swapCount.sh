@@ -13,7 +13,7 @@ do_swap () {
     let OVERALL=$OVERALL+$SUM
     SUM=0 
   done
-  echo "Overall swap used: $OVERALL"
+  echo "Overall swap used: $OVERALL KB."
  }
 do_swap > tmp.txt
 cat tmp.txt |awk -F[\ \(] '{print $5"\t KB",$1"\t",$7}' | sort -n | tail -10
