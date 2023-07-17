@@ -185,9 +185,13 @@ TDengine 节点间时间必须保证同步，否则会造成节点间状态异�
 systemctl start ntpd 
 systemctl enable ntpd
 
+ntpq -p
+
 #Ubuntu/CentOS 8+
 systemctl start  chronyd
 systemctl enable chronyd
+
+chrony sourcestats -v
 ```
 
 ### 1.9.设置 SWAP
