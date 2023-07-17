@@ -16,6 +16,6 @@ do_swap () {
   echo "Overall swap used: $OVERALL"
  }
 do_swap > tmp.txt
-cat tmp.txt |awk -F[\ \(] '{print $5,$1,$7}' | sort -n | tail -10
+cat tmp.txt |awk -F[\ \(] '{print $5"\t KB",$1"\t",$7}' | sort -n | tail -10
 cat tmp.txt |tail -1
 rm -rf tmp.txt
