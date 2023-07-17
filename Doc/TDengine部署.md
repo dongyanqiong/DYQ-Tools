@@ -186,8 +186,8 @@ systemctl start ntpd
 systemctl enable ntpd
 
 #Ubuntu/CentOS 8+
-systemctl start  chrony
-systemctl enable chrony
+systemctl start  chronyd
+systemctl enable chronyd
 ```
 
 ### 1.9.设置 SWAP
