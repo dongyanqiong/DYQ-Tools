@@ -448,12 +448,25 @@ slowLogThreshold            10
 /etc/taos/taosadapter.toml
 
 ```shell
+debug = false
+
 [pool]
 maxConnect = 32
 maxIdle = 32
 
 [log]
 path = "/data/taos/log"
+```
+```shell
+## 2.6
+[monitor]
+writeToTD = true
+user = "root"
+password = "New_Password"
+
+## 3.0
+[monitor]
+writeToTD = false
 ```
 
 #### 2.1.4.启动数据库
