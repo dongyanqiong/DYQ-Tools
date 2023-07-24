@@ -34,7 +34,7 @@ cache: 从磁盘中读取的数据，用于避免重复读。
 
 那么如何判断内存是否充足，何时进行内存回收呢？
 
-通常由两个参数来控制：`vm.min_free_kbytes` 和 `pages_low` 。
+通常由两个参数来控制：`vm.min_free_kbytes` 和 `pages_low` (pages_low=min_free_kbytes*5/4)。
 当可用内存小于 `pages_low` 时就会触发内存的回收。
 
 在 RedHat 官方文档中描述`vm.min_free_kbytes`如下：
@@ -52,7 +52,16 @@ Setting this too high will OOM your machine instantly.
 pages_low 与 min_free_kbytes 对应关系参考：
 https://blog.csdn.net/hu1610552336/article/details/113081805
 
-当然，实际情况并没有这么简单，这时我们需要了解 NUMA 这个架构，对于大多数服务器，都会启用 NUMA，这就造成了内存被分成了不同的 zone，当某个 zone 内存耗尽时，其他 zone 可能内存还空闲。这时我们就会看到剩余内存还很多，但是 SWAP 已经开始使用了。
+当然，实际情况并没有这么简单。Linux中的内存分为DMA，DMA32，Normal三个区，pages_low  会按照比例分布在这三个区域。
+
+>64位 x86_64架构
+>ZONE_DMA	first 16MB
+>ZONE_DMA32	16MB~4GB	
+>ZONE_NORMAL	all further memory
+
+`/proc/buddyinfo` 记录了三个区域内存分布。
+
+同时我们需要了解 NUMA 这个架构，对于大多数服务器，都会启用 NUMA，这就造成了内存被分成了不同的 zone，当某个 zone 内存耗尽时，其他 zone 可能内存还空闲。这时我们就会看到剩余内存还很多，但是 SWAP 已经开始使用了。
 
 `/proc/zoneinfo` 记录了系统当前不同 zone 内存的使用情况。
 
