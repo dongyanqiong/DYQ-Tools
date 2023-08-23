@@ -191,7 +191,7 @@ ntpq -p
 systemctl start  chronyd
 systemctl enable chronyd
 
-chrony sourcestats -v
+chronyc sourcestats -v
 ```
 
 ### 1.9.设置 SWAP
@@ -417,6 +417,10 @@ keepColumnName              1
 countAlwaysReturnValue      1
 supportVnodes               0
 slowLogThreshold            10
+maxShellConns             100000
+maxConnections            100000
+maxNumOfDistinctRes         10000000
+shellActivityTimer        120
 ```
 
 
