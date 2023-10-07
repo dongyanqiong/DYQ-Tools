@@ -12,6 +12,6 @@ tt=$(($tn*$days))
 te=$((($tn+1)*$days))
 dt=$(date -d @$tt +'%Y-%m-%d' )
 de=$(date -d @$te +'%Y-%m-%d' )
-echo "$vn   $dt ~ $de"
+echo "$vn   \t$dt ~ $de"
 
 done |uniq|more

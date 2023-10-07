@@ -149,17 +149,17 @@ echo "fs.nr_open = 1048576" >>/etc/sysctl.conf
 sysctl -p
 
 echo "* soft nproc  65536" >>/etc/security/limits.conf
-echo "* soft nofile 65536" >>/etc/security/limits.conf
+echo "* soft nofile 1048576" >>/etc/security/limits.conf
 echo "* soft stack  65536" >>/etc/security/limits.conf
 echo "* hard nproc  65536" >>/etc/security/limits.conf
-echo "* hard nofile 65536" >>/etc/security/limits.conf
+echo "* hard nofile 1048576" >>/etc/security/limits.conf
 echo "* hard stack  65536" >>/etc/security/limits.conf
 
 echo "root soft nproc  65536" >>/etc/security/limits.conf
-echo "root soft nofile 65536" >>/etc/security/limits.conf
+echo "root soft nofile 1048576" >>/etc/security/limits.conf
 echo "root soft stack  65536" >>/etc/security/limits.conf
 echo "root hard nproc  65536" >>/etc/security/limits.conf
-echo "root hard nofile 65536" >>/etc/security/limits.conf
+echo "root hard nofile 1048576" >>/etc/security/limits.conf
 echo "root hard stack  65536" >>/etc/security/limits.conf
 
 ```
@@ -421,6 +421,7 @@ maxShellConns             100000
 maxConnections            100000
 maxNumOfDistinctRes         10000000
 shellActivityTimer        120
+assert                      0
 ```
 
 
@@ -535,8 +536,8 @@ SHOW MNODES;
 
 #### 3.0 创建mnode
 ```sql
-CREATE MNODES ON DNODE 2; 
-CREATE MNODES ON DNODE 3;
+CREATE MNODE ON DNODE 2; 
+CREATE MNODE ON DNODE 3;
 ```
 
 ## 3.创建数据库
