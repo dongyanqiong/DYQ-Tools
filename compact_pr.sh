@@ -14,4 +14,4 @@ dt=$(date -d @$tt +'%Y-%m-%d' )
 de=$(date -d @$te +'%Y-%m-%d' )
 echo "$vn   \t$dt ~ $de"
 
-done |uniq|more
+done |sort -n|uniq|more
