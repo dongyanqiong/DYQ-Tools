@@ -17,8 +17,6 @@ global dpassWord
 global durl
 global ddb
 global dversion
-global stime
-global etime
 global unit
 
 suserName = 'root'
@@ -32,13 +30,20 @@ dpassWord = 'taosdata'
 durl = 'http://10.7.7.14:6041/rest/sql'
 ddb = 'db01'
 dversion = 3
-stime = '2000-01-01T00:00:00Z'
-etime = '2023-10-01T00:00:00Z'
-unit = 86400000
+stime = '2000-01-01T00:00:00.000+00:00'
+etime = '2023-10-01T00:00:00.000+00:00'
+unit = '1d'
 
 plog = 'process.log'
 elog = 'error.log'
 
+def arg_j(sarg):
+    try:
+        dt = datetime.datetime.fromisoformat(sarg).strftime('%s')
+        return dt
+    except:
+        print("{}. Time only support ISO8601 format!".format(sarg))
+        return 1
 
 def request_post(url, sql, user, pwd):
     try:
@@ -78,7 +83,7 @@ def get_tblist(stbname):
         print(code)
     return tbl
 
-def get_data(stbname,url,username,password,dbname,version):
+def get_data(stbname,url,username,password,dbname,version,stime,etime):
     data = dict()
     if version == 2:
         sql = "select count(*) from `"+dbname+'`.`'+stbname+'` where _c0>="'+str(stime)+'" and _c0<="'+str(etime)+'"  group by tbname;'
@@ -94,31 +99,47 @@ def get_data(stbname,url,username,password,dbname,version):
         print(rt)
     return data
 
+def table_diff(tbname):
+    tdff = dict()    
+    return tdff
+
 if __name__ == '__main__':
     print('-------------------Begin------------------------------')
     if len(sys.argv) >= 3:
         stime = str(sys.argv[1])
+        if arg_j(stime) == 1:
+            exit()
         etime = str(sys.argv[2])
+        if arg_j(etime) == 1:
+            exit()
     logp = open(plog,"a")
     loge = open(elog,"a")
     sfile = open('stblist',"r")
     stbl = []
+    tb_lost = []
+    tb_diff = []
     for stb in sfile:
         stbl.append(stb.strip())
     for stb in stbl:
-        sdata = get_data(stb,surl,suserName,spassWord,sdb,sversion)
-        ddata = get_data(stb,durl,duserName,dpassWord,ddb,dversion)
+        sdata = get_data(stb,surl,suserName,spassWord,sdb,sversion,stime,etime)
+        ddata = get_data(stb,durl,duserName,dpassWord,ddb,dversion,stime,etime)
         for key in sdata.keys():
             dv = ddata.get(key)
             if str(dv) == 'None':
-                log = 'Table:'+key+' not exits.'
-                print(log)
+                tb_lost.append(key)
+                log = 'Table:'+key+' not exits in Destination DB: ' + ddb
+                #print(log)
                 log_write(logp,log)
             else:
+                tb_diff.append(key)
                 if dv != sdata[key]:
-                    log = 'Table:'+key+' Dest:'+str(dv)+' Source:'+str(sdata[key])
-                    print(log)
+                    rd_diff = sdata[key]-dv
+                    log = 'Table:'+key+' Dest:'+str(dv)+' Source:'+str(sdata[key])+' Diff:'+str(rd_diff)
+                    #print(log)
                     log_write(logp,log)
+    print("Lost tables:{}, Diff tables:{}.".format(len(tb_lost),len(tb_diff)))    
+
     logp.close()
     loge.close()
+    sfile.close()
     print('-------------------END------------------------------')
