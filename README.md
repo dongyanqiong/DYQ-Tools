@@ -121,3 +121,11 @@ crontab -e
 ```shell
 sh swapCount.sh
 ```
+## DataCompare
+
+对比两个数据库数据量，通过对指定时间的超级表进行 `group by tbname` 查询，逐个子表对比数量。
+如果数量不同，则打印子表名称。可以通过修改程序变量或参数传递的方式指定时间范围。
+
+```shell
+python3 datacompare.py 2023-01-01T00:00:00Z 2023-10-01T00:00:00Z
+```
