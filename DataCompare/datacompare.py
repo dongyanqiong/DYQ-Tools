@@ -43,6 +43,8 @@ def arg_j(sarg):
         return dt
     except:
         print("{}. Time only support ISO8601 format!".format(sarg))
+        print("python3 datacompare.py 2023-01-01T00:00:00.000+00:00 2023-02-01T00:00:00.000+08:00")
+        print("\n")
         return 1
 
 def request_post(url, sql, user, pwd):
