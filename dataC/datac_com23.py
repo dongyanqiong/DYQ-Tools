@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ 
   Transfer data from Database A to Database B table by table by Restful.
+  DB and Stable must be create before run dataC.
 """
 import requests
 import json
@@ -18,7 +19,7 @@ handler_test = logging.FileHandler(log_file,mode='w')
 handler_control = logging.StreamHandler()    
 handler_test.setLevel('INFO')             
 handler_control.setLevel('INFO')           
-selfdef_fmt = '[%(asctime)s] %(name)s/%(funcName)s(%(process)d) %(levelname)s - %(message)s'
+selfdef_fmt = '[%(asctime)s] %(name)s/%(funcName)s(%(process)d/%(threadName)s) %(levelname)s - %(message)s'
 formatter = logging.Formatter(selfdef_fmt)
 handler_test.setFormatter(formatter)
 handler_control.setFormatter(formatter)
@@ -96,6 +97,8 @@ def request_post(url, sql, user, pwd):
                 result = requests.post(url, data=sql, auth=HTTPBasicAuth(user,pwd),headers=headers)
             except Exception as e:
                 logger.error(e)
+                logger.error(f"Try twice failed!! {sql}")
+                sys.exit()
             else:
                 text=result.content.decode()
                 return text
@@ -193,15 +196,20 @@ def export_table(etbname,itbname):
                              logger.error(resInfo)
                         else:
                             logger.info(f"Create table {itbname} success.")
+                            ctb_proced.append(1)
                             resInfo = request_post(iurl, imsql, iuserName, ipassWord)
                             chkrt = check_return(resInfo,iversion)
                             if chkrt == 'error':
                                 logger.error(resInfo)
                             datai = json.loads(resInfo).get("data")
                             logger.info(f"Table Name:{itbname} Insert Rows:{datai[0][0]}")
+                            tb_proced.append(1)
+                            rw_proced.append(int(datai[0][0]))
                 else:
                     datai = json.loads(resInfo).get("data")
                     logger.info(f"Table Name:{itbname} Insert Rows:{datai[0][0]}")
+                    tb_proced.append(1)
+                    rw_proced.append(int(datai[0][0]))
             else:
                 if count_num % recordPerSQL == 0:
                     rnum = int(count_num/recordPerSQL)
@@ -232,6 +240,8 @@ def export_table(etbname,itbname):
                                 if chkrt == 'error':
                                     logger.error(resInfo)
                                 else:
+                                    logger.info(f"Create table {itbname} success.")
+                                    ctb_proced.append(1)
                                     resInfo = request_post(iurl, imsql, iuserName, ipassWord)
                                     chkrt = check_return(resInfo,iversion)
                                     if chkrt == 'error':
@@ -240,6 +250,8 @@ def export_table(etbname,itbname):
                             datai = json.loads(resInfo).get("data")
                             irows = irows + datai[0][0]
                 logger.info(f"Table Name:{itbname} Insert Rows:{irows}")
+                tb_proced.append(1)
+                rw_proced.append(int(datai[0][0]))
 
 ## Get table create sql
 def get_table_struc(tbname):
@@ -305,8 +317,9 @@ def multi_thread(tblist,wmethod):
                 t = multiprocessing.Process(target=thread_func,args=(tblist,tnum,listnum))
                 threads.append(t)
         else:
-            for tnum in range(threadNum):             
-                t = threading.Thread(target=thread_func,args=(tblist,tnum,listnum))
+            for tnum in range(threadNum):
+                tname=str('Thread_'+str(tnum))             
+                t = threading.Thread(target=thread_func,name=tname,args=(tblist,tnum,listnum))
                 threads.append(t)
         for t in threads:  
             t.start()
@@ -314,7 +327,8 @@ def multi_thread(tblist,wmethod):
             t.join()
     logger.info('--------------------end------------------')
     logger.info("##############################")
-    logger.info(f"## {len(tblist)} tables is proceed.")
+    logger.info(f"## {len(tb_proced)}/{len(tblist)} Tables  and {sum_list(rw_proced)} Rows are proceed.")
+    logger.info(f"## {len(ctb_proced)} tables created.")
     logger.info("##############################")
 
 ## Check config file
@@ -346,12 +360,24 @@ def config_check():
         logger.error("Export DB should not be the Import DB!")
     return rvalue
 
+## sum list
+def sum_list(rwlist):
+    sum = 0
+    for i in rwlist:
+        sum += int(i)
+    return sum
 
 if __name__ == '__main__':
     cfgfile = 'datac.cfg'
     filename = ''
     wmethod = 'thread'
     help = 'false'
+    global tb_proced
+    global ctb_proced
+    global rw_proced
+    tb_proced = []
+    ctb_proced = []
+    rw_proced = []
 
     if len(sys.argv) <= 1:
             get_param(cfgfile)
