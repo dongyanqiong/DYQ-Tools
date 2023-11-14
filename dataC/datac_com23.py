@@ -1,4 +1,7 @@
-## Transfer data from Database A to Database B table by table by Restful.
+# -*- coding: utf-8 -*-
+""" 
+  Transfer data from Database A to Database B table by table by Restful.
+"""
 import requests
 import json
 from requests.auth import HTTPBasicAuth
@@ -7,6 +10,22 @@ import getopt
 import time
 import threading
 import multiprocessing
+import logging
+
+# Set logging config
+log_file = 'dataC.log'
+handler_test = logging.FileHandler(log_file,mode='w') 
+handler_control = logging.StreamHandler()    
+handler_test.setLevel('ERROR')             
+handler_control.setLevel('INFO')           
+selfdef_fmt = '[%(asctime)s] %(name)s/%(funcName)s(%(process)d) %(levelname)s - %(message)s'
+formatter = logging.Formatter(selfdef_fmt)
+handler_test.setFormatter(formatter)
+handler_control.setFormatter(formatter)
+logger = logging.getLogger('dataC')
+logger.setLevel('DEBUG')      
+logger.addHandler(handler_test)  
+logger.addHandler(handler_control)
 
 pversion = int(sys.version[0:1])
 
@@ -68,13 +87,26 @@ def request_post(url, sql, user, pwd):
             'Connection': 'keep-alive',
             'Accept-Encoding': 'gzip, deflate, br'
         }
-        result = requests.post(url, data=sql, auth=HTTPBasicAuth(user,pwd),headers=headers)
-        text=result.content.decode()
-        return text
+        try:
+            result = requests.post(url, data=sql, auth=HTTPBasicAuth(user,pwd),headers=headers)
+        except Exception as e:
+            logger.error(e)
+            logger.debug(sql)
+            try:
+                result = requests.post(url, data=sql, auth=HTTPBasicAuth(user,pwd),headers=headers)
+            except Exception as e:
+                logger.error(e)
+            else:
+                text=result.content.decode()
+                return text
+        else:
+            text=result.content.decode()
+            return text
     except Exception as e:
-        print(e)
+        logger.error(e)
+        return -1
 
-## Check Return
+## Check Restful Return
 def check_return(result, tdversion):
     if tdversion == 2:
         datart = json.loads(result).get("status")
@@ -88,7 +120,7 @@ def check_return(result, tdversion):
 
 ## Join SQL
 def export_sql(dbname,tbname,exdata):
-    load_data = json.loads(exdata,encoding='utf-8')
+    load_data = json.loads(exdata)
     data = load_data.get("data")
     exsql = 'insert into ' + dbname+'.'+tbname +' values '
     for i in range(len(data)):
@@ -122,9 +154,9 @@ def export_table_only(etbname,itbname):
     resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
     chkrt = check_return(resInfo,iversion)
     if chkrt == 'error':
-        print(resInfo)
+        logger.error(resInfo)
     else:
-        print("Create table [" + itbname +"] done.")
+        logger.info(f"Create table [{itbname}] done.")
 
 ## Select data from etbname, and insert into itbname
 def export_table(etbname,itbname):
@@ -132,7 +164,7 @@ def export_table(etbname,itbname):
     result = request_post(eurl, countsql, euserName, epassWord)
     chkrt = check_return(result,eversion)
     if chkrt == 'error':
-        print(result)
+        logger.error(result)
         exit
     else:
         load_data = json.loads(result)
@@ -141,14 +173,15 @@ def export_table(etbname,itbname):
         if row_num != 0:
             data = load_data.get("data")
             count_num = data[0][0]
-            print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",etbname,"Select Rows:",count_num)
+            logger.info(f"Table Name:{etbname}, Select Rows:{count_num}")
         if row_num != 0 and count_num != 0:
             if count_num < recordPerSQL:
                 select_sql = sqlh+' '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<=' + etime +';'
                 resInfo = request_post(eurl, select_sql, euserName, epassWord)
                 imsql = export_sql(idb,itbname,resInfo)
                 resInfo = request_post(iurl, imsql, iuserName, ipassWord)
-                chkrt = check_return(resInfo,eversion)
+                chkrt = check_return(resInfo,iversion)
+                logger.debug(f"Insert_to_DB {resInfo},{eversion},{chkrt}")
                 if chkrt == 'error':
                     datard = json.loads(resInfo).get("desc")
                     if datard == 'Table does not exist':
@@ -157,19 +190,18 @@ def export_table(etbname,itbname):
                         resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
                         chkrt = check_return(resInfo,iversion)
                         if chkrt == 'error':
-                             print(resInfo)
+                             logger.error(resInfo)
                         else:
+                            logger.info(f"Create table {itbname} success.")
                             resInfo = request_post(iurl, imsql, iuserName, ipassWord)
                             chkrt = check_return(resInfo,iversion)
                             if chkrt == 'error':
-                                print(resInfo)
+                                logger.error(resInfo)
                             datai = json.loads(resInfo).get("data")
-                            print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",datai[0][0])
-                    else:    
-                        print(resInfo)
+                            logger.info(f"Table Name:{itbname} Insert Rows:{datai[0][0]}")
                 else:
                     datai = json.loads(resInfo).get("data")
-                    print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",datai[0][0])
+                    logger.info(f"Table Name:{itbname} Insert Rows:{datai[0][0]}")
             else:
                 if count_num % recordPerSQL == 0:
                     rnum = int(count_num/recordPerSQL)
@@ -179,11 +211,11 @@ def export_table(etbname,itbname):
                 for i in range(rnum):
                     offset = i * recordPerSQL
                     select_sql = sqlh+' '+edb+'.'+etbname+' where _c0 >='+ stime + ' and _c0<='+ etime + ' limit '+str(recordPerSQL)+' offset '+str(offset) +';'
-    #                print(select_sql)
+                    logger.debug(select_sql)
                     resInfo = request_post(eurl, select_sql, euserName, epassWord)
                     chkrt = check_return(resInfo,eversion)
                     if chkrt == 'error':
-                        print(resInfo)
+                        logger.error(resInfo)
                     else:
                         imsql = export_sql(idb,itbname,resInfo)
                         resInfo = request_post(iurl, imsql, iuserName, ipassWord)
@@ -192,22 +224,22 @@ def export_table(etbname,itbname):
                             datard = json.loads(resInfo).get("desc")
                             if datard == 'Table does not exist':
                                 cSQL = get_table_struc(itbname)
+                                logger.debug(cSQL)
                                 nurl = iurl+'/'+idb
                                 resInfo = request_post(nurl, cSQL, iuserName, ipassWord)
+                                logger.debug(resInfo)
                                 chkrt = check_return(resInfo,iversion)
                                 if chkrt == 'error':
-                                    print(resInfo)
+                                    logger.error(resInfo)
                                 else:
                                     resInfo = request_post(iurl, imsql, iuserName, ipassWord)
                                     chkrt = check_return(resInfo,iversion)
                                     if chkrt == 'error':
-                                        print(resInfo)
-                            else:    
-                                print(resInfo)
+                                        logger.error(resInfo)
                         else:
                             datai = json.loads(resInfo).get("data")
                             irows = irows + datai[0][0]
-                print(time.strftime('%Y-%m-%d %H:%M:%S'),"Table Name:",itbname,"Insert Rows:",irows)
+                logger.info(f"Table Name:{itbname} Insert Rows:{irows}")
 
 ## Get table create sql
 def get_table_struc(tbname):
@@ -216,7 +248,7 @@ def get_table_struc(tbname):
         resInfo = request_post(eurl, getStrcSQL, euserName, epassWord) 
         chkrt = check_return(resInfo,eversion)
         if chkrt == 'error':
-            print(resInfo)
+            logger.error(resInfo)
         else:
             load_data = json.loads(resInfo)
             data = load_data.get("data")
@@ -233,11 +265,12 @@ def thread_func(tb_list,tnum,list_num):
             itbname = etbname
             if tableonly == 'false':
                 export_table(etbname,itbname)
+                #time.sleep(1)
             else:
                 if tableonly == 'true':
                     export_table_only(etbname,itbname)
                 else:
-                    print("tableonly set error!")
+                    logger.error("CfgFile: tableonly set error!")
            
 ## Get table list from database
 def get_tblist():
@@ -246,7 +279,7 @@ def get_tblist():
     resInfo = request_post(eurl, tbsql, euserName, epassWord)
     chkrt = check_return(resInfo,eversion)
     if chkrt == 'error':
-        print(resInfo)
+        logger.error(resInfo)
     else:
         load_data = json.loads(resInfo)
         data = load_data.get("data")
@@ -257,15 +290,14 @@ def get_tblist():
 
 ## Multiple threads/process
 def multi_thread(tblist,wmethod):
-    print('')
-    print('--------------------begin------------------')
+    logger.info('--------------------begin------------------')
     threads = []
     if len(tblist) < threadNum:
         for i in range(len(tblist)):
             tbname = tblist[i]
             export_table(tbname)
             proce = str(i+1)+'/'+str(len(tblist))
-            print(proce)
+            logger.info(proce)
     else:
         listnum = int(len(tblist)/threadNum)+1
         if wmethod == 'process':
@@ -280,12 +312,10 @@ def multi_thread(tblist,wmethod):
             t.start()
         for t in threads:  
             t.join()
-    print('--------------------end------------------')
-    print('')
-    print("##############################")
-    print("##",len(tblist),"tables is proceed.")
-    print("##############################")
-    print('')
+    logger.info('--------------------end------------------')
+    logger.info("##############################")
+    logger.info(f"## {len(tblist)} tables is proceed.")
+    logger.info("##############################")
 
 ## Check config file
 def config_check():
@@ -296,24 +326,24 @@ def config_check():
     chkrt = check_return(resInfo,eversion)
     if chkrt == 'error':
         rvalue = 1
-        print("Export DB config error!")
+        logger.error("Export DB config error!")
     resInfo = request_post(iurl, itestsql, iuserName, ipassWord)
     chkrt = check_return(resInfo,iversion)
     if chkrt == 'error':
         rvalue = 1 
-        print("Import DB config error!") 
+        logger.error("Import DB config error!") 
     if int(stime) <= 0:
         rvalue = 1
-        print("Start time must be bigger than zer0!") 
+        logger.error("Start time must be bigger than zer0!") 
     if int(recordPerSQL) <= 0:
         rvalue = 1
-        print("recordPerSQL must be bigger than zer0!")
+        logger.error("recordPerSQL must be bigger than zer0!")
     if int(threadNum) <= 0:
         rvalue = 1
-        print("recordPerSQL must be bigger than zer0!")
+        logger.error("recordPerSQL must be bigger than zer0!")
     if edb == idb and eurl == iurl:
         rvalue = 1
-        print("Export DB should not be the Import DB!")
+        logger.error("Export DB should not be the Import DB!")
     return rvalue
 
 
@@ -333,7 +363,7 @@ if __name__ == '__main__':
                 else:
                     multi_thread(tblist,wmethod)
             else:
-                print("Config file ERROR!")
+                logger.error("Config file ERROR!")
     else:
         try:
             opts,args=getopt.getopt(sys.argv[1:],"c:f:p")
@@ -373,7 +403,4 @@ if __name__ == '__main__':
                     finally:
                         fileobj.close()
             else:
-                print("Config file ERROR!")
-
-
-
+                logger.error("Config file ERROR!")
