@@ -16,7 +16,7 @@ import logging
 log_file = 'dataC.log'
 handler_test = logging.FileHandler(log_file,mode='w') 
 handler_control = logging.StreamHandler()    
-handler_test.setLevel('ERROR')             
+handler_test.setLevel('INFO')             
 handler_control.setLevel('INFO')           
 selfdef_fmt = '[%(asctime)s] %(name)s/%(funcName)s(%(process)d) %(levelname)s - %(message)s'
 formatter = logging.Formatter(selfdef_fmt)
