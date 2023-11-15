@@ -28,6 +28,7 @@ logger.setLevel('DEBUG')
 logger.addHandler(handler_test)
 logger.addHandler(handler_control)
 
+global pversion
 pversion = int(sys.version[0:1])
 
 if pversion < 3:
@@ -103,7 +104,7 @@ def request_post(url, sql, user, pwd):
                 text = result.content.decode()
             except Exception as e:
                 logger.error(e)
-                logger.error(f"Try twice failed!! {sql}")
+                logger.error("Try twice failed!!"+str(sql))
                 sys.exit()
             else:
                 return text
@@ -169,7 +170,7 @@ def export_table_only(etbname, itbname):
     if chkrt == 'error':
         logger.error(resInfo)
     else:
-        logger.info(f"Create table [{itbname}] done.")
+        logger.info("Create table ["+str(itbname)+"] done.")
         ctb_proced.append(1)
 
 # Select data from etbname, and insert into itbname
@@ -190,7 +191,7 @@ def export_table(etbname, itbname):
         if row_num != 0:
             data = load_data.get("data")
             count_num = data[0][0]
-            logger.info(f"Table Name:{etbname}, Select Rows:{count_num}")
+            logger.info("Table Name:"+str(etbname)+", Select Rows:"+str(count_num))
         if row_num != 0 and count_num != 0:
             if count_num < recordPerSQL:
                 select_sql = sqlh+' '+edb+'.'+etbname + \
@@ -199,7 +200,7 @@ def export_table(etbname, itbname):
                 imsql = export_sql(idb, itbname, resInfo)
                 resInfo = request_post(iurl, imsql, iuserName, ipassWord)
                 chkrt = check_return(resInfo, iversion)
-                logger.debug(f"Insert_to_DB {resInfo},{eversion},{chkrt}")
+                logger.debug("Insert_to_DB "+str(resInfo)+" "+str(eversion)+" "+str(chkrt))
                 if chkrt == 'error':
                     datard = json.loads(resInfo).get("desc")
                     if datard == 'Table does not exist':
@@ -211,7 +212,7 @@ def export_table(etbname, itbname):
                         if chkrt == 'error':
                             logger.error(resInfo)
                         else:
-                            logger.info(f"Create table {itbname} success.")
+                            logger.info("Create table "+str(itbname)+" success.")
                             ctb_proced.append(1)
                             resInfo = request_post(
                                 iurl, imsql, iuserName, ipassWord)
@@ -220,13 +221,13 @@ def export_table(etbname, itbname):
                                 logger.error(resInfo)
                             datai = json.loads(resInfo).get("data")
                             logger.info(
-                                f"Table Name:{itbname} Insert Rows:{datai[0][0]}")
+                                "Table Name:"+str(itbname)+" Insert Rows:"+str(datai[0][0]))
                             tb_proced.append(1)
                             rw_proced.append(int(datai[0][0]))
                 else:
                     datai = json.loads(resInfo).get("data")
                     logger.info(
-                        f"Table Name:{itbname} Insert Rows:{datai[0][0]}")
+                        "Table Name:"+str(itbname)+" Insert Rows:"+str(datai[0][0]))
                     tb_proced.append(1)
                     rw_proced.append(int(datai[0][0]))
             else:
@@ -265,7 +266,7 @@ def export_table(etbname, itbname):
                                     logger.error(resInfo)
                                 else:
                                     logger.info(
-                                        f"Create table {itbname} success.")
+                                        "Create table "+str(itbname)+" success.")
                                     ctb_proced.append(1)
                                     resInfo = request_post(
                                         iurl, imsql, iuserName, ipassWord)
@@ -275,7 +276,7 @@ def export_table(etbname, itbname):
                         else:
                             datai = json.loads(resInfo).get("data")
                             irows = irows + datai[0][0]
-                logger.info(f"Table Name:{itbname} Insert Rows:{irows}")
+                logger.info("Table Name:"+str(itbname)+" Insert Rows:"+str(irows))
                 tb_proced.append(1)
                 rw_proced.append(int(datai[0][0]))
 
@@ -368,8 +369,8 @@ def multi_thread(tblist, wmethod):
     logger.info('--------------------end------------------')
     logger.info("##############################")
     logger.info(
-        f"## {len(tb_proced)}/{len(tblist)} Tables  and {sum_list(rw_proced)} Rows are proceed.")
-    logger.info(f"## {len(ctb_proced)} tables created.")
+        "## "+str(len(tb_proced))+"/"+str(len(tblist))+" Tables  and "+str(sum_list(rw_proced))+" Rows are proceed.")
+    logger.info("## "+str(len(ctb_proced))+" tables created.")
     logger.info("##############################")
 
 # Check config file
