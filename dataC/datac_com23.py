@@ -93,24 +93,25 @@ def request_post(url, sql, user, pwd):
         try:
             result = requests.post(
                 url, data=sql, auth=HTTPBasicAuth(user, pwd), headers=headers, timeout=10)
+            text = result.content.decode()
         except Exception as e:
             logger.error(e)
             logger.debug(sql)
             try:
                 result = requests.post(
                     url, data=sql, auth=HTTPBasicAuth(user, pwd), headers=headers, timeout=30)
+                text = result.content.decode()
             except Exception as e:
                 logger.error(e)
                 logger.error(f"Try twice failed!! {sql}")
                 sys.exit()
             else:
-                text = result.content.decode()
                 return text
         else:
-            text = result.content.decode()
             return text
     except Exception as e:
         logger.error(e)
+        sys.exit()
         return -1
 
 # Check Restful Return
