@@ -191,7 +191,7 @@ def export_table(etbname, itbname, irss, erss):
         if row_num != 0:
             data = load_data.get("data")
             count_num = data[0][0]
-            logger.info("Table Name:"+str(etbname)+", Select Rows:"+str(count_num))
+            logger.debug("Table Name:"+str(etbname)+", Select Rows:"+str(count_num))
         if row_num != 0 and count_num != 0:
             if count_num < recordPerSQL:
                 select_sql = sqlh+' '+edb+'.'+etbname + \
@@ -204,7 +204,7 @@ def export_table(etbname, itbname, irss, erss):
                 if chkrt == 'error':
                     datard = json.loads(resInfo).get("desc")
                     if datard == 'Table does not exist':
-                        cSQL = get_table_struc(itbname)
+                        cSQL = get_table_struc(itbname, irss)
                         nurl = iurl+'/'+idb
                         resInfo = request_post(
                             nurl, cSQL, iuserName, ipassWord, irss)
@@ -220,13 +220,13 @@ def export_table(etbname, itbname, irss, erss):
                             if chkrt == 'error':
                                 logger.error(resInfo)
                             datai = json.loads(resInfo).get("data")
-                            logger.info(
+                            logger.debug(
                                 "Table Name:"+str(itbname)+" Insert Rows:"+str(datai[0][0]))
                             tb_proced.append(1)
                             rw_proced.append(int(datai[0][0]))
                 else:
                     datai = json.loads(resInfo).get("data")
-                    logger.info(
+                    logger.debug(
                         "Table Name:"+str(itbname)+" Insert Rows:"+str(datai[0][0]))
                     tb_proced.append(1)
                     rw_proced.append(int(datai[0][0]))
@@ -255,7 +255,7 @@ def export_table(etbname, itbname, irss, erss):
                         if chkrt == 'error':
                             datard = json.loads(resInfo).get("desc")
                             if datard == 'Table does not exist':
-                                cSQL = get_table_struc(itbname)
+                                cSQL = get_table_struc(itbname, irss)
                                 logger.debug(cSQL)
                                 nurl = iurl+'/'+idb
                                 resInfo = request_post(
@@ -276,7 +276,7 @@ def export_table(etbname, itbname, irss, erss):
                         else:
                             datai = json.loads(resInfo).get("data")
                             irows = irows + datai[0][0]
-                logger.info("Table Name:"+str(itbname)+" Insert Rows:"+str(irows))
+                logger.debug("Table Name:"+str(itbname)+" Insert Rows:"+str(irows))
                 tb_proced.append(1)
                 rw_proced.append(int(datai[0][0]))
 
@@ -305,7 +305,7 @@ def thread_func(tb_list, tnum, list_num):
     erss = requests.session()
     for ll in range(list_num):
         ii = tnum*list_num+ll
-        if ii < len(tblist):
+        if ii < len(tb_list):
             etbname = str(tb_list[ii])
             itbname = etbname
             if tableonly == 'false':
@@ -323,9 +323,34 @@ def thread_func(tb_list, tnum, list_num):
     irss.close()
     erss.close()
 
+def process_func(tb_list, tnum, list_num, m_tb, m_rw, m_ctb):
+    slnum = 1
+    irss = requests.session()
+    erss = requests.session()
+    for ll in range(list_num):
+        ii = tnum*list_num+ll
+        if ii < len(tb_list):
+            etbname = str(tb_list[ii])
+            itbname = etbname
+            if tableonly == 'false':
+                export_table(etbname, itbname, irss, erss)
+                slnum += 1
+                if slnum == 1000 :
+                    time.sleep(1)
+                    logger.info("Sleep 1 sec.")
+                    slnum = 1
+            else:
+                if tableonly == 'true':
+                    export_table_only(etbname, itbname, irss, erss)
+                else:
+                    logger.error("CfgFile: tableonly set error!")
+    irss.close()
+    erss.close()
+    m_tb[tnum] = len(tb_proced)
+    m_rw[tnum] = sum_list(rw_proced)
+    m_ctb[tnum] = len(ctb_proced)
+
 # Get table list from database
-
-
 def get_tblist():
     erss = requests.session()
     tblist = []
@@ -348,6 +373,7 @@ def get_tblist():
 
 def multi_thread(tblist, wmethod):
     logger.info('--------------------begin------------------')
+    logger.info("##############################")
     threads = []
     if len(tblist) < threadNum:
         irss = requests.session()
@@ -355,14 +381,15 @@ def multi_thread(tblist, wmethod):
         for i in range(len(tblist)):
             tbname = tblist[i]
             export_table(tbname, irss, erss)
-            proce = str(i+1)+'/'+str(len(tblist))
-            logger.info(proce)
     else:
         listnum = int(len(tblist)/threadNum)+1
         if wmethod == 'process':
+            m_tb = multiprocessing.Array('i',threadNum)
+            m_rw = multiprocessing.Array('i',threadNum)
+            m_ctb = multiprocessing.Array('i',threadNum)
             for tnum in range(threadNum):
                 t = multiprocessing.Process(
-                    target=thread_func, args=(tblist, tnum, listnum))
+                    target=process_func, args=(tblist, tnum, listnum, m_tb, m_rw, m_ctb))
                 threads.append(t)
         else:
             for tnum in range(threadNum):
@@ -374,12 +401,14 @@ def multi_thread(tblist, wmethod):
             t.start()
         for t in threads:
             t.join()
+    if wmethod == 'process':
+        logger.info("## "+str(sum_list(m_tb[:]))+"/"+str(len(tblist))+" Tables  and "+str(sum_list(m_rw[:]))+" Rows are proceed.")
+        logger.info("## "+str(sum_list(m_ctb[:]))+" tables created.")
+    else:
+        logger.info("## "+str(sum_list(tb_proced))+"/"+str(len(tblist))+" Tables  and "+str(sum_list(rw_proced))+" Rows are proceed.")
+        logger.info("## "+str(sum_list(ctb_proced))+" tables created.")
+    logger.info("##############################")
     logger.info('--------------------end------------------')
-    logger.info("##############################")
-    logger.info(
-        "## "+str(len(tb_proced))+"/"+str(len(tblist))+" Tables  and "+str(sum_list(rw_proced))+" Rows are proceed.")
-    logger.info("## "+str(len(ctb_proced))+" tables created.")
-    logger.info("##############################")
 
 # Check config file
 
