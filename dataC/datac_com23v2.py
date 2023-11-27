@@ -380,7 +380,7 @@ def multi_thread(tblist, wmethod):
         erss = requests.session()
         for i in range(len(tblist)):
             tbname = tblist[i]
-            export_table(tbname, irss, erss)
+            export_table(tbname, tbname, irss, erss)
     else:
         listnum = int(len(tblist)/threadNum)+1
         if wmethod == 'process':
@@ -401,7 +401,7 @@ def multi_thread(tblist, wmethod):
             t.start()
         for t in threads:
             t.join()
-    if wmethod == 'process':
+    if wmethod == 'process' and len(tblist) >= threadNum :
         logger.info("## "+str(sum_list(m_tb[:]))+"/"+str(len(tblist))+" Tables  and "+str(sum_list(m_rw[:]))+" Rows are proceed.")
         logger.info("## "+str(sum_list(m_ctb[:]))+" tables created.")
     else:
