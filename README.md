@@ -129,3 +129,12 @@ sh swapCount.sh
 ```shell
 python3 datacompare.py 2023-01-01T00:00:00Z 2023-10-01T00:00:00Z
 ```
+
+## dbsize.sh
+
+统计所在节点所有数据的大小。脚本通过`show databases`和`show vgroups` 获取数据库和vgroups信息，遍历所有dataDir，
+统计vnode的大小（包含WAL）。
+
+```shell
+sh dbsize.sh
+```

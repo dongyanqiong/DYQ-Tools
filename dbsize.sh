@@ -4,7 +4,7 @@ pass=taosdata
 
 taos -u${user} -p${pass} -s "show databases\G"|grep 'name:' |awk '{print $NF}' |grep -v '_schema'> dblist.tmp
 #echo "Get DBlist Done!"
-cat -v dblist.tmp | sed 's/\^M//g' >dblist
+cat -v dblist.tmp | sed 's/\^M//g' |sort -n>dblist
 rm -f dblist.tmp
 cat dblist |while read db
 do
