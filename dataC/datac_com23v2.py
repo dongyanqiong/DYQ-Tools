@@ -191,16 +191,19 @@ def export_table(etbname, itbname, irss, erss):
         if row_num != 0:
             data = load_data.get("data")
             count_num = data[0][0]
-            logger.debug("Table Name:"+str(etbname)+", Select Rows:"+str(count_num))
+            logger.debug("Table Name:"+str(etbname) +
+                         ", Select Rows:"+str(count_num))
         if row_num != 0 and count_num != 0:
             if count_num < recordPerSQL:
                 select_sql = sqlh+' '+edb+'.'+etbname + \
                     ' where _c0 >=' + stime + ' and _c0<=' + etime + ';'
-                resInfo = request_post(eurl, select_sql, euserName, epassWord, erss)
+                resInfo = request_post(
+                    eurl, select_sql, euserName, epassWord, erss)
                 imsql = export_sql(idb, itbname, resInfo)
                 resInfo = request_post(iurl, imsql, iuserName, ipassWord, irss)
                 chkrt = check_return(resInfo, iversion)
-                logger.debug("Insert_to_DB "+str(resInfo)+" "+str(eversion)+" "+str(chkrt))
+                logger.debug("Insert_to_DB "+str(resInfo) +
+                             " "+str(eversion)+" "+str(chkrt))
                 if chkrt == 'error':
                     datard = json.loads(resInfo).get("desc")
                     if datard == 'Table does not exist':
@@ -212,7 +215,8 @@ def export_table(etbname, itbname, irss, erss):
                         if chkrt == 'error':
                             logger.error(resInfo)
                         else:
-                            logger.info("Create table "+str(itbname)+" success.")
+                            logger.info("Create table " +
+                                        str(itbname)+" success.")
                             ctb_proced.append(1)
                             resInfo = request_post(
                                 iurl, imsql, iuserName, ipassWord, irss)
@@ -276,7 +280,8 @@ def export_table(etbname, itbname, irss, erss):
                         else:
                             datai = json.loads(resInfo).get("data")
                             irows = irows + datai[0][0]
-                logger.debug("Table Name:"+str(itbname)+" Insert Rows:"+str(irows))
+                logger.debug("Table Name:"+str(itbname) +
+                             " Insert Rows:"+str(irows))
                 tb_proced.append(1)
                 rw_proced.append(int(datai[0][0]))
 
@@ -311,7 +316,7 @@ def thread_func(tb_list, tnum, list_num):
             if tableonly == 'false':
                 export_table(etbname, itbname, irss, erss)
                 slnum += 1
-                if slnum == 1000 :
+                if slnum == 1000:
                     time.sleep(1)
                     logger.info("Sleep 1 sec.")
                     slnum = 1
@@ -322,6 +327,7 @@ def thread_func(tb_list, tnum, list_num):
                     logger.error("CfgFile: tableonly set error!")
     irss.close()
     erss.close()
+
 
 def process_func(tb_list, tnum, list_num, m_tb, m_rw, m_ctb):
     slnum = 1
@@ -335,7 +341,7 @@ def process_func(tb_list, tnum, list_num, m_tb, m_rw, m_ctb):
             if tableonly == 'false':
                 export_table(etbname, itbname, irss, erss)
                 slnum += 1
-                if slnum == 1000 :
+                if slnum == 1000:
                     time.sleep(1)
                     logger.info("Sleep 1 sec.")
                     slnum = 1
@@ -351,6 +357,8 @@ def process_func(tb_list, tnum, list_num, m_tb, m_rw, m_ctb):
     m_ctb[tnum] = len(ctb_proced)
 
 # Get table list from database
+
+
 def get_tblist():
     erss = requests.session()
     tblist = []
@@ -384,9 +392,9 @@ def multi_thread(tblist, wmethod):
     else:
         listnum = int(len(tblist)/threadNum)+1
         if wmethod == 'process':
-            m_tb = multiprocessing.Array('i',threadNum)
-            m_rw = multiprocessing.Array('i',threadNum)
-            m_ctb = multiprocessing.Array('i',threadNum)
+            m_tb = multiprocessing.Array('i', threadNum)
+            m_rw = multiprocessing.Array('i', threadNum)
+            m_ctb = multiprocessing.Array('i', threadNum)
             for tnum in range(threadNum):
                 t = multiprocessing.Process(
                     target=process_func, args=(tblist, tnum, listnum, m_tb, m_rw, m_ctb))
@@ -401,11 +409,13 @@ def multi_thread(tblist, wmethod):
             t.start()
         for t in threads:
             t.join()
-    if wmethod == 'process' and len(tblist) >= threadNum :
-        logger.info("## "+str(sum_list(m_tb[:]))+"/"+str(len(tblist))+" Tables  and "+str(sum_list(m_rw[:]))+" Rows are proceed.")
+    if wmethod == 'process' and len(tblist) >= threadNum:
+        logger.info("## "+str(sum_list(m_tb[:]))+"/"+str(len(tblist)) +
+                    " Tables  and "+str(sum_list(m_rw[:]))+" Rows are proceed.")
         logger.info("## "+str(sum_list(m_ctb[:]))+" tables created.")
     else:
-        logger.info("## "+str(sum_list(tb_proced))+"/"+str(len(tblist))+" Tables  and "+str(sum_list(rw_proced))+" Rows are proceed.")
+        logger.info("## "+str(sum_list(tb_proced))+"/"+str(len(tblist)) +
+                    " Tables  and "+str(sum_list(rw_proced))+" Rows are proceed.")
         logger.info("## "+str(sum_list(ctb_proced))+" tables created.")
     logger.info("##############################")
     logger.info('--------------------end------------------')
@@ -442,7 +452,7 @@ def config_check():
         rvalue = 1
         logger.error("Export DB should not be the Import DB!")
     irss.close()
-    erss.close()    
+    erss.close()
     return rvalue
 
 # sum list

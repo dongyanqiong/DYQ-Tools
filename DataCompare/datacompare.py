@@ -37,6 +37,7 @@ unit = '1d'
 plog = 'process.log'
 elog = 'error.log'
 
+
 def arg_j(sarg):
     try:
         dt = datetime.datetime.fromisoformat(sarg).strftime('%s')
@@ -47,6 +48,7 @@ def arg_j(sarg):
         print("\n")
         return 1
 
+
 def request_post(url, sql, user, pwd):
     try:
         sql = sql.encode("utf-8")
@@ -54,11 +56,13 @@ def request_post(url, sql, user, pwd):
             'Connection': 'keep-alive',
             'Accept-Encoding': 'gzip, deflate, br'
         }
-        result = requests.post(url, data=sql, auth=HTTPBasicAuth(user,pwd),headers=headers)
-        text=result.content.decode()
+        result = requests.post(
+            url, data=sql, auth=HTTPBasicAuth(user, pwd), headers=headers)
+        text = result.content.decode()
         return text
     except Exception as e:
         print(e)
+
 
 def check_return(result, tdversion):
     if tdversion == 2:
@@ -68,42 +72,50 @@ def check_return(result, tdversion):
     if str(datart) == 'succ' or str(datart) == '0':
         chkrt = 'succ'
     else:
-        chkrt = 'error' 
+        chkrt = 'error'
     return chkrt
 
-def log_write(logf,elog):
-    logf.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"|\t"+elog+'\n')
+
+def log_write(logf, elog):
+    logf.write(datetime.datetime.now().strftime(
+        "%Y-%m-%d %H:%M:%S")+"|\t"+elog+'\n')
+
 
 def get_tblist(stbname):
     tbl = []
     sql = 'select distinct tbname from `'+sdb+'`.`'+stbname+'`;'
-    rt = request_post(surl,sql,suserName,spassWord)
-    code = check_return(rt,sversion)
+    rt = request_post(surl, sql, suserName, spassWord)
+    code = check_return(rt, sversion)
     if code != 'error':
         tbl = json.loads(rt).get("data")
     else:
         print(code)
     return tbl
 
-def get_data(stbname,url,username,password,dbname,version,stime,etime):
+
+def get_data(stbname, url, username, password, dbname, version, stime, etime):
     data = dict()
     if version == 2:
-        sql = "select count(*) from `"+dbname+'`.`'+stbname+'` where _c0>="'+str(stime)+'" and _c0<="'+str(etime)+'"  group by tbname;'
+        sql = "select count(*) from `"+dbname+'`.`'+stbname+'` where _c0>="' + \
+            str(stime)+'" and _c0<="'+str(etime)+'"  group by tbname;'
     else:
-        sql = "select count(*),tbname from `"+dbname+'`.`'+stbname+'` where _c0>="'+str(stime)+'" and _c0<="'+str(etime)+'"  group by tbname;'
-    rt = request_post(url,sql,username,password)
-    code = check_return(rt,version)
+        sql = "select count(*),tbname from `"+dbname+'`.`'+stbname+'` where _c0>="' + \
+            str(stime)+'" and _c0<="'+str(etime)+'"  group by tbname;'
+    rt = request_post(url, sql, username, password)
+    code = check_return(rt, version)
     if code != 'error':
         rdata = json.loads(rt).get("data")
         for ll in range(len(rdata)):
-            data[rdata[ll][1]]=rdata[ll][0]
+            data[rdata[ll][1]] = rdata[ll][0]
     else:
         print(rt)
     return data
 
+
 def table_diff(tbname):
-    tdff = dict()    
+    tdff = dict()
     return tdff
+
 
 if __name__ == '__main__':
     print('-------------------Begin------------------------------')
@@ -114,32 +126,39 @@ if __name__ == '__main__':
         etime = str(sys.argv[2])
         if arg_j(etime) == 1:
             exit()
-    logp = open(plog,"a")
-    loge = open(elog,"a")
-    sfile = open('stblist',"r")
+    logp = open(plog, "a")
+    loge = open(elog, "a")
+    sfile = open('stblist', "r")
     stbl = []
     tb_lost = []
     tb_diff = []
     for stb in sfile:
         stbl.append(stb.strip())
     for stb in stbl:
-        sdata = get_data(stb,surl,suserName,spassWord,sdb,sversion,stime,etime)
-        ddata = get_data(stb,durl,duserName,dpassWord,ddb,dversion,stime,etime)
+        sdata = get_data(stb, surl, suserName, spassWord,
+                         sdb, sversion, stime, etime)
+        ddata = get_data(stb, durl, duserName, dpassWord,
+                         ddb, dversion, stime, etime)
         for key in sdata.keys():
             dv = ddata.get(key)
             if str(dv) == 'None':
                 tb_lost.append(key)
                 log = 'Table:'+key+' not exits in Destination DB: ' + ddb
-                #print(log)
-                log_write(logp,log)
+                # print(log)
+                log_write(logp, log)
             else:
                 tb_diff.append(key)
                 if dv != sdata[key]:
                     rd_diff = sdata[key]-dv
-                    log = 'Table:'+key+' Dest:'+str(dv)+' Source:'+str(sdata[key])+' Diff:'+str(rd_diff)
-                    #print(log)
-                    log_write(logp,log)
-    print("Lost tables:{}, Diff tables:{}.".format(len(tb_lost),len(tb_diff)))    
+                    log = 'Table:'+key+' Dest:' + \
+                        str(dv)+' Source:' + \
+                        str(sdata[key])+' Diff:'+str(rd_diff)
+                    # print(log)
+                    log_write(logp, log)
+    f_info = "Lost tables:{}, Diff tables:{}.".format(
+        len(tb_lost), len(tb_diff))
+    print(f_info)
+    log_write(logp, f_info)
 
     logp.close()
     loge.close()
