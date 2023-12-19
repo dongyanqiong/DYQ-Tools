@@ -147,8 +147,8 @@ if __name__ == '__main__':
                 # print(log)
                 log_write(logp, log)
             else:
-                tb_diff.append(key)
                 if dv != sdata[key]:
+                    tb_diff.append(key)
                     rd_diff = sdata[key]-dv
                     log = 'Table:'+key+' Dest:' + \
                         str(dv)+' Source:' + \

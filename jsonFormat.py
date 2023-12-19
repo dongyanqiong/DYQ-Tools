@@ -1,6 +1,5 @@
 import json
 import sys
-import getopt
 
 cfile = sys.argv[1]
 

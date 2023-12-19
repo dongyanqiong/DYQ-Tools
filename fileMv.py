@@ -64,6 +64,9 @@ def mv_file(file, path):
     import subprocess
     try:
         print(f"mv {file} {path}")
+        ms = input("Enter y to Continue:")
+        if ms != 'y':
+            sys.exit()
         rt = subprocess.run(["mv", file, path])
         return rt.returncode
     except Exception as e:

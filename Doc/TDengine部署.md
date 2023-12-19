@@ -404,8 +404,8 @@ fqdn                        node1
 logDir                      /data/taos/log
 dataDir                     /data/taos/data
 tempDir                     /data/taos/tmp
-numOfCommitThreads          8.0
-#numOfVnodeQueryThreads      8
+numOfCommitThreads          8
+#numOfVnodeQueryThreads     8
 timezone                    UTC-8
 locale                      en_US.UTF-8
 charset                     UTF-8
@@ -415,13 +415,18 @@ logKeepDays                 -1
 debugflag                   131
 keepColumnName              1
 countAlwaysReturnValue      1
-supportVnodes               0
+supportVnodes               64 
 slowLogThreshold            10
-maxShellConns             100000
-maxConnections            100000
+maxShellConns               100000
+maxConnections              100000
 maxNumOfDistinctRes         10000000
-shellActivityTimer        120
-assert                      0
+shellActivityTimer          120
+statusInterval              5
+assert                      1 
+audit                       0
+auditFqdn                   localhost
+#rpcQueueMemoryAllowed       10737418240
+
 ```
 
 
@@ -567,7 +572,7 @@ REPLICA 3
 KEEP 7,30,3650 
 MINROWS 100 
 MAXROWS 4096 
-STT_TRIGGER 4
+STT_TRIGGER 1
 PAGES 512  
 PAGESIZE 8;  --KB
 ```
