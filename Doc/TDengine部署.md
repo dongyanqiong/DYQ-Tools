@@ -38,6 +38,8 @@ SWAP设置可参考 [What is the recommended swap size for Red Hat platforms?](h
 
 4.如果数据量大，磁盘空间大，建议选择 xfs。
 
+5.如果使用外挂存储，建议在挂载点配置`chattr +i`，防止因挂载故障造成数据污染。
+
 > 实验测试结果：
 >
 > 在写入方面xfs优于ext4[未优化]，速度提升约25%；关闭barrier后，ext4写入速度较xfs提升近50%。
@@ -426,7 +428,7 @@ assert                      1
 audit                       0
 auditFqdn                   localhost
 #rpcQueueMemoryAllowed       10737418240
-
+telemetryReporting          0
 ```
 
 

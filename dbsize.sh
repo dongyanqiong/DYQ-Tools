@@ -2,6 +2,10 @@
 user=root
 pass=taosdata
 
+tmpdir=db_size_tmp.$$
+mkdir $tmpdir
+cd $tmpdir
+
 taos -u${user} -p${pass} -s "show databases\G"|grep 'name:' |awk '{print $NF}' |grep -v '_schema'> dblist.tmp
 #echo "Get DBlist Done!"
 cat -v dblist.tmp | sed 's/\^M//g' |sort -n>dblist
@@ -29,3 +33,6 @@ do
                 echo "${db}  $(cat ${db}.size|awk '{sum+=$2} END {print sum/1024/1024 " GB"}')"
         fi
 done
+
+cd ../
+rm -rf $tmpdir

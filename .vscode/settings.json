@@ -1,5 +1,8 @@
 {
     "python.envFile": "${workspaceFolder}/.env",
-    "devchat.defaultModel": "gpt-4"
+    "devchat.defaultModel": "gpt-4",
+    "DevChat.PythonForChat": "c:\\Users\\dong_\\.vscode\\extensions\\merico.devchat-0.1.39\\tools\\python-3.11.6-embed-amd64\\python.exe",
+    "DevChat.PythonForCommands": "C:\\Users\\dong_\\.chat\\mamba\\envs\\devchat-commands\\python.exe",
+    "DevChat.Language": "en"
 
 }
