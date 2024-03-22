@@ -481,6 +481,17 @@ password = "New_Password"
 writeToTD = false
 ```
 
+## taosadapter
+```bash
+[log]
+path = '/data/taos/log'
+```
+
+## taosx
+```bash
+logs_home = 'data/taos/log'
+```
+
 #### 2.1.4.启动数据库
 
 ```shell
