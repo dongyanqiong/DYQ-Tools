@@ -67,6 +67,12 @@ least_conn;
 ```
 在实际测试中发现采用轮询方式，每个节点分配的连接数并不均匀。
 
+## IP HASH
+```bash
+ip_hash
+```
+
+
 ## 操作系统参数
 ```bash
 sysctl -w net.core.somaxconn=10240
@@ -88,3 +94,40 @@ sysctl -w net.core.rmem_max = 212992
 
 ## WebSocket
 http://nginx.org/en/docs/http/websocket.html
+
+## 安全加固
+
+### CORS 设置
+```bash
+server{
+set $flag 0;
+if ( $http_Origin ~* 127.0.0.1|192.168.1.121 ) {
+       set $flag '1';
+}
+if ( $http_Origin ~* '^$'){
+    set $flag '1';
+}
+if ( $flag = "0") {
+    return 403;
+}
+proxy_set_header Host $host;
+proxy_set_header Origin $host;
+proxy_pass_request_headers  on;
+server_tokens off;
+}
+```
+
+## 限制IP访问
+```bash
+http{
+include blocksip.conf;
+}
+```
+allow 10.122.166.201;
+allow 10.122.28.232;
+allow 10.122.6.53;
+allow 10.59.173.32;
+deny all;
+```bash
+
+```

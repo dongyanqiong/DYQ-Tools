@@ -666,6 +666,7 @@ net.ipv4.tcp_tw_recycle=1
 net.ipv4.tcp_keepalive_time=600
 net.ipv4.tcp_abort_on_overflow=1
 net.ipv4.tcp_max_tw_buckets=5000
+net.ipv4.ip_local_port_range=10000 65534
 
 net.core.wmem_default=212992
 net.core.wmem_max=212992
