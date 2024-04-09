@@ -147,21 +147,22 @@ ufw disable
 为保证 TDengine 运行时获取到足够的系统资源，需要对配置相应的资源限制。
 
 ```shell
-echo "fs.nr_open = 1048576" >>/etc/sysctl.conf 
+echo "fs.nr_open = 2147483584" >>/etc/sysctl.conf 
+echo "fs.file-max = 2147483584" >>/etc/sysctl.conf 
 sysctl -p
 
 echo "* soft nproc  65536" >>/etc/security/limits.conf
-echo "* soft nofile 1048576" >>/etc/security/limits.conf
+echo "* soft nofile 2147483584" >>/etc/security/limits.conf
 echo "* soft stack  65536" >>/etc/security/limits.conf
 echo "* hard nproc  65536" >>/etc/security/limits.conf
-echo "* hard nofile 1048576" >>/etc/security/limits.conf
+echo "* hard nofile 2147483584" >>/etc/security/limits.conf
 echo "* hard stack  65536" >>/etc/security/limits.conf
 
 echo "root soft nproc  65536" >>/etc/security/limits.conf
-echo "root soft nofile 1048576" >>/etc/security/limits.conf
+echo "root soft nofile 2147483584" >>/etc/security/limits.conf
 echo "root soft stack  65536" >>/etc/security/limits.conf
 echo "root hard nproc  65536" >>/etc/security/limits.conf
-echo "root hard nofile 1048576" >>/etc/security/limits.conf
+echo "root hard nofile 2147483584" >>/etc/security/limits.conf
 echo "root hard stack  65536" >>/etc/security/limits.conf
 
 ```
