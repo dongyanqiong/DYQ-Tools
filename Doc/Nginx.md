@@ -132,10 +132,10 @@ deny all;
 
 ```
 ## 均衡策略
-hash $binary_remote_addr consistent; 和 ip_hash都是NGINX中负载均衡的方式，但它们的工作原理有些差异。
+hash $binary_remote_addr consistent 和 ip_hash都是NGINX中负载均衡的方式，但它们的工作原理有些差异。
 
 ip_hash：这种方式是针对每个客户端IP地址进行哈希计算，并依据哈希结果将来自同一IP的客户端请求分配给同一台后端服务器。这主要用于处理需要会话保持（session persistence）的应用，比如购物车应用、某些需要登录的网站等。
 
-hash $binary_remote_addr consistent;：这是NGINX提供的一种更灵活的哈希负载均衡方式，有一致性哈希（Consistent hashing）的特性。它使用的哈希键（key）是二进制形式的客户端IP地址（$binary_remote_addr）。一致性哈希的特点是，当增加或减少后端服务器时，只需重新分配一小部分请求，而不是所有请求，这有利于缓存命中率（Cache hit ratio）的维持和热点数据的控制。这种方式在负载均衡分配、数据分布和复制等方面有很好的应用。
+hash $binary_remote_addr consistent：这是NGINX提供的一种更灵活的哈希负载均衡方式，有一致性哈希（Consistent hashing）的特性。它使用的哈希键（key）是二进制形式的客户端IP地址（$binary_remote_addr）。一致性哈希的特点是，当增加或减少后端服务器时，只需重新分配一小部分请求，而不是所有请求，这有利于缓存命中率（Cache hit ratio）的维持和热点数据的控制。这种方式在负载均衡分配、数据分布和复制等方面有很好的应用。
 
-总结，虽然ip_hash和hash $binary_remote_addr consistent;都是使用客户端IP为基础进行哈希负载均衡，但它们的应用场景和工作原理有所不同，并且hash $binary_remote_addr consistent;相比ip_hash具有更高的灵活性。
+总结，虽然ip_hash和hash $binary_remote_addr consistent 都是使用客户端IP为基础进行哈希负载均衡，但它们的应用场景和工作原理有所不同，并且hash $binary_remote_addr consistent 相比ip_hash具有更高的灵活性。

@@ -277,8 +277,8 @@ iperf3 -c  ###启动iperf客户端
 ```shell
 fio -ioengine=libaio -direct=1 --iodepth=32 -thread -rw=randwrite -filename=/data/test -runtime=60 -numjobs=4 -filesize=20g -bsrange=480k-500k -loop 1000 -name="Test" 
 ```
-```
-
+``` shell
+dd oflag=direct if=/dev/zero of=/data/test  bs=480k count=100000
 ```
 
 ## 2.部署 TDengine 集群
