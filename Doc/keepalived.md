@@ -1,4 +1,5 @@
 ## 概述
+![架构图](.\keepalived_td.png)
 
 |fqdn|角色|
 |---|----|
@@ -31,7 +32,7 @@ make install
 ```bash
 [Unit]
 Description=LVS and VRRP High Availability Monitor
-After=syslog.target network-online.target
+After=syslog.target network-online.target taosadapter.service
 
 [Service]
 Type=forking
@@ -54,6 +55,8 @@ WantedBy=multi-user.target
 
 global_defs {
    router_id c3-60  ## 主机名
+   script_user root
+   enable_script_security
 }
 
 vrrp_script chk_adapter {
