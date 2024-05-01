@@ -12,10 +12,12 @@
 
 ## 安装
 
+### CentOS
 ```bash
 yum install -y keepalived
 ```
 
+### 编译
 ```bash
 wget https://keepalived.org/software/keepalived-2.2.8.tar.gz
 tar xzf keepalived-2.2.8.tar.gz
@@ -101,6 +103,24 @@ acheck()
 
 acheck
 ```
+### nginx_check.sh
+```bash
+#!/bin/sh
+ncheck() 
+{
+        if [ $(pidof nginx|wc -l) -eq 0 ]
+        then
+                pkill keepalived
+                exit 1
+        else
+                exit 0
+        fi
+}
+
+ncheck
+```
+
+
 
 ## 启动
 ```bash
