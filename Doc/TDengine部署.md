@@ -430,6 +430,7 @@ audit                       0
 auditFqdn                   localhost
 #rpcQueueMemoryAllowed       10737418240
 telemetryReporting          0
+keepAliveIdle               900
 ```
 
 

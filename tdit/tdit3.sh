@@ -7,6 +7,9 @@
 ####taos配置文件
 CFGFILE=/etc/taos/taos.cfg
 ADPFILE=/etc/taos/taosadapter.toml
+EXPFILE=/etc/taos/explorer.toml
+KEPFILE=/etc/taos/taoskeeper.toml
+TAXFILE=/etc/taos/taosx.toml
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US:en
 user=root
@@ -31,15 +34,7 @@ TDRUN=0
 ##TDengine是否随机启动
 TDOB=1
 
-eversion=0
-taosd -V | grep 'enterprise' 1>/dev/null 2>/dev/null 
-RS=$?
-if [ $RS -eq 0 ]
-then
-    eversion=1
-else
-    eversion=0
-fi
+eversion=1
 
  mcheck(){
     os=$(cat /etc/os-release| grep PRETTY_NAME | awk '{print $1}'|awk -F '=' '{print $2}' | sed 's/"//g')
@@ -57,8 +52,7 @@ fi
     fi
 
 
-    acode=$(grep -i 'activeCode' $CFGFILE| grep -v '#'| awk '{print $2}' )
-    echo "ACODE:$acode:"
+    echo "ACODE:0:"
 
 
     utime=$(cat /proc/uptime |awk '{printf "%d",$1/24/3600}')
@@ -212,7 +206,7 @@ fi
 
     if [ $eversion -eq 1 ]
     then
-        etime=$(taos -u$user -p$pass -s "show grants\G" | grep 'expire_time:' |awk '{print $3}')
+        etime=$(taos -u$user -p$pass -s "show grants\G" | grep 'expire_time:' |awk '{print $2}')
     else
         etime=null
     fi
@@ -384,88 +378,84 @@ fi
     dd=$(date +%Y%m%d)
     taoscfg=$(echo "taoscfg"$dd".txt")
 
-
     echo ""
     echo "###### TDengine进程 ##########"
-    ps aux | grep -w taosd | grep -v grep
+    ps aux | grep -w taos | grep -v grep
 
     echo ""
     echo "###### Cluster ID ##########"
-    grep -v '^#' $CFGFILE| grep -iw datadir  1>/dev/null 2>/dev/null
-    if [ $? -eq 0 ]
-    then
-        datad=$(grep -v '^#' $CFGFILE| grep -iw datadir|head -1|awk  '{print $2}')
-    else
-        datad=/var/lib/taos
-    fi
-    clid=$(grep clusterId $datad/dnode/dnode.json  | awk '{print $2}'|sed 's/"//g')
+    clid=$(taos -u${user} -p${pass} -s "show cluster\G"|grep 'id:'|awk '{print $NF}')
     echo "ClusterId:$clid"
 
 
 
     echo ""
     echo "###### TDengine近3次启动时间 ##########"
+    taosdlog=$(lsof -p `pidof taosd`|grep taosdlog|awk '{print $NF}')
 
-    grep -v '^#' $CFGFILE| grep -iw logdir  1>/dev/null 2>/dev/null
-    if [ $? -eq 0 ]
+    grep -w startup $taosdlog |tail -n 3
+
+    tar -czf taosdlog.tar.gz $taosdlog
+
+    if [ $nodei -ne 2 ]
     then
-        logd=$(grep -v '^#' $CFGFILE| grep -iw logdir|awk  '{print $2}')
-    else
-        logd=/var/log/taos
-    fi
-
-    #for i in $(grep 'start to initialize TDengine' $logd/taosinfo.0 | tail -3| sed 's/ /_/g')
-    #do
-    #    stime=$(echo $i|awk -F '_' '{print $1" "$2}')
-    #    ds=$(echo $stime| awk '{print $2}'|awk -F '.' '{print $1}')
-    #    ds=$(date +%s -d $ds)
-    #    snum=$(echo $i|awk -F '_' {'print $3'})
-    #    endtime=$(grep $snum $logd/taosinfo.0 | grep 'TDengine is initialized successfully' | awk '{print $1" "$2}')
-    #    es=$(echo $stime| awk '{print $2}'|awk -F '.' '{print $1}')
-    #    es=$(date +%s -d $es)
-    #    dif=$(($es-$ds+1))
-    #    echo "Start Time:$stime  Used Time(S):$dif"
-    #done
-
-    grep TDengine $logd/taosinfo.* |grep -v 'shut down' |awk -F ':' '{for(i=1;i<=NF;++i) printf $i ":";printf "\n"}' |sort  |tail -n 6
-    tar -czf taosinfo.tar.gz $logd/taosinfo.*
-
-
+    echo ""
+    echo "###### TDengine Cluster Info ##########"
+    echo ""
+    echo "###### Timeseries ##########"
+    echo '```sql'
+    taos -u$user -p$pass -s "select cast(sum(columns-1) as int) as tss,db_name from information_schema.ins_tables group by db_name;"
+    echo '```'
+    echo ""
+    echo "###### Tables_Count ##########"
+    echo '```sql'
+    taos -u$user -p$pass -s "select cast(count(*) as int) as tbs,db_name from information_schema.ins_tables group by db_name;"
+    echo '```'
     echo ""
     echo "###### dnode ##########"
-
+    echo '```sql'
     taos -u$user -p$pass -s "show dnodes\G;"
-
+    echo '```'
     echo ""
     echo "###### monde ##########"
+    echo '```sql'
     taos -u$user -p$pass -s "show mnodes\G;"
-
+    echo '```'
     echo ""
     echo "###### 授权 ##########"
-    if [ $eversion -eq 1 ]
-    then
-        taos -u$user -p$pass -s "show grants\G;"
-    fi
+    echo '```sql'
+    taos -u$user -p$pass -s "show grants full\G;"
+    echo '```'
     echo ""
     echo "###### 数据库 ##########"
+    echo '```sql'
     taos -u$user -p$pass -s "show databases\G;"
-
+    echo '```'
     echo ""
     echo "###### 连接 ##########"
+    echo '```sql'
     taos -u$user -p$pass -s "show connections\G;"
-
+    echo '```'
     echo ""
     echo "###### 查询 ##########"
+    echo '```sql'
     taos -u$user -p$pass -s "show queries\G;"
-
+    echo '```'
+    echo ""
+    echo "###### 订阅 ##########"
+    echo '```sql'
+    taos -u$user -p$pass -s "show subscriptions\G;"
+    echo '```'
     echo ""
     echo "###### 流计算 ##########"
+    echo '```sql'
     taos -u$user -p$pass -s "show streams\G;" 
+    echo '```'
 
     grep -v '^#' $CFGFILE  | grep -v "^$"  >$taoscfg
     echo "------------------" >> $taoscfg
     taos -u$user -p$pass -s "show variables;" >> $taoscfg
-
+    fi
 
     echo ""
     echo "###### Data 目录 ##########"
@@ -479,14 +469,14 @@ fi
             echo ""
             echo "______________________________________________"
             echo ""
-            ls -lh $i/vnode*/*/*/*
+            tree -h $i/
         done
         else
         du -sh /var/lib/taos/*
             echo ""
             echo "______________________________________________"
             echo ""
-        ls -lh /var/lib/taos/vnode*/*/*/*
+        tree -h /var/lib/taos/
 
     fi
 
@@ -511,7 +501,7 @@ fi
 
     echo ""
     echo "###### Variables ##########"
-    taos -u$user -p$pass -s "set max_binary_display_width 40;show variables" | grep '|'| grep -v 'value' | sed 's/|//g' |while read sv 
+    taos -u$user -p$pass -s "set max_binary_display_width 40;show variables;show dnode 1 variables;" | grep '|'| grep -v 'value' | sed 's/|//g' |while read sv 
     do
         echo $sv | awk '{print $1"\t"$2}'
     done
@@ -523,97 +513,28 @@ fi
         grep -v '^#' $ADPFILE
     fi
 
-}
 
- dblog2()
-{
-#    CFGFILE=/etc/taos/taos.cfg
-    dd=$(date +%Y%m%d)
-    taoscfg=$(echo "taoscfg"$dd".txt")
-
-
-    echo ""
-    echo "###### TDengine进程 ##########"
-    ps aux | grep -w taosd | grep -v grep
-
-    echo ""
-    echo "###### Cluster ID ##########"
-    grep -v '^#' $CFGFILE| grep -iw datadir  1>/dev/null 2>/dev/null
-    if [ $? -eq 0 ]
-    then
-        datad=$(grep -v '^#' $CFGFILE| grep -iw datadir|head -1|awk  '{print $2}')
-    else
-        datad=/var/lib/taos
-    fi
-    clid=$(grep clusterId $datad/dnode/dnode.json  | awk '{print $2}'|sed 's/"//g')
-    echo "ClusterId:$clid"
-
-
-
-    echo ""
-    echo "###### TDengine近3次启动时间 ##########"
-
-    grep -v '^#' $CFGFILE| grep -iw logdir  1>/dev/null 2>/dev/null
-    if [ $? -eq 0 ]
-    then
-        logd=$(grep -v '^#' $CFGFILE| grep -iw logdir|awk  '{print $2}')
-    else
-        logd=/var/log/taos
-    fi
-
-
-    grep TDengine $logd/taosinfo.* |grep -v 'shut down' |awk -F ':' '{for(i=1;i<=NF;++i) printf $i ":";printf "\n"}' |sort  |tail -n 6
-    tar -czf taosinfo.tar.gz $logd/taosinfo.*
-
-    echo ""
-    echo "###### Data 目录 ##########"
-
-    grep -v '^#' $CFGFILE | grep -i datadir 1>/dev/null 2>/dev/null
-    if [ $? -eq 0 ]
-    then
-        for i in $(grep -v '^#' $CFGFILE | grep -iw datadir | awk '{print $2}')
-        do
-            du -sh $i/*
-            echo ""
-            echo "______________________________________________"
-            echo ""
-            ls -lh $i/vnode*/*/*/*
-        done
-        else
-        du -sh /var/lib/taos/*
-            echo ""
-            echo "______________________________________________"
-            echo ""
-        ls -lh /var/lib/taos/vnode*/*/*/*
-
-    fi
-
-    echo ""
-    echo "###### Log 目录 ##########"
-
-
-    grep -v '^#' $CFGFILE | grep -i logdir  1>/dev/null 2>/dev/null
-    if [ $? -eq 0 ]
-    then
-        for i in $(grep -v '^#' $CFGFILE | grep -iw logdir  | awk '{print $2}')
-        do
-            du -sh $i
-            echo ""
-            du -sh $i/*
-        done
-        else
-            du -sh /var/log/taos
-            echo ""
-            du -sh /var/log/taos/*
-    fi 
-
-    if [ -e $ADPFILE ]
+    if [ -e $EXPFILE ]
     then 
         echo ""
-        echo "###### taosAdapter.toml ##########"
+        echo "###### taosExplorer.toml ##########"
         grep -v '^#' $ADPFILE
     fi
 
+
+    if [ -e $KEPFILE ]
+    then 
+        echo ""
+        echo "###### taosKeeper.toml ##########"
+        grep -v '^#' $ADPFILE
+    fi
+
+    if [ -e $TAXFILE ]
+    then 
+        echo ""
+        echo "###### taosX.toml ##########"
+        grep -v '^#' $ADPFILE
+    fi
 }
 
 report()
@@ -744,7 +665,6 @@ report()
     echo "巡检员："
     echo "主机名：$(hostname)"
     echo "机器码：$code"
-    echo "激活码：$acode"
     echo "到期时间：$etime"
     echo "ClusterID：$clusterId"
 
@@ -767,22 +687,17 @@ report()
 
     echo "### 1.3 TDengine信息"
     echo "#### 1.3.1 关键配置信息"
+    echo '```bash'
     grep -v '^#' $CFGFILE | grep -v '^$' |while read cv
     do
-        echo $cv | awk '{print $1"\t"$2}'
+        echo $cv | awk '{print $1"\t"$2"\t"$3"\t"$4}'
 
     done
-
+    echo '```'
     echo "<i>查看详细配置请见3.2.TDengine配置项</i>"
 
     echo "#### 1.3.2 近期启动时间"
     grep ' DND ' $dblog
-
-    if [ -e $ADPFILE ]
-    then
-        echo "#### 1.3.3 taosAdapter配置信息"
-        grep -E "maxConnect|maxIdle" $ADPFILE| grep -v '^#'
-    fi
 
     echo "### 1.4 巡检概述"
     echo "本次通过对系统各项指标进行检查，发现问题如下："
@@ -877,7 +792,9 @@ report()
 
     echo "### 3.2 数据库巡检日志"
     echo ""
-    cat $dblog
+    head -1000 $dblog
+    echo '```'
+    echo "详情见dblog.txt"
 }
 
 
@@ -908,17 +825,15 @@ mcheck >>mlog.txt
 echo -n "....."
 oslog >>oslog.txt
 echo -n "....."
+nodei=1
 if [ $nodeinfo ]
 then
     if [ $nodeinfo = 'dnode' ]
     then
-        dblog2 >>dblog.txt
-    else
-        dblog >>dblog.txt
+        nodei=2
     fi
-else
-    dblog >>dblog.txt
 fi
+dblog >>dblog.txt
 echo -n "....."
 echo "done"
 echo ""
