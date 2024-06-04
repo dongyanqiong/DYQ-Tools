@@ -118,13 +118,20 @@ TDengine 节点间通信，依赖于域名解析，需保证各节点间能够�
 192.168.0.234 cl1.taosdata.com
 ```
 
-### **1.4.关闭 SELinux**
+### **1.4.关闭 SELinux/Apparmor**
 
 SELinux 是 RedHat 开发的一套安全增强工具，建议关闭以防出现未知问题。
 
 ```shell
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ```
+
+AppArmor 是 Ubuntu 平台的安全模块，功能类似 SELinux，无特殊需求建议关闭
+```shell
+systemctl disable apparmor
+systemctl stop apparmor
+```
+
 
 ### 1.5.关闭防火墙
 
@@ -430,7 +437,7 @@ audit                       0
 auditFqdn                   localhost
 #rpcQueueMemoryAllowed       10737418240
 telemetryReporting          0
-keepAliveIdle               900
+eeepAliveIdle               900
 ```
 
 

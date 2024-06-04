@@ -67,7 +67,7 @@ eversion=1
     fi
 
     corefile=$(cat /proc/sys/kernel/core_pattern|awk '{print $1}'|sed -e 's/|//g')
-    if [ $corefile = 'core' ]
+    if [ $corefile = 'core' ] || [ $corefile = '/usr/share/apport/apport' ]
         then    
             echo "coreCheck:$corefile:no"
             CORE=0
@@ -258,21 +258,9 @@ eversion=1
 
     ##vgroup
     VGS=1
-    for i in $(taos -u$user -p$pass -s "show databases\G;"| grep name |awk '{print $2}'| grep -v log|grep -v '_schema')
-    do
-        sql=$(echo "use $i;show vgroups\G;")
-        for l in $(taos -u$user -p$pass -s "$sql" | grep status | awk '{print $2}')
-        do
-            if [ $l = 'offline' ] || [ $l = 'unsynced' ]
-            then
-                echo "$i:$l"
-                VGS=0
-                break
-            fi 
-        done
-    done
+    VGS=$(taos -u$user -p$pass -s "show vnodes"|grep false|wc -l) 
 
-    if [ $VGS -eq 0 ]
+    if [ $VGS -ne 0 ]
     then
         echo "VGS:ERROR:no"
     else
@@ -364,10 +352,15 @@ eversion=1
     echo "" >> $sysfile
     cat  /etc/security/limits.conf >> $sysfile
 
-    ulimit -a >$ufile
-
+    echo "User Limits" >$ufile
+    ulimit -a >>$ufile
+    echo "" >>$ufile
+    echo "taosd Limits" >>$ufile
     cat /proc/`pidof taosd`/limits >>$ufile
 
+    echo "" >>$ufile
+    echo "taosadapter Limits" >>$ufile
+    cat /proc/`pidof taosadapter`/limits >>$ufile
     dmesg -T >>$dmesgfile
 
 }
@@ -380,7 +373,7 @@ eversion=1
 
     echo ""
     echo "###### TDengine进程 ##########"
-    ps aux | grep -w taos | grep -v grep
+    ps aux | grep taos | grep -v grep
 
     echo ""
     echo "###### Cluster ID ##########"
@@ -392,15 +385,22 @@ eversion=1
     echo ""
     echo "###### TDengine近3次启动时间 ##########"
     taosdlog=$(lsof -p `pidof taosd`|grep taosdlog|awk '{print $NF}')
-
     grep -w startup $taosdlog |tail -n 3
+
+
+    echo ""
+    echo "###### Vnode leader distuibuted ##########"
+    echo "<table>"
+    echo "<tr><th>节点ID</th><th>LeaderNum</th></tr>"
+    taos -u${user} -p${pass} -s "show vnodes"|grep leader| awk '{print $1}'|sort -n |uniq -c|awk '{print "<tr><th>"$2"</th><th>"$1"</th></tr>"}'
+    echo "</table>"
 
     tar -czf taosdlog.tar.gz $taosdlog
 
     if [ $nodei -ne 2 ]
     then
     echo ""
-    echo "###### TDengine Cluster Info ##########"
+    echo "##### TDengine Cluster Info ##########"
     echo ""
     echo "###### Timeseries ##########"
     echo '```sql'
@@ -412,24 +412,39 @@ eversion=1
     taos -u$user -p$pass -s "select cast(count(*) as int) as tbs,db_name from information_schema.ins_tables group by db_name;"
     echo '```'
     echo ""
-    echo "###### dnode ##########"
+    echo "###### Dnode ##########"
     echo '```sql'
     taos -u$user -p$pass -s "show dnodes\G;"
     echo '```'
     echo ""
-    echo "###### monde ##########"
+    echo "###### Mnode ##########"
     echo '```sql'
-    taos -u$user -p$pass -s "show mnodes\G;"
+    taos -u$user -p$pass -s "show mnodes;"
+    echo '```'
+    echo ""
+    echo "###### Vnode ##########"
+    echo '```sql'
+    taos -u$user -p$pass -s "show vnodes;"
+    echo '```'
+    echo ""
+    echo "###### Qnode ##########"
+    echo '```sql'
+    taos -u$user -p$pass -s "show qnodes;"
     echo '```'
     echo ""
     echo "###### 授权 ##########"
     echo '```sql'
-    taos -u$user -p$pass -s "show grants full\G;"
+    taos -u$user -p$pass -s "show grants\G;show grants full\G;"
     echo '```'
     echo ""
     echo "###### 数据库 ##########"
     echo '```sql'
-    taos -u$user -p$pass -s "show databases\G;"
+    taos -u$user -p$pass -s "select * from information_schema.ins_databases\G;"
+    echo '```'
+    echo ""
+    echo "###### 事务 ##########"
+    echo '```sql'
+    taos -u$user -p$pass -s "show transactions\G;"
     echo '```'
     echo ""
     echo "###### 连接 ##########"
@@ -501,11 +516,10 @@ eversion=1
 
     echo ""
     echo "###### Variables ##########"
-    taos -u$user -p$pass -s "set max_binary_display_width 40;show variables;show dnode 1 variables;" | grep '|'| grep -v 'value' | sed 's/|//g' |while read sv 
-    do
-        echo $sv | awk '{print $1"\t"$2}'
-    done
+    taos -u$user -p$pass -s "set max_binary_display_width 60;show variables;show dnode 1 variables;" | grep '|'| grep -v 'value' 
 
+    echo ""
+    echo "###### Cfgs ##########"
     if [ -e $ADPFILE ]
     then 
         echo ""
@@ -659,7 +673,7 @@ report()
 
 
 
-    echo "# TDengine巡检报告"
+    echo "# TDengine 3.x 巡检报告"
 
     echo "巡检日期：$(date +%Y-%m-%d)"
     echo "巡检员："
@@ -676,7 +690,7 @@ report()
     echo "磁盘："
     #echo "$(df -TH|grep -v tmpfs)"
     echo "<table>"
-    df -TH|grep -v tmpfs|awk '{print "<tr><th>"$1"</th><th>"$2"</th><th>"$3"</th><th>"$4"</th><th>"$5"</th><th>"$6"</th><th>"$7"</tr>"}'
+    df -TH|grep -v tmpfs|grep -v loop|awk '{print "<tr><th>"$1"</th><th>"$2"</th><th>"$3"</th><th>"$4"</th><th>"$5"</th><th>"$6"</th><th>"$7"</tr>"}'
     echo "</table>"
     echo "### 1.2 软件信息："
     echo "操作系统：$(cat /etc/os-release | grep 'PRETTY_NAME="' | awk -F '=' '{print $2}' |sed 's/"//g')"
@@ -776,7 +790,12 @@ report()
     done
     echo "</table>"
     echo ""
-
+    echo "数据库 Vnode Leader 分布"
+    echo "<table>"
+    echo "<tr><th>节点ID</th><th>LeaderNum</th></tr>"
+    taos -u${user} -p${pass} -s "show vnodes"|grep leader| awk '{print $1}'|sort -n |uniq -c|awk '{print "<tr><th>"$2"</th><th>"$1"</th></tr>"}'
+    echo "</table>"
+    echo ""
 #    echo "### 2.3 系统资源概况"
 
 #    echo "#### 2.3.1 磁盘性能(fio)"
@@ -792,7 +811,7 @@ report()
 
     echo "### 3.2 数据库巡检日志"
     echo ""
-    head -1000 $dblog
+    head -300 $dblog
     echo '```'
     echo "详情见dblog.txt"
 }
