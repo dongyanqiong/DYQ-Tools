@@ -107,6 +107,8 @@ tree：目录结果可视化工具。
 
 bpftrace：程序性能诊断工具。
 
+smartmontools: 磁盘信息查看。
+
 ### 1.3.配置域名解析
 
 TDengine 节点间通信，依赖于域名解析，需保证各节点间能够解析所有节点地址。在所有节点配置如下：
@@ -126,7 +128,7 @@ SELinux 是 RedHat 开发的一套安全增强工具，建议关闭以防出现�
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ```
 
-AppArmor 是 Ubuntu 平台的安全模块，功能类似 SELinux，无特殊需求建议关闭
+AppArmor 是 Ubuntu 平台的安全模块，功能类似 SELinux，无特殊需求建议关闭。
 ```shell
 systemctl disable apparmor
 systemctl stop apparmor
