@@ -19,18 +19,18 @@ global ddb
 global dversion
 global unit
 
-suserName = 'root'
-spassWord = 'taosdata'
-surl = 'http://192.168.2.125:6041/rest/sql'
-sdb = 'db01'
-sversion = 3
-duserName = 'root'
-dpassWord = 'taosdata'
-durl = 'http://10.7.7.14:6041/rest/sql'
-ddb = 'db01'
+suserName = 'kunyue'
+spassWord = 'kunyue'
+surl = 'http://192.168.3.66:6041/rest/sql'
+sdb = 'db'
+sversion = 2
+duserName = 'kunyue'
+dpassWord = 'kunyue'
+durl = 'http://192.168.3.68:6041/rest/sql'
+ddb = 'db'
 dversion = 3
-stime = '2000-01-01T00:00:00.000+00:00'
-etime = '2023-10-01T00:00:00.000+00:00'
+stime = '2023-06-13T00:00:00.000+00:00'
+etime = '2023-07-23T00:00:00.000+00:00'
 unit = '1d'
 
 plog = 'process.log'
@@ -82,7 +82,7 @@ def log_write(logf, elog):
 
 def get_tblist(stbname):
     tbl = []
-    sql = 'select distinct tbname from `'+sdb+'`.`'+stbname+'`;'
+    sql = 'select distinct tbname from '+sdb+'.'+stbname+';'
     rt = request_post(surl, sql, suserName, spassWord)
     code = check_return(rt, sversion)
     if code != 'error':
@@ -95,10 +95,10 @@ def get_tblist(stbname):
 def get_data(stbname, url, username, password, dbname, version, stime, etime):
     data = dict()
     if version == 2:
-        sql = "select count(*) from `"+dbname+'`.`'+stbname+'` where _c0>="' + \
+        sql = "select count(*) from "+dbname+'.'+stbname+' where _c0>="' + \
             str(stime)+'" and _c0<="'+str(etime)+'"  group by tbname;'
     else:
-        sql = "select count(*),tbname from `"+dbname+'`.`'+stbname+'` where _c0>="' + \
+        sql = "select count(*),tbname from "+dbname+'.'+stbname+' where _c0>="' + \
             str(stime)+'" and _c0<="'+str(etime)+'"  group by tbname;'
     rt = request_post(url, sql, username, password)
     code = check_return(rt, version)
