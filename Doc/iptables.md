@@ -88,6 +88,7 @@ iptables -t nat -nvL
 iptables -A INPUT -s 10.59.55.0/28 -j ACCEPT --comment "allow all dnodes"
 iptables -A INPUT -s 10.78.2.111 -p tcp --dport 6041 -j ACCEPT --comment "allow nginx"
 iptables -A INPUT -s 10.78.2.111 -p tcp --dport 6060 -j ACCEPT --comment "allow nginx"
+iptables -A INPUT -s 10.78.2.112 -p tcp --dport 6041 -j ACCEPT --comment "allow monitor"
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT --comment "allow SSH"
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT

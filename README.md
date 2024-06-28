@@ -138,3 +138,11 @@ python3 datacompare.py 2023-01-01T00:00:00Z 2023-10-01T00:00:00Z
 ```shell
 sh dbsize.sh
 ```
+
+## google_code.py
+
+Google身份验证器
+
+```shell
+python google_code.py   key
+```
